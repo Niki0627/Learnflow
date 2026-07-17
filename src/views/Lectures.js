@@ -33,12 +33,119 @@ const getFileUrl = (file) => {
     // Relative path — try to prepend the media base URL if configured
     const baseUrl = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL || '').replace(/\/$/, '');
     if (baseUrl) return `${baseUrl}/${file.replace(/^\//, '')}`;
-    // If just a filename with no base URL, we cannot load it
+    // If just a filename with no base URL, we cannot load it — it's a legacy record
     return null;
 };
 
 // Only flag as previewable when we have a real fetchable URL
 const hasPreviewableFileUrl = (fileUrl) => Boolean(fileUrl && /^(https?:|blob:|data:)/.test(fileUrl));
+
+// Determine if the file_path is just a bare filename (old-format lecture, no URL scheme)
+const isLegacyFilename = (file) => Boolean(file && !file.startsWith('http') && !file.startsWith('/') && !file.startsWith('blob:') && !file.startsWith('data:'));
+
+const NoPreviewFallback = ({ lecture, isLegacy, onReuploadSuccess }) => {
+    const [reuploading, setReuploading] = useState(false);
+    const [reuploadError, setReuploadError] = useState('');
+    const [reuploadSuccess, setReuploadSuccess] = useState(false);
+    const fileInputRef = useRef(null);
+
+    const handleReupload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setReuploading(true);
+        setReuploadError('');
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await API.post(`lectures/${lecture.id}/reupload/`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            setReuploadSuccess(true);
+            if (onReuploadSuccess) onReuploadSuccess(res.data.file_path);
+        } catch (err) {
+            setReuploadError(err?.response?.data?.error || 'Re-upload failed. Make sure SUPABASE_SERVICE_ROLE_KEY is set in your Vercel environment variables.');
+        } finally {
+            setReuploading(false);
+        }
+    };
+
+    return (
+        <div className="flex h-full flex-col p-6 md:p-10 overflow-y-auto custom-scrollbar bg-card">
+            <div className="mx-auto w-full max-w-3xl">
+                {/* Header */}
+                <div className="mb-8 flex items-start gap-4 pb-6 border-b border-border/50">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary border border-primary/10">
+                        <FileText size={24} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="text-xl font-black text-foreground mb-1">
+                            {lecture.file ? 'Document Content' : 'Text Lesson'}
+                        </h3>
+                        <p className="text-sm font-medium text-muted-foreground">
+                            {lecture.file ? 'Displaying extracted text content.' : 'This lecture was added as plain text.'}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Re-upload banner for legacy uploads */}
+                {isLegacy && (
+                    <div className="mb-6 rounded-2xl border border-amber-200/60 bg-amber-50 p-5 dark:border-amber-500/20 dark:bg-amber-500/10">
+                        <div className="flex items-start gap-3 mb-4">
+                            <span className="mt-0.5 flex-shrink-0 text-xl">⚠️</span>
+                            <div>
+                                <p className="text-sm font-bold text-amber-800 dark:text-amber-300">PDF preview not available</p>
+                                <p className="text-xs font-medium text-amber-700/80 dark:text-amber-400/80 mt-1">
+                                    This lecture was uploaded before PDF storage was configured. Re-upload the same PDF below to enable live preview — your extracted text and AI study aids are preserved.
+                                </p>
+                            </div>
+                        </div>
+                        {reuploadSuccess ? (
+                            <div className="flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 px-4 py-2.5 text-sm font-bold text-emerald-600">
+                                <Check size={16} /> PDF uploaded! Refreshing preview…
+                            </div>
+                        ) : (
+                            <>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="application/pdf,.pdf"
+                                    className="hidden"
+                                    onChange={handleReupload}
+                                />
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={reuploading}
+                                    className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-amber-600 disabled:opacity-60 transition-colors"
+                                >
+                                    {reuploading ? <><Loader2 size={16} className="animate-spin" /> Uploading…</> : <><UploadCloud size={16} /> Re-upload PDF</>}
+                                </button>
+                                {reuploadError && (
+                                    <p className="mt-2 text-xs font-semibold text-red-600 dark:text-red-400">{reuploadError}</p>
+                                )}
+                            </>
+                        )}
+                    </div>
+                )}
+
+                {/* Extracted text content */}
+                <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-foreground/90 leading-relaxed">
+                    {lecture.content ? (
+                        <div className="markdown-body">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {lecture.content}
+                            </ReactMarkdown>
+                        </div>
+                    ) : (
+                        <div className="rounded-2xl border-2 border-dashed border-border/50 bg-background/50 p-12 text-center">
+                            <FileText size={48} className="mx-auto mb-4 opacity-20" />
+                            <p className="text-base font-bold text-muted-foreground">No text content available for this lecture.</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const FileViewer = ({ lecture }) => {
     const [numPages, setNumPages] = useState(0);
@@ -105,57 +212,17 @@ const FileViewer = ({ lecture }) => {
     }
 
     if (!lecture.file || !canPreviewFile) {
-        // Determine if this is an old-format lecture (file_path = just a filename, not a URL)
-        const hasFilename = Boolean(lecture.file && !lecture.file.startsWith('http'));
-
+        const isLegacy = isLegacyFilename(lecture.file);
         return (
-            <div className="flex h-full flex-col p-6 md:p-10 overflow-y-auto custom-scrollbar bg-card">
-                <div className="mx-auto w-full max-w-3xl">
-                    {/* Header */}
-                    <div className="mb-8 flex items-start gap-4 pb-6 border-b border-border/50">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary border border-primary/10">
-                            <FileText size={24} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <h3 className="text-xl font-black text-foreground mb-1">
-                                {lecture.file ? 'Document Content' : 'Text Lesson'}
-                            </h3>
-                            <p className="text-sm font-medium text-muted-foreground">
-                                {lecture.file ? 'Displaying extracted text content.' : 'This lecture was added as plain text.'}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Notice banner for old-format uploads */}
-                    {hasFilename && (
-                        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200/60 bg-amber-50 px-4 py-3 dark:border-amber-500/20 dark:bg-amber-500/10">
-                            <span className="mt-0.5 flex-shrink-0 text-amber-500">⚠️</span>
-                            <div>
-                                <p className="text-sm font-bold text-amber-800 dark:text-amber-300">PDF preview not available for this lecture</p>
-                                <p className="text-xs font-medium text-amber-700/80 dark:text-amber-400/80 mt-0.5">
-                                    This file was uploaded before PDF storage was enabled. Re-upload the PDF to enable live preview. The extracted text is shown below.
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Content */}
-                    <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-foreground/90 leading-relaxed">
-                        {lecture.content ? (
-                            <div className="markdown-body">
-                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                  {lecture.content}
-                              </ReactMarkdown>
-                            </div>
-                        ) : (
-                            <div className="rounded-2xl border-2 border-dashed border-border/50 bg-background/50 p-12 text-center">
-                                <FileText size={48} className="mx-auto mb-4 opacity-20" />
-                                <p className="text-base font-bold text-muted-foreground">No text content available for this lecture.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+            <NoPreviewFallback
+                lecture={lecture}
+                isLegacy={isLegacy}
+                onReuploadSuccess={(newUrl) => {
+                    // Patch the lecture object in-place so we don't need a full refresh
+                    lecture.file = newUrl;
+                    window.location.reload();
+                }}
+            />
         );
     }
 
