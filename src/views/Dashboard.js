@@ -293,7 +293,7 @@ export default function Dashboard() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         <div className="relative z-10">
           <h1 className="text-3xl md:text-5xl font-black tracking-tight text-foreground mb-2">
-            {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">{user?.first_name || "Student"}</span>
+            {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">{user?.first_name ? `${user.first_name} ${user.last_name || ''}` : user?.username || "Learner"}</span>
           </h1>
           <p className="text-muted-foreground font-medium text-lg">
             Ready to crush your goals today? You have a <span className="font-bold text-orange-500">{data.streak}-day streak!</span>

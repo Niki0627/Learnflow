@@ -90,7 +90,7 @@ function SidebarContent({ navItems, location, handleLogout, user, t, onNavClick 
     <div className="flex flex-col h-full bg-card border-r border-border py-6 px-3">
       <Link to="/dashboard" className="flex items-center gap-3 px-3 mb-6 outline-none">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
-          <span className="text-white font-black tracking-tighter">LF</span>
+          <GraduationCap className="text-white" size={24} strokeWidth={2.5} />
         </div>
         <div>
           <h1 className="font-black text-lg bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent leading-tight">
@@ -106,15 +106,7 @@ function SidebarContent({ navItems, location, handleLogout, user, t, onNavClick 
           const isActive = location.pathname === item.to || location.pathname.startsWith(item.to + "/");
           return (
             <React.Fragment key={item.key}>
-              {item.flagship && (
-                <div className="flex items-center gap-2 px-4 py-2 mt-2">
-                  <div className="flex-1 h-px bg-gradient-to-r from-primary/30 to-transparent" />
-                  <span className="text-[10px] font-black uppercase text-primary tracking-widest">
-                    {t("nav_main_feature", "AI Features")}
-                  </span>
-                  <div className="flex-1 h-px bg-gradient-to-l from-primary/30 to-transparent" />
-                </div>
-              )}
+              {/* Separator removed as per user request */}
               <NavItem item={item} isActive={isActive} onClick={onNavClick} />
             </React.Fragment>
           );

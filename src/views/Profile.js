@@ -99,6 +99,11 @@ export default function Profile() {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
 
+  const userInitial = user?.first_name && user?.last_name
+    ? `${user.first_name[0]}${user.last_name[0]}`.toUpperCase()
+    : user?.username?.substring(0, 2).toUpperCase() || "U";
+
+
   const handlePreferenceChange = (key) => {
       setProfile(prev => ({
           ...prev,
