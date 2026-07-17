@@ -15,7 +15,6 @@ export default function LectureSelect({ value, onChange, label = "" }) {
         if (!mounted) return;
         setLectures(res.data || []);
       } catch (e) {
-        console.error("Failed to load lectures", e);
         setLectures([]);
       }
       setLoading(false);

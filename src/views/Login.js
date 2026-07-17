@@ -67,7 +67,7 @@ export default function Login() {
     >
       <Container maxWidth="lg">
         <Grid container spacing={3.5} alignItems="stretch">
-          <Grid item xs={12} md={5} sx={{ display: "flex" }}>
+          <Grid size={{ xs: 12, md: 5 }} sx={{ display: "flex" }}>
             <Paper
               elevation={0}
               sx={{
@@ -259,7 +259,7 @@ export default function Login() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={7} sx={{ display: "flex" }}>
+          <Grid size={{ xs: 12, md: 7 }} sx={{ display: "flex" }}>
             <Paper
               elevation={0}
               sx={{

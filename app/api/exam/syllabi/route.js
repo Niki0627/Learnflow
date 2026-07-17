@@ -1,4 +1,4 @@
-import { apiError, getSupabaseRequestContext } from "../../../../lib/api/auth";
+import { apiError, getSupabaseRequestContext, isSupabaseSchemaCacheError } from "../../../../lib/api/auth";
 
 export const runtime = "nodejs";
 
@@ -11,8 +11,12 @@ export async function GET(request) {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
     if (error) throw error;
-    return Response.json(data || []);
+    return Response.json({ syllabi: data || [] });
   } catch (error) {
+    if (isSupabaseSchemaCacheError(error)) {
+      return Response.json({ syllabi: [] });
+    }
+
     return apiError(error);
   }
 }

@@ -1,4 +1,6 @@
 import { apiError, getSupabaseRequestContext } from "../../../../lib/api/auth";
+import { notFound } from "../../../../lib/api/errors";
+import { isNoRowsError, isSupabaseSchemaCacheError } from "../../../../lib/api/supabase";
 
 export const runtime = "nodejs";
 
@@ -18,28 +20,48 @@ function toLecture(row) {
 
 export async function GET(request, { params }) {
   try {
+    const { id } = await params;
     const { user, supabase } = await getSupabaseRequestContext(request);
     const { data, error } = await supabase
       .from("lecture_notes")
       .select("*, questions(*)")
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("user_id", user.id)
       .single();
-    if (error) throw error;
+    if (error) {
+      if (isNoRowsError(error)) throw notFound("Lecture not found.");
+      throw error;
+    }
 
     return Response.json({ ...toLecture(data), questions: data.questions || [] });
   } catch (error) {
+    if (isSupabaseSchemaCacheError(error)) {
+      return Response.json({ error: "Lecture data is not available yet." }, { status: 503 });
+    }
+
     return apiError(error);
   }
 }
 
 export async function DELETE(request, { params }) {
   try {
+    const { id } = await params;
     const { user, supabase } = await getSupabaseRequestContext(request);
+    const read = await supabase
+      .from("lecture_notes")
+      .select("id")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+    if (read.error) {
+      if (isNoRowsError(read.error)) throw notFound("Lecture not found.");
+      throw read.error;
+    }
+
     const { error } = await supabase
       .from("lecture_notes")
       .delete()
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("user_id", user.id);
     if (error) throw error;
 

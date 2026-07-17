@@ -132,7 +132,9 @@ export default function Flashcards() {
     setRatings(r => ({ ...r, [currentIndex]: rating }));
     try {
         if(card.id) await API.post(`flashcards/${card.id}/review/`, { rating });
-    } catch(e) { console.error(e) }
+    } catch {
+      // Keep local progress even if the review sync fails.
+    }
     handleNext();
   };
 
@@ -428,7 +430,7 @@ export default function Flashcards() {
                                   { label: 'Hard', count: Object.values(ratings).filter(r => r === 'hard').length, color: '#F59E0B' },
                                   { label: 'Again', count: Object.values(ratings).filter(r => r === 'again').length, color: '#EF4444' },
                               ].map(s => (
-                                  <Grid item xs={3} key={s.label}>
+                                  <Grid size={{ xs: 3 }} key={s.label}>
                                       <Box sx={{ textAlign: 'center' }}>
                                           <Typography variant="h3" fontWeight={800} sx={{ color: s.color }}>{s.count}</Typography>
                                           <Typography variant="caption" color="text.secondary">{s.label}</Typography>

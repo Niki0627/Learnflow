@@ -47,7 +47,9 @@ const NotesSidebar = ({ lectureId }) => {
     try {
       const res = await API.get(`/sticky-notes/?lecture_id=${lectureId}`);
       setNotes(res.data || []);
-    } catch (e) { console.error(e); }
+    } catch {
+      setNotes([]);
+    }
     finally { setLoading(false); }
   }, [lectureId]);
 
@@ -80,7 +82,9 @@ const NotesSidebar = ({ lectureId }) => {
       setNotes(prev => [res.data, ...prev]);
       setTitle(''); setContent(''); setColor('#f9edca'); setNoteType('lecture');
       setCreating(false);
-    } catch (e) { console.error(e); }
+    } catch {
+      // Keep the draft open so the user can retry.
+    }
   };
 
   const handleStartEdit = (note) => {
@@ -101,14 +105,18 @@ const NotesSidebar = ({ lectureId }) => {
       });
       setNotes(prev => prev.map(n => n.id === noteId ? { ...n, ...res.data } : n));
       setEditingId(null);
-    } catch (e) { console.error(e); }
+    } catch {
+      // Keep edit mode active so the user can retry.
+    }
   };
 
   const handleDelete = async (noteId) => {
     try {
       await API.delete(`/sticky-notes/${noteId}/`);
       setNotes(prev => prev.filter(n => n.id !== noteId));
-    } catch (e) { console.error(e); }
+    } catch {
+      // Leave the note visible if deletion fails.
+    }
   };
 
   const handleGrabText = (setContentFunc) => {

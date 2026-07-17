@@ -1,13 +1,14 @@
 import { apiError, getSupabaseRequestContext } from "../../../../lib/api/auth";
 import { generateAIContent } from "../../../../lib/ai/providers";
 import { getOwnedLecture, parseJsonArray } from "../../../../lib/api/learnflow";
+import { readJson } from "../../../../lib/api/errors";
 
 export const runtime = "nodejs";
 
 export async function POST(request) {
   try {
     const { user, supabase } = await getSupabaseRequestContext(request);
-    const body = await request.json();
+    const body = await readJson(request);
     const count = Math.max(1, Math.min(40, Number(body.count || 15)));
     const lecture = await getOwnedLecture(supabase, user.id, body.note_id);
 

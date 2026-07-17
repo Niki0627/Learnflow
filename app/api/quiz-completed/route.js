@@ -1,17 +1,22 @@
 import { apiError, getSupabaseRequestContext } from "../../../lib/api/auth";
+import { readJson, requireNumericId } from "../../../lib/api/errors";
+import { getOwnedLecture } from "../../../lib/api/learnflow";
 
 export const runtime = "nodejs";
 
 export async function POST(request) {
   try {
     const { user, supabase } = await getSupabaseRequestContext(request);
-    const body = await request.json();
+    const body = await readJson(request);
     const firstNoteId = String(body.note_id || "").split(",")[0];
+    const lectureId = requireNumericId(firstNoteId, "lecture id");
+    await getOwnedLecture(supabase, user.id, lectureId);
+
     const { data, error } = await supabase
       .from("quiz_attempts")
       .insert({
         user_id: user.id,
-        lecture_note_id: Number(firstNoteId),
+        lecture_note_id: lectureId,
         score: Number(body.score || 0),
         total_questions: Number(body.total || body.total_questions || 0),
       })

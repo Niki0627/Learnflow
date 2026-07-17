@@ -220,7 +220,7 @@ export default function LandingPage() {
         </Box>
 
         <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Stack spacing={3.5}>
               <Chip
                 label="Phase 1 redesign"
@@ -308,7 +308,7 @@ export default function LandingPage() {
             </Stack>
           </Grid>
 
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Paper
               elevation={0}
               sx={{
@@ -408,7 +408,7 @@ export default function LandingPage() {
 
           <Grid container spacing={2.5}>
             {steps.map((step) => (
-              <Grid item xs={12} md={4} key={step.number}>
+              <Grid size={{ xs: 12, md: 4 }} key={step.number}>
                 <SurfaceCard sx={{ height: "100%" }}>
                   <Stack spacing={2}>
                     <Box
@@ -451,7 +451,7 @@ export default function LandingPage() {
 
           <Grid container spacing={2.5}>
             {featureGrid.map((feature) => (
-              <Grid item xs={12} sm={6} key={feature.title}>
+              <Grid size={{ xs: 12, sm: 6 }} key={feature.title}>
                 <SurfaceCard>
                   <Stack spacing={1.25}>
                     <CheckCircleOutlineIcon color="primary" />
@@ -481,7 +481,7 @@ export default function LandingPage() {
 
           <Grid container spacing={2.5}>
             {trustPoints.map((item) => (
-              <Grid item xs={12} md={4} key={item.title}>
+              <Grid size={{ xs: 12, md: 4 }} key={item.title}>
                 <SurfaceCard sx={{ height: "100%" }}>
                   <Stack spacing={1.5}>
                     <AccentIcon

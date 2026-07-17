@@ -4,11 +4,12 @@ export const runtime = "nodejs";
 
 export async function POST(request, { params }) {
   try {
+    const { id } = await params;
     const { user, supabase } = await getSupabaseRequestContext(request);
     const { error } = await supabase
       .from("notifications")
       .update({ is_read: true })
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("user_id", user.id);
     if (error) throw error;
 

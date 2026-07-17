@@ -1,13 +1,14 @@
 import { apiError, getSupabaseRequestContext } from "../../../../lib/api/auth";
 import { generateAIContent } from "../../../../lib/ai/providers";
 import { parseJsonObject } from "../../../../lib/api/learnflow";
+import { readJson } from "../../../../lib/api/errors";
 
 export const runtime = "nodejs";
 
 export async function POST(request) {
   try {
     await getSupabaseRequestContext(request);
-    const body = await request.json();
+    const body = await readJson(request);
     const prompt = `Explain this weak topic for a student. Return ONLY JSON object with summary, why_it_matters, steps, practice_tip.
 Topic: ${body.topic}
 Subject: ${body.subject || "General"}`;

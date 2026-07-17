@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { generateAIContent } from "../../../../lib/ai/providers";
+import { readJson } from "../../../../lib/api/errors";
 
 export const runtime = "nodejs";
 
 export async function POST(request) {
   try {
-    const body = await request.json();
+    const body = await readJson(request);
     const prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
 
     if (!prompt) {
@@ -24,6 +25,9 @@ export async function POST(request) {
       model: result.model,
     });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "AI generation failed.", code: error.code },
+      { status: error.status || 500 },
+    );
   }
 }

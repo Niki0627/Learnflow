@@ -100,7 +100,7 @@ export default function Register() {
     >
       <Container maxWidth="lg">
         <Grid container spacing={3.5} alignItems="stretch">
-          <Grid item xs={12} md={5} sx={{ display: "flex" }}>
+          <Grid size={{ xs: 12, md: 5 }} sx={{ display: "flex" }}>
             <Paper
               elevation={0}
               sx={{
@@ -263,7 +263,7 @@ export default function Register() {
             </Paper>
           </Grid>
 
-          <Grid item xs={12} md={7} sx={{ display: "flex" }}>
+          <Grid size={{ xs: 12, md: 7 }} sx={{ display: "flex" }}>
             <Paper
               elevation={0}
               sx={{
@@ -298,7 +298,7 @@ export default function Register() {
                 {error ? <Alert severity="error">{error}</Alert> : null}
 
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="First name"
                       name="first_name"
@@ -307,7 +307,7 @@ export default function Register() {
                       fullWidth
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <TextField
                       label="Last name"
                       name="last_name"

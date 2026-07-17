@@ -1,4 +1,4 @@
-import { apiError, getSupabaseRequestContext } from "../../../lib/api/auth";
+import { apiError, getSupabaseRequestContext, isSupabaseSchemaCacheError } from "../../../lib/api/auth";
 
 export const runtime = "nodejs";
 
@@ -14,6 +14,10 @@ export async function GET(request) {
 
     return Response.json(data || []);
   } catch (error) {
+    if (isSupabaseSchemaCacheError(error)) {
+      return Response.json([]);
+    }
+
     return apiError(error);
   }
 }

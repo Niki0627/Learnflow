@@ -110,7 +110,6 @@ const Quiz = () => {
           );
           noteIdsToFetch = res.data.note_ids || [];
         } catch (err) {
-          console.error("Failed to fetch lectures by topics:", err);
           setError("Failed to find lectures for selected topics.");
           setLoading(false);
           return;
@@ -156,11 +155,8 @@ const Quiz = () => {
                   });
                   res = await API.get(`quiz/${id}/?n=${questionsPerLecture}`);
                   fetchedQuestions = res.data.questions || [];
-                } catch (genErr) {
-                  console.error(
-                    `Auto-generation failed for lecture ${id}:`,
-                    genErr,
-                  );
+                } catch {
+                  // Continue with the questions already available for this lecture.
                 } finally {
                   setGenerating(false);
                 }
@@ -169,7 +165,6 @@ const Quiz = () => {
 
             allQuestions.push(...fetchedQuestions);
           } catch (err) {
-            console.error(`Failed to load questions from lecture ${id}:`, err);
           }
         }
 
@@ -187,7 +182,6 @@ const Quiz = () => {
 
         setQuestions(finalQuestions);
       } catch (err) {
-        console.error("Failed to load questions:", err);
         setError("Failed to load questions. Please try again.");
       } finally {
         setLoading(false);
@@ -216,7 +210,7 @@ const Quiz = () => {
 
   // Navigation Block
   useEffect(() => {
-    if (finished) return;
+    if (finished || loading || questions.length === 0) return;
 
     window.history.pushState(null, "", window.location.href);
 
@@ -241,7 +235,7 @@ const Quiz = () => {
       window.removeEventListener("popstate", handlePopState);
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [finished]);
+  }, [finished, loading, questions.length]);
 
   const handleExit = () => {
     if (
@@ -249,7 +243,7 @@ const Quiz = () => {
         "Are you sure you want to exit? Your progress will be lost.",
       )
     ) {
-      navigate("/quiz-entry"); // Or dashboard?
+      navigate("/quiz");
     }
   };
 
@@ -326,7 +320,6 @@ const Quiz = () => {
             },
           });
         } catch (err) {
-          console.error("Failed to complete quiz:", err);
           // Navigate anyway
           navigate("/quiz-result", {
             state: {
@@ -340,7 +333,6 @@ const Quiz = () => {
         }
       }
     } catch (error) {
-      console.error("Submit failed", error);
     }
   };
 

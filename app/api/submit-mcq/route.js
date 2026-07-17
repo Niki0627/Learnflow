@@ -1,12 +1,13 @@
 import { apiError, getSupabaseRequestContext } from "../../../lib/api/auth";
 import { ensureQuestionOwnership } from "../../../lib/api/learnflow";
+import { readJson } from "../../../lib/api/errors";
 
 export const runtime = "nodejs";
 
 export async function POST(request) {
   try {
     const { user, supabase } = await getSupabaseRequestContext(request);
-    const body = await request.json();
+    const body = await readJson(request);
     const question = await ensureQuestionOwnership(supabase, user.id, body.question_id);
     const selected = String(body.selected_option || body.user_answer || "").toUpperCase();
     const correctOption = String(question.correct_option || "A").toUpperCase();

@@ -479,7 +479,6 @@ export default function Dashboard() {
       const response = await API.get("dashboard/stats/");
       setStats(response.data);
     } catch (error) {
-      console.error("Failed to fetch dashboard stats", error);
       setStatsError("Could not load your dashboard statistics.");
     } finally {
       setLoading(false);
@@ -491,7 +490,6 @@ export default function Dashboard() {
       const response = await API.get("notifications/");
       setNotifications(response.data);
     } catch (error) {
-      console.error("Failed to fetch notifications", error);
     }
   };
 
@@ -535,7 +533,6 @@ export default function Dashboard() {
       await API.post(`notifications/${id}/mark-read/`);
       fetchNotifications();
     } catch (error) {
-      console.error("Failed to mark notification as read", error);
     }
   };
 
@@ -544,7 +541,6 @@ export default function Dashboard() {
       await API.post("notifications/mark-all-read/");
       fetchNotifications();
     } catch (error) {
-      console.error("Failed to mark all notifications as read", error);
     }
   };
 
@@ -576,7 +572,6 @@ export default function Dashboard() {
         loading: false,
       }));
     } catch (error) {
-      console.error("Failed to fetch weak topic explanation", error);
 
       let errorMessage = "Failed to load explanation. ";
       if (error.name === "AbortError" || error.code === "ECONNABORTED") {
@@ -1015,7 +1010,7 @@ export default function Dashboard() {
         <>
           {/* Stats Grid */}
           <Grid container spacing={{ xs: 2, sm: 3, md: 3 }}>
-            <Grid item xs={6} sm={6} md={3} sx={{ display: "flex" }}>
+            <Grid size={{ xs: 6, sm: 6, md: 3 }} sx={{ display: "flex" }}>
               <StatCard
                 title="Current Streak"
                 value={`${data.streak || 0} Days`}
@@ -1024,7 +1019,7 @@ export default function Dashboard() {
                 icon={<WhatshotIcon sx={{ fontSize: 24 }} />}
               />
             </Grid>
-            <Grid item xs={6} sm={6} md={3} sx={{ display: "flex" }}>
+            <Grid size={{ xs: 6, sm: 6, md: 3 }} sx={{ display: "flex" }}>
               <StatCard
                 title="Questions Answered"
                 value={data.questions_answered}
@@ -1033,7 +1028,7 @@ export default function Dashboard() {
                 icon={<QuizIcon sx={{ fontSize: 24 }} />}
               />
             </Grid>
-            <Grid item xs={6} sm={6} md={3} sx={{ display: "flex" }}>
+            <Grid size={{ xs: 6, sm: 6, md: 3 }} sx={{ display: "flex" }}>
               <StatCard
                 title="Topics Mastered"
                 value={data.topics_mastered}
@@ -1042,7 +1037,7 @@ export default function Dashboard() {
                 icon={<SchoolIcon sx={{ fontSize: 24 }} />}
               />
             </Grid>
-            <Grid item xs={6} sm={6} md={3} sx={{ display: "flex" }}>
+            <Grid size={{ xs: 6, sm: 6, md: 3 }} sx={{ display: "flex" }}>
               <StatCard
                 title="Avg. Quiz Score"
                 value={`${data.avg_score}%`}
@@ -1076,7 +1071,7 @@ export default function Dashboard() {
               </Typography>
             </Box>
             <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3} lg={3} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }} sx={{ display: "flex" }}>
                 <QuickActionCard
                   title="Start Adaptive Quiz"
                   subtitle="Test your knowledge on weak areas and get instant feedback."
@@ -1085,7 +1080,7 @@ export default function Dashboard() {
                   onClick={() => navigate("/quiz")}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={3} lg={3} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }} sx={{ display: "flex" }}>
                 <QuickActionCard
                   title="Upload Lecture Notes"
                   subtitle="AI parses your PDFs to generate summaries and flashcards."
@@ -1094,7 +1089,7 @@ export default function Dashboard() {
                   onClick={() => navigate("/lectures")}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={3} lg={3} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }} sx={{ display: "flex" }}>
                 <QuickActionCard
                   title="Generate Study Guide"
                   subtitle="Create a personalized study plan for your upcoming exams."
@@ -1103,7 +1098,7 @@ export default function Dashboard() {
                   onClick={() => navigate("/analysis")}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={3} lg={3} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, sm: 6, md: 3, lg: 3 }} sx={{ display: "flex" }}>
                 <QuickActionCard
                   title="Exam Preparation"
                   subtitle="Generate strategies and practice with past papers."
@@ -1140,7 +1135,7 @@ export default function Dashboard() {
 
             {/* Analytics & Performance Grid */}
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6} lg={4} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: "flex" }}>
                 <Card
                   sx={{
                     borderRadius: "20px",
@@ -1265,7 +1260,7 @@ export default function Dashboard() {
               </Grid>
 
               {/* Recent Activity */}
-              <Grid item xs={12} md={6} lg={4} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: "flex" }}>
                 <Card sx={{ height: "100%", width: "100%", minHeight: 300 , minWidth:500}}>
                   <CardContent
                     sx={{
@@ -1373,7 +1368,7 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} md={6} lg={4} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: "flex" }}>
                 <Card
                   sx={{
                     borderRadius: "20px",
@@ -1460,7 +1455,7 @@ export default function Dashboard() {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} md={6} lg={4} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: "flex" }}>
                 <Card
                   sx={{
                     borderRadius: "20px",
@@ -1538,7 +1533,7 @@ export default function Dashboard() {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} md={6} lg={4} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: "flex" }}>
                 <Card
                   sx={{
                     borderRadius: "20px",
@@ -1614,7 +1609,7 @@ export default function Dashboard() {
                 </Card>
               </Grid>
               {/* Subject Mastery */}
-              <Grid item xs={12} md={6} lg={4} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: "flex" }}>
                 <Card
                   sx={{
                     borderRadius: "20px",
@@ -1704,7 +1699,7 @@ export default function Dashboard() {
               </Grid>
 
               {/* Weak Topics */}
-              <Grid item xs={12} md={6} lg={4} sx={{ display: "flex" }}>
+              <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: "flex" }}>
                 <Card sx={{ height: "100%", width: "100%", minHeight: 300 , minWidth: 500}}>
                   <CardContent
                     sx={{

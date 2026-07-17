@@ -1,3 +1,6 @@
+-- Run this once in Supabase SQL Editor for project xtxjpnkrrhlognzxnfsg.
+-- It creates/repairs the LearnFlow tables and refreshes PostgREST's schema cache.
+
 create extension if not exists "pgcrypto";
 
 create table if not exists public.profiles (
@@ -15,36 +18,9 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer set search_path = public
-as $$
-begin
-  insert into public.profiles (id, username, first_name, last_name)
-  values (
-    new.id,
-    coalesce(new.raw_user_meta_data ->> 'username', new.email),
-    coalesce(new.raw_user_meta_data ->> 'first_name', ''),
-    coalesce(new.raw_user_meta_data ->> 'last_name', '')
-  )
-  on conflict (id) do update set
-    username = excluded.username,
-    first_name = excluded.first_name,
-    last_name = excluded.last_name,
-    updated_at = now();
-  return new;
-end;
-$$;
-
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute function public.handle_new_user();
-
 create table if not exists public.lecture_notes (
   id bigint generated always as identity primary key,
-  user_id uuid references auth.users(id) on delete set null,
+  user_id uuid references auth.users(id) on delete cascade,
   title text not null,
   subject text,
   file_path text,
@@ -175,6 +151,18 @@ alter table public.previous_question_papers enable row level security;
 alter table public.exam_questions enable row level security;
 alter table public.ai_response_cache enable row level security;
 
+drop policy if exists "Users manage own profiles" on public.profiles;
+drop policy if exists "Users manage own lecture notes" on public.lecture_notes;
+drop policy if exists "Users read own questions" on public.questions;
+drop policy if exists "Users manage own flashcards" on public.flashcards;
+drop policy if exists "Users manage own sticky notes" on public.sticky_notes;
+drop policy if exists "Users manage own notifications" on public.notifications;
+drop policy if exists "Users manage own quiz attempts" on public.quiz_attempts;
+drop policy if exists "Users manage own exam syllabi" on public.exam_syllabi;
+drop policy if exists "Users manage own previous papers" on public.previous_question_papers;
+drop policy if exists "Users manage own exam questions" on public.exam_questions;
+drop policy if exists "Users manage own AI cache" on public.ai_response_cache;
+
 create policy "Users manage own profiles" on public.profiles
   for all using (auth.uid() = id) with check (auth.uid() = id);
 
@@ -183,6 +171,13 @@ create policy "Users manage own lecture notes" on public.lecture_notes
 
 create policy "Users read own questions" on public.questions
   for all using (
+    exists (
+      select 1 from public.lecture_notes
+      where lecture_notes.id = questions.lecture_note_id
+      and lecture_notes.user_id = auth.uid()
+    )
+  )
+  with check (
     exists (
       select 1 from public.lecture_notes
       where lecture_notes.id = questions.lecture_note_id
@@ -212,10 +207,24 @@ create policy "Users manage own previous papers" on public.previous_question_pap
       where exam_syllabi.id = previous_question_papers.exam_syllabus_id
       and exam_syllabi.user_id = auth.uid()
     )
+  )
+  with check (
+    exists (
+      select 1 from public.exam_syllabi
+      where exam_syllabi.id = previous_question_papers.exam_syllabus_id
+      and exam_syllabi.user_id = auth.uid()
+    )
   );
 
 create policy "Users manage own exam questions" on public.exam_questions
   for all using (
+    exists (
+      select 1 from public.exam_syllabi
+      where exam_syllabi.id = exam_questions.exam_syllabus_id
+      and exam_syllabi.user_id = auth.uid()
+    )
+  )
+  with check (
     exists (
       select 1 from public.exam_syllabi
       where exam_syllabi.id = exam_questions.exam_syllabus_id
@@ -235,12 +244,24 @@ create policy "Users manage own AI cache" on public.ai_response_cache
       where exam_syllabi.id = ai_response_cache.exam_syllabus_id
       and exam_syllabi.user_id = auth.uid()
     )
+  )
+  with check (
+    exists (
+      select 1 from public.lecture_notes
+      where lecture_notes.id = ai_response_cache.lecture_note_id
+      and lecture_notes.user_id = auth.uid()
+    )
+    or exists (
+      select 1 from public.exam_syllabi
+      where exam_syllabi.id = ai_response_cache.exam_syllabus_id
+      and exam_syllabi.user_id = auth.uid()
+    )
   );
 
 grant usage on schema public to anon, authenticated;
 grant select, insert, update, delete on all tables in schema public to authenticated;
-grant select on public.profiles to anon;
 grant usage, select on all sequences in schema public to authenticated;
+grant select on public.profiles to anon;
 
 alter default privileges in schema public
   grant select, insert, update, delete on tables to authenticated;

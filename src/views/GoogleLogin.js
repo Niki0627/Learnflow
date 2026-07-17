@@ -18,6 +18,12 @@ import {
 } from '@mui/icons-material';
 import { supabase, isSupabaseConfigured } from '../../lib/supabase/client';
 
+const getOAuthRedirectUrl = () => {
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  const appUrl = configuredUrl || window.location.origin;
+  return `${appUrl.replace(/\/$/, '')}/auth/callback?next=/dashboard`;
+};
+
 export default function GoogleLogin() {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -36,16 +42,14 @@ export default function GoogleLogin() {
       return;
     }
 
-    const origin = window.location.origin;
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${origin}/auth/callback?next=/dashboard`,
+        redirectTo: getOAuthRedirectUrl(),
       },
     });
 
     if (error) {
-      console.error('Google login failed:', error);
     }
   };
 

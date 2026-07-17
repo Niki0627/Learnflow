@@ -141,7 +141,6 @@ function WeakTopics() {
     API.get(`weak-topics/?note_id=${noteId}`)
       .then((res) => setTopics(res.data.weak_topics || []))
       .catch((err) => {
-        console.error("Error fetching weak topics:", err);
         setTopics([]);
         setError("We could not load weak topics right now.");
       })

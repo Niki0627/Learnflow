@@ -1,4 +1,5 @@
 import { apiError, getSupabaseRequestContext } from "../../../lib/api/auth";
+import { isSupabaseSchemaCacheError } from "../../../lib/api/supabase";
 
 export const runtime = "nodejs";
 
@@ -38,6 +39,10 @@ export async function GET(request) {
 
     return Response.json({ weak_topics });
   } catch (error) {
+    if (isSupabaseSchemaCacheError(error)) {
+      return Response.json({ weak_topics: [] });
+    }
+
     return apiError(error);
   }
 }

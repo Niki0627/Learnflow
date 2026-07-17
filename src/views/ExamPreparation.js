@@ -206,7 +206,7 @@ const QuestionBankView = ({ syllabi, activeSyllabusId, setActiveSyllabusId, onSy
             setFetchingQuestions(true);
             API.get(`/exam/syllabus/${activeSyllabusId}/questions/`)
                 .then(res => setQuestions(res.data.questions || []))
-                .catch(err => console.error(err))
+                .catch(() => setQuestions([]))
                 .finally(() => setFetchingQuestions(false));
         } else {
             setQuestions([]);
@@ -227,7 +227,6 @@ const QuestionBankView = ({ syllabi, activeSyllabusId, setActiveSyllabusId, onSy
             onSyllabusUploaded(res.data);
             setSnack({ open: true, msg: `Syllabus "${res.data.title}" uploaded successfully!`, severity: 'success' });
         } catch (err) {
-            console.error(err);
             setSnack({ open: true, msg: 'Syllabus upload failed. Please try again.', severity: 'error' });
             setUploadedSyllabusFile(null);
         } finally {
@@ -246,7 +245,6 @@ const QuestionBankView = ({ syllabi, activeSyllabusId, setActiveSyllabusId, onSy
             setUploadedPapers(prev => [...prev, ...acceptedFiles.map(f => f.name)]);
             setSnack({ open: true, msg: `${res.data.uploaded_count} previous paper(s) uploaded!`, severity: 'success' });
         } catch (err) {
-            console.error(err);
             setSnack({ open: true, msg: 'Paper upload failed.', severity: 'error' });
         } finally {
             setPapersLoading(false);
@@ -302,7 +300,6 @@ const QuestionBankView = ({ syllabi, activeSyllabusId, setActiveSyllabusId, onSy
             setQuestions(res.data.questions || []);
             setSnack({ open: true, msg: `Generated ${res.data.questions_generated} questions!`, severity: 'success' });
         } catch (err) {
-            console.error(err);
             setSnack({ open: true, msg: err?.response?.data?.details || 'Generation failed. Try again.', severity: 'error' });
         } finally {
             setGenerating(false);
@@ -331,7 +328,7 @@ const QuestionBankView = ({ syllabi, activeSyllabusId, setActiveSyllabusId, onSy
 
             <Grid container spacing={3} alignItems="flex-start">
                 {/* LEFT PANEL */}
-                <Grid item xs={12} xl={4}>
+                <Grid size={{ xs: 12, xl: 4 }}>
                     <Stack spacing={3}>
 
                         {/* Step 1: Syllabus Selector + Upload */}
@@ -493,7 +490,7 @@ const QuestionBankView = ({ syllabi, activeSyllabusId, setActiveSyllabusId, onSy
                 </Grid>
 
                 {/* RIGHT PANEL: Questions */}
-                <Grid item xs={12} xl={8}>
+                <Grid size={{ xs: 12, xl: 8 }}>
                     <GlassCard sx={{ p: 3, minHeight: 600 }}>
                         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} flexWrap="wrap" gap={2}>
                             <Box>
@@ -574,7 +571,6 @@ const StrategyRoadmapView = ({ syllabi, activeSyllabusId, setActiveSyllabusId })
             });
             setStrategy(res.data.strategy || []);
         } catch (err) {
-            console.error(err);
             setSnack({ open: true, msg: 'Failed to generate roadmap. Please try again.', severity: 'error' });
         } finally {
             setLoading(false);
@@ -610,7 +606,7 @@ const StrategyRoadmapView = ({ syllabi, activeSyllabusId, setActiveSyllabusId })
             {/* Config Card */}
             <GlassCard sx={{ p: 3, mb: 4 }}>
                 <Grid container spacing={3} alignItems="flex-end">
-                    <Grid item xs={12} md={4}>
+                    <Grid size={{ xs: 12, md: 4 }}>
                         <Typography variant="caption" fontWeight={800} color="text.secondary" display="block" gutterBottom>SYLLABUS</Typography>
                         <FormControl fullWidth size="small">
                             <Select
@@ -624,18 +620,18 @@ const StrategyRoadmapView = ({ syllabi, activeSyllabusId, setActiveSyllabusId })
                             </Select>
                         </FormControl>
                     </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid size={{ xs: 12, md: 3 }}>
                         <Typography variant="caption" fontWeight={800} color="text.secondary" display="block" gutterBottom>EXAM DATE</Typography>
                         <TextField type="date" fullWidth size="small" value={examDate} onChange={e => setExamDate(e.target.value)}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
                     </Grid>
-                    <Grid item xs={12} md={2}>
+                    <Grid size={{ xs: 12, md: 2 }}>
                         <Typography variant="caption" fontWeight={800} color="text.secondary" display="block" gutterBottom>HOURS / DAY</Typography>
                         <TextField type="number" fullWidth size="small" value={hours} onChange={e => setHours(e.target.value)}
                             InputProps={{ inputProps: { min: 1, max: 16 }, endAdornment: <InputAdornment position="end">hrs</InputAdornment> }}
                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }} />
                     </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid size={{ xs: 12, md: 3 }}>
                         <Box sx={{ p: 2, borderRadius: 2, bgcolor: theme.palette.mode === 'dark' ? 'rgba(19,127,236,0.08)' : 'rgba(19,127,236,0.05)', border: '1px solid', borderColor: 'rgba(19,127,236,0.2)', mb: 1 }}>
                             <Typography variant="caption" color="text.secondary">Days remaining: <strong>{daysRemaining}</strong> · Total study: <strong>{daysRemaining * hours}h</strong></Typography>
                         </Box>
@@ -795,7 +791,7 @@ export default function ExamPreparation() {
                 setSyllabi(list);
                 if (list.length > 0) setActiveSyllabusId(list[0].id);
             })
-            .catch(err => console.error('Failed to fetch syllabi', err));
+            .catch(() => setSyllabi([]));
     }, []);
 
     const handleSyllabusUploaded = (newSyllabus) => {

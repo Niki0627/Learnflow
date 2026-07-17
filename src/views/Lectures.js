@@ -58,24 +58,31 @@ const getFileType = (filename) => {
 const getFileUrl = (file) => {
     if (!file) return null;
     const baseUrl = process.env.NEXT_PUBLIC_MEDIA_BASE_URL || '';
-    return file.startsWith('http') ? file : `${baseUrl}${file.startsWith('/') ? '' : '/'}${file}`;
+    if (file.startsWith('http') || file.startsWith('blob:') || file.startsWith('data:')) return file;
+    if (!baseUrl && !file.startsWith('/')) return null;
+    return `${baseUrl}${file.startsWith('/') ? '' : '/'}${file}`;
 };
+
+const hasPreviewableFileUrl = (fileUrl) => Boolean(fileUrl && /^(https?:|blob:|data:|\/)/.test(fileUrl));
 
 const FileViewer = ({ lecture }) => {
     const [numPages, setNumPages] = useState(0);
     const [pageNumber, setPageNumber] = useState(1);
     const [scale, setScale] = useState(1.0);
     const [selectedText, setSelectedText] = useState('');
+    const [previewError, setPreviewError] = useState('');
     const viewerRef = useRef(null);
 
     const fileType = getFileType(lecture?.file);
     const fileUrl = getFileUrl(lecture?.file);
+    const canPreviewFile = hasPreviewableFileUrl(fileUrl);
 
     useEffect(() => {
         setNumPages(0);
         setPageNumber(1);
         setScale(1.0);
         setSelectedText('');
+        setPreviewError('');
     }, [lecture?.id, lecture?.file]);
 
     const handleMouseUp = () => {
@@ -108,19 +115,21 @@ const FileViewer = ({ lecture }) => {
         );
     }
 
-    if (!lecture.file) {
+    if (!lecture.file || !canPreviewFile) {
         return (
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 2, py: 10 }}>
                 <ArticleIcon sx={{ fontSize: 80, color: 'text.disabled', opacity: 0.3 }} />
-                <Typography variant="h6" color="text.secondary">Text-based lecture</Typography>
-                <Typography variant="body2" color="text.disabled" sx={{ maxWidth: 400, textAlign: 'center' }}>
-                    {lecture.content ? lecture.content.slice(0, 300) + '...' : 'No preview available for this lecture type.'}
+                <Typography variant="h6" color="text.secondary">
+                    {lecture.file ? 'Uploaded lecture content' : 'Text-based lecture'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 620, textAlign: 'left', whiteSpace: 'pre-wrap', maxHeight: 360, overflowY: 'auto', px: 2 }}>
+                    {lecture.content ? lecture.content.slice(0, 2500) : 'No preview available for this lecture type.'}
                 </Typography>
             </Box>
         );
     }
 
-    const showPdfSelectionButton = fileType === 'pdf' && Boolean(selectedText);
+    const showPdfSelectionButton = fileType === 'pdf' && Boolean(selectedText) && !previewError;
 
     return (
         <Box ref={viewerRef} sx={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }} onMouseUp={handleMouseUp}>
@@ -165,12 +174,17 @@ const FileViewer = ({ lecture }) => {
             </Box>
 
             <Box sx={{ flex: 1, overflowY: 'auto', p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', bgcolor: fileType === 'pdf' ? '#1e1e2e' : 'background.default' }}>
-                {fileType === 'pdf' ? (
+                {previewError ? (
+                    <Alert severity="info" sx={{ maxWidth: 640 }}>
+                        {previewError}
+                    </Alert>
+                ) : fileType === 'pdf' ? (
                     <Document
                         file={fileUrl}
                         loading={<Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}><CircularProgress sx={{ color: 'white' }} /></Box>}
                         onLoadSuccess={({ numPages: loadedPages }) => setNumPages(loadedPages)}
-                        error={<Alert severity="error">Failed to load PDF</Alert>}
+                        onLoadError={() => setPreviewError('This PDF preview is not available, but the lecture text was saved and can still be used for study aids.')}
+                        error={<Alert severity="info">PDF preview is not available.</Alert>}
                     >
                         <Page
                             pageNumber={Math.min(pageNumber, numPages || pageNumber)}
@@ -617,7 +631,7 @@ const UploadPanel = ({ onUploadSuccess }) => {
             setTimeout(() => setShowSuccess(false), 4000);
             onUploadSuccess();
         } catch (err) {
-            setError('Upload failed. Please try again.');
+            setError(err.response?.data?.error || 'Upload failed. Please try again.');
         } finally {
             setUploading(false);
         }
@@ -774,7 +788,6 @@ export default function Lectures() {
                 setSelectedLecture(response.data[0]);
             }
         } catch (err) {
-            console.error('Failed to fetch lectures:', err);
         } finally {
             setLoading(false);
         }
@@ -809,7 +822,6 @@ export default function Lectures() {
             setDetailsData(res.data);
             setDetailLecture(res.data);
         } catch (err) {
-            console.error(err);
         } finally {
             setLoadingDetails(false);
         }
@@ -822,7 +834,6 @@ export default function Lectures() {
             const res = await API.get(`lectures/${noteId}/`);
             setDetailsData(res.data);
         } catch (err) {
-            console.error('Failed to generate questions:', err);
         } finally {
             setGenerating(false);
         }
@@ -863,7 +874,7 @@ export default function Lectures() {
 
             <Grid container spacing={3} sx={{ flex: 1, minHeight: 0 }}>
                 {/* Left: Library Accordion */}
-                <Grid item xs={12} lg={3} md={4} sx={{ height: '100%' }}>
+                <Grid size={{ xs: 12, md: 4, lg: 3 }} sx={{ height: '100%' }}>
                     <Paper elevation={0} sx={{ borderRadius: '20px', border: '1px solid', borderColor: 'divider', height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                         <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
                             <TextField
@@ -919,7 +930,7 @@ export default function Lectures() {
                 </Grid>
 
                 {/* Right: Persistent File Viewer & Notes Sidebar */}
-                <Grid item xs={12} lg={9} md={8} sx={{ height: '100%' }}>
+                <Grid size={{ xs: 12, md: 8, lg: 9 }} sx={{ height: '100%' }}>
                     {selectedLecture ? (
                         <Box sx={{ display: 'flex', height: '100%', gap: 3 }}>
                             {/* Viewer Section */}

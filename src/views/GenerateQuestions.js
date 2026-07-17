@@ -138,7 +138,6 @@ function GenerateQuestions() {
       setShowQuestions(true);
       setFilterTopic("All");
     } catch (err) {
-      console.error("Generation error:", err);
       const errData = err?.response?.data;
       setError(
         typeof errData === "string"
@@ -186,7 +185,6 @@ function GenerateQuestions() {
       setEditDialogOpen(false);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.error("Failed to update question:", err);
       setError("Failed to update question. Please try again.");
     } finally {
       setSaving(false);

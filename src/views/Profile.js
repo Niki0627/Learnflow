@@ -96,7 +96,6 @@ export default function Profile() {
           streak_days: data.streak_days || 0
       });
     } catch (error) {
-      console.error('Failed to fetch profile:', error);
     } finally {
       setLoading(false);
     }
@@ -113,7 +112,6 @@ export default function Profile() {
           preferences: profile.preferences
       });
     } catch (error) {
-      console.error('Failed to update profile:', error);
     } finally {
       setSaving(false);
     }
@@ -147,7 +145,7 @@ export default function Profile() {
         }} />
         <Box sx={{ px: 4, pb: 4, mt: -6 }}>
             <Grid container spacing={4} alignItems="flex-start">
-                <Grid item>
+                <Grid>
                     <Box sx={{ position: 'relative' }}>
                         <Avatar 
                             src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.username}&backgroundColor=${theme.palette.primary.main.slice(1)}`} 
@@ -165,7 +163,7 @@ export default function Profile() {
                         </IconButton>
                     </Box>
                 </Grid>
-                <Grid item xs>
+                <Grid size="grow">
                     <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { md: 'flex-start' }, gap: 2, pt: { xs: 0, md: 7 } }}>
                         <Box>
                             <Typography variant="h4" fontWeight={800}>{user?.first_name ? `${user.first_name} ${user.last_name}` : user?.username}</Typography>
@@ -198,7 +196,7 @@ export default function Profile() {
               { label: 'Avg. Score', value: `${stats.average_score}%`, unit: '', color: '#10B981', bg: 'rgba(16,185,129,0.08)' },
               { label: 'Study Streak', value: stats.streak_days, unit: ' days', color: '#F59E0B', bg: 'rgba(245,158,11,0.08)' },
           ].map(s => (
-              <Grid item xs={12} sm={4} key={s.label}>
+              <Grid size={{ xs: 12, sm: 4 }} key={s.label}>
                   <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Box sx={{ width: 48, height: 48, borderRadius: '12px', bgcolor: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                           <Typography variant="h5" fontWeight={800} sx={{ color: s.color }}>{typeof s.value === 'number' ? s.value : s.value.split('%')[0]}<Typography component="span" variant="body2" sx={{ color: s.color }}>%</Typography></Typography>
@@ -231,7 +229,7 @@ export default function Profile() {
                     { icon: <PsychologyIcon sx={{ fontSize: 32 }} />, color: 'secondary', title: 'Consistent Mind', sub: `${stats.streak_days} Day Streak` },
                     { icon: <RocketLaunchIcon sx={{ fontSize: 32 }} />, color: 'info', title: 'Fast Learner', sub: 'Completed 5 modules' },
                 ].map((badge, idx) => (
-                    <Grid item xs={12} sm={6} md={3} key={idx}>
+                    <Grid size={{ xs: 12, sm: 6, md: 3 }} key={idx}>
                          <Paper elevation={0} sx={{ p: '24px !important', borderRadius: '16px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', textAlign: 'center', transition: 'all 0.2s', '&:hover': { transform: 'translateY(-4px)', borderColor: 'primary.main', boxShadow: '0 10px 20px -10px rgba(0,0,0,0.5)' } }}>
                              <Avatar sx={{ width: 56, height: 56, bgcolor: `${badge.color}.light`, color: `${badge.color}.main`, mx: 'auto', mb: 2, borderRadius: '12px' }}>
                                  {badge.icon}
@@ -241,7 +239,7 @@ export default function Profile() {
                          </Paper>
                     </Grid>
                 ))}
-                 <Grid item xs={12} sm={6} md={3}>
+                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                     <Paper elevation={0} variant="outlined" sx={{ p: '24px !important', borderRadius: '16px', border: '1px dashed', borderColor: 'divider', textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', bgcolor: 'transparent' }}>
                          <Avatar sx={{ width: 56, height: 56, bgcolor: 'rgba(255,255,255,0.05)', color: 'text.disabled', mb: 2, borderRadius: '12px' }}>
                              <LockIcon fontSize="large" />
@@ -260,16 +258,16 @@ export default function Profile() {
                 <Typography variant="h5" fontWeight={800} color="text.primary">Personal Information</Typography>
             </Box>
             <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                     <TextField label="First Name" fullWidth defaultValue={user?.first_name || "Alex"} variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                     <TextField label="Last Name" fullWidth defaultValue={user?.last_name || "Johnson"} variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
                 </Grid>
-                <Grid item xs={12} md={12}>
+                <Grid size={{ xs: 12, md: 12 }}>
                     <TextField label="Email Address" fullWidth defaultValue={user?.email || "alex@example.com"} variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid size={{ xs: 12 }}>
                     <TextField 
                         label="Bio / About Me" 
                         fullWidth 
@@ -292,7 +290,7 @@ export default function Profile() {
                 <Typography variant="h5" fontWeight={800} color="text.primary">Academic Details</Typography>
             </Box>
             <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                     <TextField 
                         label="School / University" 
                         fullWidth 
@@ -302,7 +300,7 @@ export default function Profile() {
                         sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
                     />
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                     <TextField 
                         select 
                         label="Current Grade/Level" 
@@ -330,7 +328,7 @@ export default function Profile() {
             </Box>
             <Paper elevation={0} variant="outlined" sx={{ p: '32px !important', borderRadius: '16px', borderColor: 'divider', bgcolor: 'background.paper' }}>
                 <Grid container spacing={4}>
-                    <Grid item xs={12} md={8}>
+                    <Grid size={{ xs: 12, md: 8 }}>
                         <Typography variant="subtitle1" fontWeight={700} color="text.primary">Target Subjects</Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 3, mt: 0.5 }}>Select subjects for AI daily recommendations.</Typography>
                         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
@@ -340,12 +338,12 @@ export default function Profile() {
                             <Chip icon={<AddIcon />} label="Add Subject" onClick={() => {}} variant="outlined" sx={{ fontWeight: 600, borderRadius: '8px', color: 'text.primary', borderColor: 'divider', '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' } }} />
                         </Box>
                     </Grid>
-                    <Grid item xs={12}><Divider /></Grid>
+                    <Grid size={{ xs: 12 }}><Divider /></Grid>
                     {[
                         { label: 'Adaptive Difficulty', value: 'adaptiveDifficulty', desc: 'AI adjusts question hardness based on performance.' },
                         { label: 'Strict Exam Mode', value: 'strictMode', desc: 'Disable hints and timer pauses during practice exams.' }
                     ].map((pref) => (
-                        <Grid item xs={12} key={pref.value}>
+                        <Grid size={{ xs: 12 }} key={pref.value}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Box>
                                     <Typography variant="subtitle1" fontWeight={700} color="text.primary">{pref.label}</Typography>

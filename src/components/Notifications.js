@@ -39,7 +39,6 @@ export default function Notifications() {
       
       // Listen for custom refresh event
       const handleRefresh = () => {
-        // console.log('Refreshing notifications...');
         fetchNotifications();
       };
       window.addEventListener('refreshNotifications', handleRefresh);
@@ -59,10 +58,8 @@ export default function Notifications() {
       setNotifications(response.data);
       setUnreadCount(response.data.filter((n) => !n.is_read).length);
     } catch (error) {
-      console.error("Failed to fetch notifications:", error);
       // Don't show error to user if it's just an auth issue
       if (error.response?.status !== 401) {
-        console.error("Unexpected error fetching notifications:", error);
       }
     }
   };
@@ -87,7 +84,6 @@ export default function Notifications() {
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
-      console.error("Failed to mark as read:", error);
     }
   };
 
@@ -99,7 +95,6 @@ export default function Notifications() {
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (error) {
-      console.error("Failed to mark all as read:", error);
     }
   };
 
@@ -116,7 +111,6 @@ export default function Notifications() {
         setUnreadCount((prev) => Math.max(0, prev - 1));
       }
     } catch (error) {
-      console.error("Failed to delete notification:", error);
     }
   };
 

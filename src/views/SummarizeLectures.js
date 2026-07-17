@@ -42,7 +42,6 @@ const MermaidDiagram = ({ chart }) => {
         const { svg } = await mermaid.render(id, chart);
         setSvg(svg);
       } catch (err) {
-        console.error('Mermaid rendering error:', err);
         setError(true);
       }
     };
@@ -298,7 +297,7 @@ export default function SummarizeLectures() {
                                   const meta = importanceMeta[concept.importance] || importanceMeta.medium;
                                   const dotColors = { high: '#EF4444', medium: '#F59E0B', low: '#10B981' };
                                   return (
-                                      <Grid item xs={12} sm={6} xl={4} key={idx}>
+                                      <Grid size={{ xs: 12, sm: 6, xl: 4 }} key={idx}>
                                           <Paper sx={{
                                               p: 3, height: '100%',
                                               borderRadius: '16px',
@@ -395,7 +394,7 @@ export default function SummarizeLectures() {
                   {(summary.exam_bullets?.length > 0 || summary.memory_anchors?.length > 0) && (
                       <Grid container spacing={3}>
                           {summary.exam_bullets?.length > 0 && (
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <Paper sx={{ p: 4, borderRadius: '16px', border: '1px solid', borderColor: 'divider', height: '100%' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
                                         <TrendingUpIcon sx={{ color: '#F59E0B' }} />
@@ -412,7 +411,7 @@ export default function SummarizeLectures() {
                             </Grid>
                           )}
                           {summary.memory_anchors?.length > 0 && (
-                            <Grid item xs={12} md={6}>
+                            <Grid size={{ xs: 12, md: 6 }}>
                                 <Paper sx={{ p: 4, borderRadius: '16px', border: '1px solid', borderColor: 'divider', height: '100%' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
                                         <PsychologyIcon sx={{ color: '#8B5CF6' }} />

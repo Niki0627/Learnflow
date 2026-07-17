@@ -4,11 +4,12 @@ export const runtime = "nodejs";
 
 export async function DELETE(request, { params }) {
   try {
+    const { id } = await params;
     const { user, supabase } = await getSupabaseRequestContext(request);
     const { data: row, error: readError } = await supabase
       .from("exam_questions")
       .select("id, exam_syllabi!inner(user_id)")
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("exam_syllabi.user_id", user.id)
       .single();
     if (readError) throw readError;

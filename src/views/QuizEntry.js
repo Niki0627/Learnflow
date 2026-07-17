@@ -48,20 +48,13 @@ export default function QuizEntry() {
     const fetchLectures = async () => {
       try {
         setFetchingLectures(true);
-        console.log('Fetching lectures...');
         const response = await API.get('lectures/');
-        console.log('Lectures API response:', response);
-        console.log('Response data:', response.data);
         
         // Handle both array and object responses
         const lectureData = Array.isArray(response.data) ? response.data : response.data.results || [];
-        console.log('Processed lecture data:', lectureData);
-        console.log('Number of lectures:', lectureData.length);
         
         setLectures(lectureData);
       } catch (error) {
-        console.error('Failed to fetch lectures:', error);
-        console.error('Error details:', error.response);
         setLectures([]);
       } finally {
         setFetchingLectures(false);

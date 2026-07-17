@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateAIContent } from "../../../../lib/ai/providers";
+import { readJson } from "../../../../lib/api/errors";
 
 export const runtime = "nodejs";
 
@@ -11,7 +12,7 @@ const SYSTEM_PROMPT = `You are Concept Coach AI, an expert personal tutor.
 
 export async function POST(request) {
   try {
-    const body = await request.json();
+    const body = await readJson(request);
     const message = typeof body.message === "string" ? body.message.trim() : "";
     const chatHistory = Array.isArray(body.chat_history) ? body.chat_history.slice(-4) : [];
 
@@ -45,6 +46,6 @@ Concept Coach AI:`, { maxTokens: 1000 });
       hints: [],
       suggestions: [],
       is_error: true,
-    });
+    }, { status: error.status || 200 });
   }
 }

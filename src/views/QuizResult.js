@@ -215,7 +215,7 @@ function QuizResult() {
             {/* KPI Grid */}
             <Grid container spacing={3} sx={{ mb: 6 }}>
                 {/* Score */}
-                <Grid item xs={12} sm={6} lg={3}>
+                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <Paper sx={{ p: 3, borderRadius: '16px', position: 'relative', overflow: 'hidden', height: '100%', border: '1px solid', borderColor: 'divider' }}>
                          <Box sx={{ position: 'absolute', top: 0, right: 0, p: 3, opacity: 0.05 }}>
                             <TrophyIcon sx={{ fontSize: 80, color: '#137fec' }} />
@@ -239,7 +239,7 @@ function QuizResult() {
                 </Grid>
 
                 {/* Accuracy */}
-                <Grid item xs={12} sm={6} lg={3}>
+                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                     <Paper sx={{ p: 3, borderRadius: '16px', position: 'relative', overflow: 'hidden', height: '100%', border: '1px solid', borderColor: 'divider' }}>
                          <Box sx={{ position: 'absolute', top: 0, right: 0, p: 3, opacity: 0.05 }}>
                             <CheckCircleIcon sx={{ fontSize: 80, color: '#10B981' }} />
@@ -256,7 +256,7 @@ function QuizResult() {
                 </Grid>
 
                 {/* Time Taken */}
-                <Grid item xs={12} sm={6} lg={3}>
+                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                      <Paper sx={{ p: 3, borderRadius: '16px', position: 'relative', overflow: 'hidden', height: '100%', border: '1px solid', borderColor: 'divider' }}>
                          <Box sx={{ position: 'absolute', top: 0, right: 0, p: 3, opacity: 0.05 }}>
                             <TimerIcon sx={{ fontSize: 80, color: '#F59E0B' }} />
@@ -275,7 +275,7 @@ function QuizResult() {
                 </Grid>
 
                 {/* Streak */}
-                <Grid item xs={12} sm={6} lg={3}>
+                <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                      <Paper sx={{ p: 3, borderRadius: '16px', position: 'relative', overflow: 'hidden', height: '100%', border: '1px solid', borderColor: 'divider' }}>
                          <Box sx={{ position: 'absolute', top: 0, right: 0, p: 3, opacity: 0.05 }}>
                             <FireIcon sx={{ fontSize: 80, color: '#EF4444' }} />
@@ -294,7 +294,7 @@ function QuizResult() {
             
             <Grid container spacing={4}>
                 {/* Main Content: Chart & Questions */}
-                <Grid item xs={12} lg={8}>
+                <Grid size={{ xs: 12, lg: 8 }}>
                      {/* Performance Analysis Chart */}
                     {chartData.length > 0 && (
                         <Paper sx={{ p: 4, borderRadius: '16px', border: '1px solid', borderColor: 'divider', mb: 4 }}>
@@ -438,7 +438,7 @@ function QuizResult() {
                 </Grid>
 
                 {/* Sidebar: AI Insights & Topics */}
-                <Grid item xs={12} lg={4}>
+                <Grid size={{ xs: 12, lg: 4 }}>
                     <Box sx={{ mb: 4 }}>
                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
                             <Box sx={{ p: 1, borderRadius: '8px', bgcolor: 'secondary.main', color: 'secondary.contrastText', display: 'flex' }}>
@@ -448,7 +448,7 @@ function QuizResult() {
                          </Box>
 
                          <Grid container spacing={2}>
-                             <Grid item xs={12}>
+                             <Grid size={{ xs: 12 }}>
                                  <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: percentage >= 70 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)', border: '1px solid', borderColor: percentage >= 70 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)' }}>
                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: percentage >= 70 ? '#10B981' : '#EF4444', mb: 1 }}>
                                          <ThumbUpIcon fontSize="small" />
@@ -464,7 +464,7 @@ function QuizResult() {
                                  </Paper>
                              </Grid>
                              {avgTimePerQuestion && (
-                                 <Grid item xs={12}>
+                                 <Grid size={{ xs: 12 }}>
                                      <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: 'rgba(19, 127, 236, 0.05)', border: '1px solid', borderColor: 'rgba(19, 127, 236, 0.2)' }}>
                                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'primary.main', mb: 1 }}>
                                              <SpeedIcon fontSize="small" />
@@ -478,7 +478,7 @@ function QuizResult() {
                                      </Paper>
                                  </Grid>
                              )}
-                             <Grid item xs={12}>
+                             <Grid size={{ xs: 12 }}>
                                  <Paper sx={{ p: 3, borderRadius: '12px', bgcolor: 'rgba(245, 158, 11, 0.1)', border: '1px solid', borderColor: 'rgba(245, 158, 11, 0.2)' }}>
                                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#F59E0B', mb: 1 }}>
                                          <LightbulbIcon fontSize="small" />

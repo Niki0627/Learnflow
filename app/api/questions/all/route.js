@@ -1,4 +1,4 @@
-import { apiError, getSupabaseRequestContext } from "../../../../lib/api/auth";
+import { apiError, getSupabaseRequestContext, isSupabaseSchemaCacheError } from "../../../../lib/api/auth";
 import { questionWithMeta } from "../../../../lib/api/learnflow";
 
 export const runtime = "nodejs";
@@ -15,6 +15,10 @@ export async function GET(request) {
 
     return Response.json({ questions: (data || []).map(questionWithMeta) });
   } catch (error) {
+    if (isSupabaseSchemaCacheError(error)) {
+      return Response.json({ questions: [] });
+    }
+
     return apiError(error);
   }
 }

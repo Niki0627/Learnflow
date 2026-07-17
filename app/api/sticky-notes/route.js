@@ -1,4 +1,6 @@
 import { apiError, getSupabaseRequestContext } from "../../../lib/api/auth";
+import { readJson } from "../../../lib/api/errors";
+import { isSupabaseSchemaCacheError } from "../../../lib/api/supabase";
 
 export const runtime = "nodejs";
 
@@ -22,6 +24,10 @@ export async function GET(request) {
 
     return Response.json(data || []);
   } catch (error) {
+    if (isSupabaseSchemaCacheError(error)) {
+      return Response.json([]);
+    }
+
     return apiError(error);
   }
 }
@@ -29,7 +35,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const { user, supabase } = await getSupabaseRequestContext(request);
-    const body = await request.json();
+    const body = await readJson(request);
     const { data, error } = await supabase
       .from("sticky_notes")
       .insert({

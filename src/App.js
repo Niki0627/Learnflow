@@ -28,6 +28,7 @@ import ExamPreparation from "./views/ExamPreparation";
 import LandingPage from "./views/LandingPage";
 import ConceptCoach from "./views/ConceptCoach";
 import QuestionBank from "./views/QuestionBank";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "./context/ThemeContext";
@@ -47,7 +48,14 @@ export default function App() {
             <Route path="/google-login" element={<GoogleLogin />} />
 
             {/* Protected routes with sidebar */}
-            <Route path="/" element={<SidebarLayout />}>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <SidebarLayout />
+                </ProtectedRoute>
+              }
+            >
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="questions" element={<QuestionsPage />} />
               <Route path="quiz" element={<QuizEntry />} />
@@ -72,7 +80,14 @@ export default function App() {
             </Route>
 
             {/* Active Quiz Environment (Fullscreen) */}
-            <Route path="/quiz-mode" element={<QuizPage />} />
+            <Route
+              path="/quiz-mode"
+              element={
+                <ProtectedRoute>
+                  <QuizPage />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>

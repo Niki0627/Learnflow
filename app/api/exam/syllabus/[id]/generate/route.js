@@ -1,17 +1,19 @@
 import { apiError, getSupabaseRequestContext } from "../../../../../../lib/api/auth";
 import { generateAIContent } from "../../../../../../lib/ai/providers";
 import { parseJsonArray } from "../../../../../../lib/api/learnflow";
+import { readJson } from "../../../../../../lib/api/errors";
 
 export const runtime = "nodejs";
 
 export async function POST(request, { params }) {
   try {
+    const { id } = await params;
     const { user, supabase } = await getSupabaseRequestContext(request);
-    const body = await request.json();
+    const body = await readJson(request);
     const { data: syllabus, error: syllabusError } = await supabase
       .from("exam_syllabi")
       .select("*")
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("user_id", user.id)
       .single();
     if (syllabusError) throw syllabusError;
@@ -49,7 +51,7 @@ ${String(syllabus.content || "").slice(0, 12000)}`;
     }));
     const { data, error } = await supabase.from("exam_questions").insert(rows).select("*");
     if (error) throw error;
-    return Response.json({ questions: data || [] });
+    return Response.json({ questions: data || [], questions_generated: data?.length || 0 });
   } catch (error) {
     return apiError(error);
   }

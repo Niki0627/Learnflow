@@ -92,7 +92,6 @@ export const AuthProvider = ({ children }) => {
         .single();
       profile = data;
     } catch (error) {
-      console.warn('Profile lookup failed:', error);
     }
 
     setUser({
@@ -121,7 +120,6 @@ export const AuthProvider = ({ children }) => {
       const response = await api.get('auth/me/');
       setUser(response.data);
     } catch (error) {
-      console.error('Failed to fetch user:', error);
       logout();
     } finally {
       setLoading(false);

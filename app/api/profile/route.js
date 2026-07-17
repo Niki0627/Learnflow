@@ -1,4 +1,6 @@
 import { apiError, getSupabaseRequestContext } from "../../../lib/api/auth";
+import { readJson } from "../../../lib/api/errors";
+import { isSupabaseSchemaCacheError } from "../../../lib/api/supabase";
 
 export const runtime = "nodejs";
 
@@ -33,6 +35,10 @@ export async function GET(request) {
       streak_days: 0,
     });
   } catch (error) {
+    if (isSupabaseSchemaCacheError(error)) {
+      return Response.json({ error: "Profile data is not available yet." }, { status: 503 });
+    }
+
     return apiError(error);
   }
 }
@@ -40,7 +46,7 @@ export async function GET(request) {
 export async function PUT(request) {
   try {
     const { user, supabase } = await getSupabaseRequestContext(request);
-    const body = await request.json();
+    const body = await readJson(request);
     const payload = {
       id: user.id,
       username: body.username || body.email || user.email,

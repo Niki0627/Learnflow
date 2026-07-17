@@ -34,7 +34,7 @@ export default function QuestionBank() {
       .then(res => {
         setQuestions(res.data.questions || []);
       })
-      .catch(err => console.error("Failed to fetch question bank:", err))
+      .catch(() => setQuestions([]))
       .finally(() => setLoading(false));
   }, []);
 
@@ -228,7 +228,7 @@ export default function QuestionBank() {
                         }
 
                         return (
-                          <Grid item xs={12} sm={6} key={opt}>
+                          <Grid size={{ xs: 12, sm: 6 }} key={opt}>
                             <Paper
                               elevation={0}
                               onClick={() => !attempt && handleAttempt(q.id, opt, q.correct_option)}

@@ -77,7 +77,7 @@ const StudyPlanGenerator = ({ noteId, setNoteId, onGenerate, loading }) => {
             <Container maxWidth="lg" sx={{ py: 6 }}>
                 <Grid container spacing={4} alignItems="stretch">
                     {/* Form */}
-                    <Grid item xs={12} md={5}>
+                    <Grid size={{ xs: 12, md: 5 }}>
                         <Paper sx={{ 
                             p: 4, borderRadius: '20px', 
                             background: theme.palette.mode === 'dark' ? 'rgba(28, 37, 46, 0.65)' : 'rgba(255, 255, 255, 0.7)',
@@ -197,7 +197,7 @@ const StudyPlanGenerator = ({ noteId, setNoteId, onGenerate, loading }) => {
                     </Grid>
 
                     {/* Right side: Info */}
-                    <Grid item xs={12} md={7}>
+                    <Grid size={{ xs: 12, md: 7 }}>
                         <Paper sx={{ 
                             p: 4, borderRadius: '20px', 
                             background: theme.palette.mode === 'dark' ? 'rgba(28, 37, 46, 0.65)' : 'rgba(255, 255, 255, 0.7)',
@@ -307,7 +307,7 @@ const StudyPlanDashboard = ({ planData, noteId, onReset }) => {
                             sub: 'Overall accuracy'
                         },
                     ].map(s => (
-                        <Grid item xs={6} sm={3} key={s.label}>
+                        <Grid size={{ xs: 6, sm: 3 }} key={s.label}>
                             <Paper sx={{ p: 3, borderRadius: '16px', border: '1px solid', borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)', background: theme.palette.mode === 'dark' ? 'rgba(28, 37, 46, 0.65)' : 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(20px)' }}>
                                 <Box sx={{ p: 1, borderRadius: '8px', bgcolor: s.bgcolor, color: s.color, display: 'inline-flex', mb: 2 }}>
                                     {React.cloneElement(s.icon, { fontSize: 'small' })}
@@ -321,7 +321,7 @@ const StudyPlanDashboard = ({ planData, noteId, onReset }) => {
 
                 <Grid container spacing={4}>
                     {/* Left Column */}
-                    <Grid item xs={12} lg={7}>
+                    <Grid size={{ xs: 12, lg: 7 }}>
                         {/* Weak Areas */}
                         {weakList.length > 0 && (
                             <Box sx={{ mb: 5 }}>
@@ -428,7 +428,7 @@ const StudyPlanDashboard = ({ planData, noteId, onReset }) => {
                     </Grid>
 
                     {/* Right Column: Timeline */}
-                    <Grid item xs={12} lg={5}>
+                    <Grid size={{ xs: 12, lg: 5 }}>
                         {/* Study Timeline */}
                         <Paper sx={{ p: 4, mt: { xs: 4, lg: 0 }, borderRadius: '16px', border: '1px solid', borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)', background: theme.palette.mode === 'dark' ? 'rgba(28, 37, 46, 0.65)' : 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(20px)', height: '100%' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4 }}>

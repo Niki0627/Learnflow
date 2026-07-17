@@ -1,13 +1,14 @@
 import { apiError, getSupabaseRequestContext } from "../../../lib/api/auth";
 import { generateAIContent } from "../../../lib/ai/providers";
 import { getOwnedLecture, parseJsonObject } from "../../../lib/api/learnflow";
+import { readJson } from "../../../lib/api/errors";
 
 export const runtime = "nodejs";
 
 export async function POST(request) {
   try {
     const { user, supabase } = await getSupabaseRequestContext(request);
-    const body = await request.json();
+    const body = await readJson(request);
     const lecture = await getOwnedLecture(supabase, user.id, body.note_id);
     const prompt = `Create a practical study plan for this lecture. Return ONLY JSON object with:
 title, overview, days (array of {day,title,tasks}), milestones, focus_topics.

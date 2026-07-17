@@ -881,10 +881,6 @@ export default function ConceptCoach() {
           },
         ]);
       } catch (err) {
-        console.error(
-          "ConceptCoach API error:",
-          err?.response?.data || err.message,
-        );
         const errMsg =
           err?.response?.data?.detail ||
           err?.response?.data?.error ||

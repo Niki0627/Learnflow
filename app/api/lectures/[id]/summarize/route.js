@@ -6,8 +6,9 @@ export const runtime = "nodejs";
 
 export async function POST(request, { params }) {
   try {
+    const { id } = await params;
     const { user, supabase } = await getSupabaseRequestContext(request);
-    const lecture = await getOwnedLecture(supabase, user.id, params.id);
+    const lecture = await getOwnedLecture(supabase, user.id, id);
     const prompt = `Summarize this lecture for a student. Return ONLY JSON object:
 {
   "overview": "...",
