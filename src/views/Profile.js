@@ -111,15 +111,13 @@ export default function Profile() {
       }));
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-primary"></div>
+  if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-background">
+      <div className="animate-pulse rounded-2xl bg-card p-6 shadow-xl border border-border/50">
+        <div className="h-12 w-12 rounded-xl bg-primary/20" />
       </div>
-    );
-  }
-
-  const userInitial = user?.username ? user.username[0].toUpperCase() : 'U';
+    </div>
+  );
 
   return (
     <div className="mx-auto max-w-5xl pb-24 space-y-6">
