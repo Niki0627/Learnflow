@@ -42,7 +42,7 @@ import {
 
 import { useAuth } from "../context/AuthContext";
 import API from "../api/api";
-import { cn } from "../lib/utils";
+import { cn, formatUsername } from "../lib/utils";
 
 // If shadcn components exist, use them. If not, standard html/tailwind is used to ensure no missing deps.
 // We will use standard tailwind classes for the best look as per the instructions.
