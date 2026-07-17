@@ -1,0 +1,26 @@
+import { apiError, getSupabaseRequestContext } from "../../../lib/api/auth";
+
+export const runtime = "nodejs";
+
+export async function POST(request) {
+  try {
+    const { user, supabase } = await getSupabaseRequestContext(request);
+    const body = await request.json();
+    const firstNoteId = String(body.note_id || "").split(",")[0];
+    const { data, error } = await supabase
+      .from("quiz_attempts")
+      .insert({
+        user_id: user.id,
+        lecture_note_id: Number(firstNoteId),
+        score: Number(body.score || 0),
+        total_questions: Number(body.total || body.total_questions || 0),
+      })
+      .select("*")
+      .single();
+    if (error) throw error;
+
+    return Response.json({ ok: true, attempt: data });
+  } catch (error) {
+    return apiError(error);
+  }
+}
