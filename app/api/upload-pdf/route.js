@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 export async function POST(request) {
   try {
-    const { user, supabase } = await getSupabaseRequestContext(request);
+    const { user, supabase, serviceSupabase } = await getSupabaseRequestContext(request);
     const formData = await readMultipartFormData(request);
     const file = getRequiredFile(formData);
     const title = formData.get("title") || file?.name || "Uploaded Lecture";
@@ -20,7 +20,9 @@ export async function POST(request) {
     try {
       const fileBuffer = await file.arrayBuffer();
       const safeName = `${user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      
+      // Use serviceSupabase to bypass RLS, since newly created buckets lack INSERT policies
+      const { data: uploadData, error: uploadError } = await serviceSupabase.storage
         .from("lectures")
         .upload(safeName, fileBuffer, {
           contentType: file.type || "application/pdf",
@@ -28,12 +30,15 @@ export async function POST(request) {
         });
 
       if (!uploadError && uploadData?.path) {
-        const { data: urlData } = supabase.storage
+        const { data: urlData } = serviceSupabase.storage
           .from("lectures")
           .getPublicUrl(uploadData.path);
         filePublicUrl = urlData?.publicUrl || null;
+      } else if (uploadError) {
+        console.error("Storage upload error:", uploadError);
       }
-    } catch {
+    } catch (err) {
+      console.error("Storage exception:", err);
       // If storage upload fails, still save text content — no PDF preview, but AI aids work
     }
 
