@@ -1,22 +1,14 @@
 import nextVitals from "eslint-config-next/core-web-vitals";
 
-const legacyWarnings = {
+const ignoredPaths = {
   ignores: [
     ".next/**",
     "node_modules/**",
-    ".venv/**",
-    "venv/**",
-    "frontend/build/**",
-    "frontend/node_modules/**",
-    "backend/**",
-    "core/**",
-    "dark_mode/**",
-    "stitch_html/**",
   ],
 };
 
 const config = [
-  legacyWarnings,
+  ignoredPaths,
   ...nextVitals,
   {
     rules: {
