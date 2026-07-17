@@ -578,6 +578,8 @@ export default function Lectures() {
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [lectureToDelete, setLectureToDelete] = useState(null);
+    const [deleteError, setDeleteError] = useState('');
+    const [deleting, setDeleting] = useState(false);
 
     const fetchLectures = useCallback(async () => {
         try {
@@ -626,18 +628,26 @@ export default function Lectures() {
     };
 
     const handleDeleteClick = (lecture) => {
-        setLectureToDelete(lecture); setDeleteDialogOpen(true);
+        setLectureToDelete(lecture);
+        setDeleteError('');
+        setDeleteDialogOpen(true);
     };
 
     const confirmDelete = async () => {
         if (!lectureToDelete) return;
+        setDeleting(true);
+        setDeleteError('');
         try {
             await API.delete(`lectures/${lectureToDelete.id}/`);
             setLectures(prev => prev.filter(l => l.id !== lectureToDelete.id));
             if (selectedLecture?.id === lectureToDelete.id) setSelectedLecture(null);
-            setDeleteDialogOpen(false); setLectureToDelete(null);
+            setDeleteDialogOpen(false);
+            setLectureToDelete(null);
         } catch (err) {
-            alert('Failed to delete lecture');
+            const msg = err?.response?.data?.error || err?.message || 'Failed to delete lecture. Please try again.';
+            setDeleteError(msg);
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -735,10 +745,19 @@ export default function Lectures() {
                             <Trash2 size={32} />
                         </div>
                         <h2 className="text-xl font-black mb-2">Delete Lecture?</h2>
-                        <p className="text-sm text-muted-foreground mb-8">Are you sure you want to delete <strong>"{lectureToDelete?.title}"</strong>? This action cannot be undone.</p>
+                        <p className="text-sm text-muted-foreground mb-4">Are you sure you want to delete <strong>"{lectureToDelete?.title}"</strong>? This action cannot be undone.</p>
+
+                        {deleteError && (
+                            <div className="mb-4 rounded-xl border border-red-200/60 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400 text-left">
+                                {deleteError}
+                            </div>
+                        )}
+
                         <div className="flex gap-3">
-                            <button onClick={() => setDeleteDialogOpen(false)} className="flex-1 rounded-full bg-muted py-3 font-bold text-muted-foreground hover:bg-muted/80">Cancel</button>
-                            <button onClick={confirmDelete} className="flex-1 rounded-full bg-red-500 py-3 font-bold text-white hover:bg-red-600 shadow-lg shadow-red-500/20">Delete</button>
+                            <button disabled={deleting} onClick={() => { setDeleteDialogOpen(false); setDeleteError(''); }} className="flex-1 rounded-full bg-muted py-3 font-bold text-muted-foreground hover:bg-muted/80 disabled:opacity-50">Cancel</button>
+                            <button onClick={confirmDelete} disabled={deleting} className="flex-1 rounded-full bg-red-500 py-3 font-bold text-white hover:bg-red-600 shadow-lg shadow-red-500/20 disabled:opacity-60 flex items-center justify-center gap-2">
+                                {deleting ? <><Loader2 size={16} className="animate-spin" /> Deleting…</> : 'Delete'}
+                            </button>
                         </div>
                     </div>
                 </div>

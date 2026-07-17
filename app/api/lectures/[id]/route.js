@@ -1,6 +1,6 @@
 import { apiError, getSupabaseRequestContext } from "../../../../lib/api/auth";
-import { notFound } from "../../../../lib/api/errors";
-import { isNoRowsError, isSupabaseSchemaCacheError } from "../../../../lib/api/supabase";
+import { isSupabaseSchemaCacheError } from "../../../../lib/api/supabase";
+import { query } from "../../../../lib/db/postgres";
 
 export const runtime = "nodejs";
 
@@ -28,17 +28,19 @@ export async function GET(request, { params }) {
       .eq("id", id)
       .eq("user_id", user.id)
       .single();
+
     if (error) {
-      if (isNoRowsError(error)) throw notFound("Lecture not found.");
+      if (isSupabaseSchemaCacheError(error)) {
+        return Response.json({ error: "Lecture data is not available yet." }, { status: 503 });
+      }
+      if (error.code === "PGRST116") {
+        return Response.json({ error: "Lecture not found." }, { status: 404 });
+      }
       throw error;
     }
 
     return Response.json({ ...toLecture(data), questions: data.questions || [] });
   } catch (error) {
-    if (isSupabaseSchemaCacheError(error)) {
-      return Response.json({ error: "Lecture data is not available yet." }, { status: 503 });
-    }
-
     return apiError(error);
   }
 }
@@ -47,23 +49,29 @@ export async function DELETE(request, { params }) {
   try {
     const { id } = await params;
     const { user, supabase } = await getSupabaseRequestContext(request);
-    const read = await supabase
-      .from("lecture_notes")
-      .select("id")
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .single();
-    if (read.error) {
-      if (isNoRowsError(read.error)) throw notFound("Lecture not found.");
-      throw read.error;
-    }
 
-    const { error } = await supabase
+    // Single-step delete — RLS ensures user can only delete their own rows
+    const { error, count } = await supabase
       .from("lecture_notes")
-      .delete()
+      .delete({ count: "exact" })
       .eq("id", id)
       .eq("user_id", user.id);
-    if (error) throw error;
+
+    if (error) {
+      if (isSupabaseSchemaCacheError(error)) {
+        // Fallback to raw postgres
+        await query(
+          "delete from public.lecture_notes where id = $1 and user_id = $2",
+          [id, user.id]
+        );
+        return Response.json({ ok: true });
+      }
+      throw error;
+    }
+
+    if (count === 0) {
+      return Response.json({ error: "Lecture not found or already deleted." }, { status: 404 });
+    }
 
     return Response.json({ ok: true });
   } catch (error) {
