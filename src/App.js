@@ -30,7 +30,6 @@ import ConceptCoach from "./views/ConceptCoach";
 import QuestionBank from "./views/QuestionBank";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import { CssBaseline } from "@/src/components/tailwind/mui";
 import { ThemeProvider } from "./context/ThemeContext";
 // import theme from "./theme"; // Handled by context now
 
@@ -38,7 +37,6 @@ export default function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <CssBaseline />
         <BrowserRouter>
           <Routes>
             {/* Public routes */}

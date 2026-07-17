@@ -1,75 +1,67 @@
-import React, { useState } from "react";
-import { Button, Typography, Box, Stack } from "@/src/components/tailwind/mui";
-import LectureSelect from "../components/LectureSelect";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowForward as ArrowForwardIcon } from "@/src/components/tailwind/icons";
-import { PageHeader, SurfaceCard } from "../components/ui";
-
-const PRIMARY_CTA_SX = {
-  minHeight: 56,
-  px: 3,
-  borderRadius: 2.5,
-  fontWeight: 800,
-  letterSpacing: "0.01em",
-  whiteSpace: "nowrap",
-  color: "#fff",
-  background: "linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)",
-  boxShadow: "0 10px 24px rgba(37,99,235,0.26)",
-  transition: "all 180ms cubic-bezier(0.22, 1, 0.36, 1)",
-  "&:hover": {
-    background: "linear-gradient(135deg, #1D4ED8 0%, #6D28D9 100%)",
-    boxShadow: "0 14px 30px rgba(37,99,235,0.34)",
-    transform: "translateY(-1px)",
-  },
-  "&:active": {
-    transform: "translateY(0)",
-  },
-};
+import { ArrowRight, GraduationCap, ChevronDown, Loader2 } from "lucide-react";
+import API from "../api/api";
 
 export default function WeakTopicsEntry() {
   const [noteId, setNoteId] = useState("");
+  const [lectures, setLectures] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    API.get('lectures/')
+      .then(r => setLectures(r.data || []))
+      .catch(() => setLectures([]))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
-    <Box sx={{ maxWidth: 860, mx: "auto", display: "grid", gap: 2.5 }}>
-      <PageHeader
-        title="Weak Topics Analysis"
-        subtitle="Select a lecture to identify weak concepts and jump straight into focused practice."
-      />
+    <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div>
+        <div className="mb-3 inline-flex items-center gap-2 rounded-xl bg-red-500/10 px-3 py-1.5 text-sm font-bold text-red-600">
+          <GraduationCap size={14} /> Weak Topics
+        </div>
+        <h1 className="text-4xl font-black tracking-tight">Weak Topics Analysis</h1>
+        <p className="mt-3 text-lg font-medium text-muted-foreground">
+          Select a lecture to identify weak concepts and jump straight into focused practice.
+        </p>
+      </div>
 
-      <SurfaceCard>
-        <Stack spacing={2.25}>
-          <Typography variant="body2" color="text.secondary">
-            Choose your lecture note and generate a ranked list of weak topics.
-          </Typography>
-
-          <Box
-            sx={{
-              display: "flex",
-              gap: 1.5,
-              alignItems: "stretch",
-              flexWrap: { xs: "wrap", md: "nowrap" },
-            }}
+      <div className="max-w-2xl rounded-3xl border bg-card p-8 shadow-sm">
+        <h2 className="text-xl font-black mb-2">Select a Lecture</h2>
+        <p className="text-sm text-muted-foreground mb-6">
+          Choose your lecture note and generate a ranked list of weak topics based on your quiz history.
+        </p>
+        <div className="flex items-stretch gap-4 flex-wrap sm:flex-nowrap">
+          <div className="relative flex-1 min-w-[200px]">
+            {loading ? (
+              <div className="flex h-12 items-center justify-center rounded-xl border bg-background">
+                <Loader2 className="animate-spin text-muted-foreground" size={18} />
+              </div>
+            ) : (
+              <>
+                <select
+                  value={noteId}
+                  onChange={e => setNoteId(e.target.value)}
+                  className="h-12 w-full appearance-none rounded-xl border bg-background px-4 pr-10 text-sm font-bold outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="">Select a lecture...</option>
+                  {lectures.map(l => <option key={l.id} value={l.id}>{l.title}</option>)}
+                </select>
+                <ChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              </>
+            )}
+          </div>
+          <button
+            onClick={() => noteId && navigate(`/weak-topics/${noteId}`)}
+            disabled={!noteId}
+            className="flex h-12 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-black text-primary-foreground shadow-lg shadow-primary/30 transition hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:scale-100 whitespace-nowrap"
           >
-            <Box sx={{ flex: 1, minWidth: 260 }}>
-              <LectureSelect
-                value={noteId}
-                onChange={(value) => setNoteId(value)}
-              />
-            </Box>
-
-            <Button
-              variant="contained"
-              endIcon={<ArrowForwardIcon />}
-              onClick={() => noteId && navigate(`/weak-topics/${noteId}`)}
-              disabled={!noteId}
-              sx={PRIMARY_CTA_SX}
-            >
-              Analyze Weak Topics
-            </Button>
-          </Box>
-        </Stack>
-      </SurfaceCard>
-    </Box>
+            Analyze <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,45 +1,36 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Container, Typography, Box, CircularProgress, Alert, Button, 
-  MenuItem, Select, FormControl, InputLabel, Chip, IconButton,
-  Paper, LinearProgress, Grid, Divider, useTheme, Tooltip,
-  Tab, Tabs, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
-} from "@/src/components/tailwind/mui";
-import { 
-  ArrowForward as NextIcon,
-  ArrowBack as PrevIcon,
-  CheckCircle as CheckCircleIcon,
-  Shuffle as ShuffleIcon,
-  AutoAwesome as SparkleIcon,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  BookmarkBorder as BookmarkBorderIcon,
-  Bookmark as BookmarkIcon,
-  RestartAlt as RestartIcon,
-  Psychology as PsychologyIcon,
-  EmojiEvents as TrophyIcon,
-  TrendingUp as TrendingUpIcon,
-  Close as CloseIcon,
-  Check as CheckIcon
-} from "@/src/components/tailwind/icons";
 import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ArrowRight, 
+  ArrowLeft, 
+  BrainCircuit,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+  Bookmark,
+  RefreshCw,
+  Trophy,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  PlayCircle
+} from 'lucide-react';
 import API from '../api/api';
+import { cn } from '../lib/utils';
 
 export default function Flashcards() {
-  const theme = useTheme();
-  
   const [lectures, setLectures] = useState([]);
   const [selectedLecture, setSelectedLecture] = useState('');
   const [flashcards, setFlashcards] = useState([]);
+  
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState(0);
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [bookmarked, setBookmarked] = useState(new Set());
   const [ratings, setRatings] = useState({}); // { cardIndex: 'again' | 'hard' | 'good' | 'easy' }
-  const [direction, setDirection] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
 
   useEffect(() => {
@@ -96,7 +87,6 @@ export default function Flashcards() {
     setIsFlipped(false);
     setBookmarked(new Set());
     setRatings({});
-    setDirection(0);
     setSessionComplete(false);
 
     try {
@@ -115,14 +105,12 @@ export default function Flashcards() {
       setSessionComplete(true);
       return;
     }
-    setDirection(1);
     setIsFlipped(false);
     setTimeout(() => setCurrentIndex(i => i + 1), 150);
   }, [currentIndex, flashcards.length]);
 
   const handlePrev = useCallback(() => {
     if (currentIndex <= 0) return;
-    setDirection(-1);
     setIsFlipped(false);
     setTimeout(() => setCurrentIndex(i => i - 1), 150);
   }, [currentIndex]);
@@ -133,25 +121,14 @@ export default function Flashcards() {
     try {
         if(card.id) await API.post(`flashcards/${card.id}/review/`, { rating });
     } catch {
-      // Keep local progress even if the review sync fails.
+      // Keep local progress even if sync fails
     }
     handleNext();
-  };
-
-  const handleShuffle = () => {
-    const shuffled = [...flashcards].sort(() => Math.random() - 0.5);
-    setFlashcards(shuffled);
-    setCurrentIndex(0);
-    setIsFlipped(false);
-    setDirection(0);
-    setRatings({});
-    setSessionComplete(false);
   };
 
   const handleRestart = () => {
     setCurrentIndex(0);
     setIsFlipped(false);
-    setDirection(0);
     setRatings({});
     setSessionComplete(false);
   };
@@ -167,547 +144,252 @@ export default function Flashcards() {
   };
 
   const masteredCount = Object.values(ratings).filter(r => r === 'good' || r === 'easy').length;
-  const masteryPct = flashcards.length > 0 ? Math.round((masteredCount / flashcards.length) * 100) : 0;
-  const progress = flashcards.length > 0 ? ((currentIndex) / flashcards.length) * 100 : 0;
+  const progress = flashcards.length > 0 ? (currentIndex / flashcards.length) * 100 : 0;
   const currentCard = flashcards[currentIndex];
-  const currentRating = ratings[currentIndex];
 
-  const ratingColors = {
-    again: ['error.main', 'rgba(239,68,68,0.1)', 'rgba(239,68,68,0.2)'],
-    hard: ['warning.main', 'rgba(245,158,11,0.1)', 'rgba(245,158,11,0.2)'],
-    good: ['primary.main', 'rgba(19,127,236,0.1)', 'rgba(19,127,236,0.2)'],
-    easy: ['success.main', 'rgba(16,185,129,0.1)', 'rgba(16,185,129,0.2)'],
-  };
-
-  if (loading) return (
-    <Box sx={{ height: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <CircularProgress />
-    </Box>
-  );
+  if (loading && !selectedLecture) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-primary"></div>
+      </div>
+    );
+  }
 
   return (
-    <Box sx={{ 
-        minHeight: '100vh', 
-        bgcolor: 'background.default',
-        display: 'flex',
-        flexDirection: 'column'
-    }}>
-      {/* === HEADER === */}
-      <Box sx={{ 
-          bgcolor: 'background.paper', 
-          borderBottom: '1px solid', 
-          borderColor: 'divider',
-          px: { xs: 2, md: 4 },
-          py: 3
-      }}>
-          <Container maxWidth="xl">
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
-                  <Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-                          <Box sx={{ p: 1, borderRadius: '8px', bgcolor: 'rgba(19,127,236,0.1)', color: 'primary.main', display: 'flex' }}>
-                              <PsychologyIcon fontSize="small" />
-                          </Box>
-                          <Typography variant="h4" fontWeight={900} sx={{ letterSpacing: '-0.02em' }}>
-                              Flashcard Studio
-                          </Typography>
-                          {flashcards.length > 0 && (
-                              <Chip label="Session Active" color="primary" size="small" sx={{ fontWeight: 700 }} />
-                          )}
-                      </Box>
-                      <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                          AI-powered spaced repetition for accelerated learning
-                      </Typography>
-                  </Box>
+    <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto min-h-[calc(100vh-100px)]">
+      
+      {/* ── HEADER ── */}
+      <div className="rounded-[2rem] border border-primary/20 bg-card p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <BrainCircuit size={24} strokeWidth={2.5} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black">Flashcard Studio</h1>
+              <p className="text-sm font-medium text-muted-foreground">AI-powered spaced repetition learning</p>
+            </div>
+          </div>
+        </div>
 
-                  {/* Lecture Selector */}
-                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-                     <FormControl sx={{ minWidth: 220 }} size="small">
-                        <InputLabel>Select Lecture</InputLabel>
-                        <Select
-                            value={selectedLecture}
-                            label="Select Lecture"
-                            onChange={(e) => setSelectedLecture(e.target.value)}
-                        >
-                            {lectures.map((l) => (
-                                <MenuItem key={l.id} value={l.id}>{l.title}</MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <Button 
-                        variant="contained"
-                        startIcon={generating ? <CircularProgress size={16} color="inherit" /> : <SparkleIcon />}
-                        onClick={handleGenerate}
-                        disabled={!selectedLecture || generating}
-                        sx={{ fontWeight: 700, px: 3, boxShadow: '0 4px 14px 0 rgba(19, 127, 236, 0.4)' }}
-                    >
-                        {generating ? 'Generating...' : 'Generate Cards'}
-                    </Button>
-                  </Box>
-              </Box>
-          </Container>
-      </Box>
+        <div className="flex w-full md:w-auto items-center gap-3">
+          <select 
+            value={selectedLecture}
+            onChange={(e) => setSelectedLecture(e.target.value)}
+            className="flex-1 md:w-64 rounded-xl border border-primary/20 bg-background px-4 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="" disabled>Select a lecture note...</option>
+            {lectures.map(l => (
+              <option key={l.id} value={l.id}>{l.title}</option>
+            ))}
+          </select>
+          <button
+            onClick={handleGenerate}
+            disabled={!selectedLecture || generating}
+            className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-sm transition hover:bg-primary/90 disabled:opacity-50"
+          >
+            {generating ? (
+              <><div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" /> Generating...</>
+            ) : (
+              <><Sparkles size={16} /> Generate</>
+            )}
+          </button>
+        </div>
+      </div>
 
       {error && (
-          <Container maxWidth="xl" sx={{ mt: 2 }}>
-              <Alert severity="error" onClose={() => setError('')}>{error}</Alert>
-          </Container>
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-600">
+          {error}
+        </div>
       )}
 
-      {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', px: { xs: 2, md: 4 } }}>
-          <Tabs value={activeTab} onChange={(e, v) => setActiveTab(v)}>
-              <Tab label="Study Session" sx={{ fontWeight: 700 }} />
-              <Tab label="Flashcard Browser" sx={{ fontWeight: 700 }} />
-          </Tabs>
-      </Box>
+      {/* ── MAIN CONTENT ── */}
+      <div className="flex flex-1 flex-col md:flex-row gap-6">
+        
+        {/* SIDEBAR: Stats & Index */}
+        <div className="w-full md:w-72 flex flex-col gap-4">
+          <div className="rounded-[1.5rem] border border-primary/20 bg-card p-5 shadow-sm">
+            <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground mb-4">Session Stats</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-primary/20 bg-background p-3 text-center">
+                <div className="text-xl font-black text-primary">{currentIndex + 1} / {flashcards.length || 0}</div>
+                <div className="text-xs font-bold text-muted-foreground mt-1">Progress</div>
+              </div>
+              <div className="rounded-xl border border-primary/20 bg-background p-3 text-center">
+                <div className="text-xl font-black text-emerald-500">{masteredCount}</div>
+                <div className="text-xs font-bold text-muted-foreground mt-1">Mastered</div>
+              </div>
+            </div>
+            
+            {flashcards.length > 0 && (
+              <div className="mt-4">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+                  <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }} />
+                </div>
+              </div>
+            )}
+          </div>
 
-      {activeTab === 0 && (
-      <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-          {/* === SIDEBAR === */}
-          <Box sx={{ 
-              width: { xs: 0, md: 280 }, 
-              display: { xs: 'none', md: 'flex' },
-              flexDirection: 'column',
-              borderRight: '1px solid',
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
-              overflow: 'hidden'
-          }}>
-              <Box sx={{ p: 3, flex: 1, overflowY: 'auto' }}>
-                  {/* Stats */}
-                  {flashcards.length > 0 && (
-                      <Box sx={{ mb: 3 }}>
-                          <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                              Session Stats
-                          </Typography>
-                          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5, mt: 1.5 }}>
-                              {[
-                                  { label: 'Progress', value: `${currentIndex}/${flashcards.length}`, icon: <TrendingUpIcon sx={{ fontSize: 16 }} /> },
-                                  { label: 'Mastered', value: `${masteryPct}%`, icon: <TrophyIcon sx={{ fontSize: 16 }} /> },
-                                  { label: 'Bookmarked', value: bookmarked.size, icon: <BookmarkIcon sx={{ fontSize: 16 }} /> },
-                                  { label: 'Remaining', value: flashcards.length - currentIndex, icon: <SparkleIcon sx={{ fontSize: 16 }} /> },
-                              ].map(stat => (
-                                  <Paper key={stat.label} sx={{ p: 1.5, borderRadius: '8px', border: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
-                                      <Box sx={{ color: 'primary.main', mb: 0.5 }}>{stat.icon}</Box>
-                                      <Typography variant="h6" fontWeight={800} lineHeight={1}>{stat.value}</Typography>
-                                      <Typography variant="caption" color="text.secondary">{stat.label}</Typography>
-                                  </Paper>
-                              ))}
-                          </Box>
-                          <LinearProgress 
-                              variant="determinate" 
-                              value={masteryPct}
-                              sx={{ mt: 2, height: 6, borderRadius: 3, bgcolor: 'action.hover', '& .MuiLinearProgress-bar': { borderRadius: 3 } }} 
-                          />
-                          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                              {masteryPct}% Mastery
-                          </Typography>
-                      </Box>
-                  )}
+          {flashcards.length > 0 && (
+            <div className="flex-1 rounded-[1.5rem] border border-primary/20 bg-card p-4 shadow-sm flex flex-col max-h-[500px]">
+              <h3 className="text-xs font-black uppercase tracking-wider text-muted-foreground mb-3 px-1">Card Index</h3>
+              <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1.5 pr-2">
+                {flashcards.map((card, idx) => {
+                  const isActive = idx === currentIndex;
+                  const rating = ratings[idx];
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => { setCurrentIndex(idx); setIsFlipped(false); }}
+                      className={cn(
+                        "flex w-full items-center gap-3 rounded-xl border p-2.5 text-left transition",
+                        isActive ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted"
+                      )}
+                    >
+                      <div className={cn(
+                        "flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-xs font-bold",
+                        isActive && !rating ? "bg-primary text-white" : 
+                        rating === 'easy' || rating === 'good' ? "bg-emerald-500/20 text-emerald-600" :
+                        rating === 'hard' ? "bg-amber-500/20 text-amber-600" :
+                        rating === 'again' ? "bg-red-500/20 text-red-600" :
+                        "bg-muted text-muted-foreground"
+                      )}>
+                        {rating === 'easy' || rating === 'good' ? <CheckCircle2 size={14} /> :
+                         rating === 'hard' ? '!' :
+                         rating === 'again' ? <XCircle size={14} /> :
+                         idx + 1}
+                      </div>
+                      <span className={cn(
+                        "truncate text-sm font-semibold",
+                        isActive ? "text-foreground" : "text-muted-foreground"
+                      )}>
+                        {card.front}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
 
-                  {/* Card Index */}
-                  {flashcards.length > 0 && (
-                      <Box>
-                          <Typography variant="caption" fontWeight={700} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                              Cards
-                          </Typography>
-                          <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            {flashcards.map((card, idx) => {
-                                const rating = ratings[idx];
-                                const isActive = idx === currentIndex;
-                                return (
-                                    <Box
-                                        key={idx}
-                                        onClick={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); setIsFlipped(false); }}
-                                        sx={{ 
-                                            p: 1.5, borderRadius: '8px', cursor: 'pointer',
-                                            border: '1px solid',
-                                            borderColor: isActive ? 'primary.main' : 'divider',
-                                            bgcolor: isActive ? 'rgba(19,127,236,0.08)' : 'transparent',
-                                            transition: 'all 0.15s ease',
-                                            '&:hover': { bgcolor: isActive ? 'rgba(19,127,236,0.1)' : 'action.hover' },
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 1
-                                        }}
-                                    >
-                                        <Box sx={{ 
-                                            width: 24, height: 24, borderRadius: '6px', flexShrink: 0,
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem',
-                                            bgcolor: rating === 'easy' || rating === 'good' ? 'rgba(16,185,129,0.2)' :
-                                                     rating === 'hard' ? 'rgba(245,158,11,0.2)' :
-                                                     rating === 'again' ? 'rgba(239,68,68,0.2)' :
-                                                     isActive ? 'primary.main' : 'action.hover',
-                                            color: isActive && !rating ? 'white' : 'text.secondary',
-                                            fontWeight: 700
-                                        }}>
-                                            {rating === 'easy' || rating === 'good' ? <CheckIcon sx={{ fontSize: 14 }} color="success" /> :
-                                             rating === 'hard' ? <span style={{ fontSize: 11, color: '#F59E0B' }}>!</span> :
-                                             rating === 'again' ? <CloseIcon sx={{ fontSize: 14 }} color="error" /> :
-                                             idx + 1}
-                                        </Box>
-                                        <Typography 
-                                            variant="caption" fontWeight={isActive ? 700 : 500} 
-                                            color={isActive ? 'text.primary' : 'text.secondary'}
-                                            sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}
-                                        >
-                                            {card.front}
-                                        </Typography>
-                                        {bookmarked.has(idx) && <BookmarkIcon sx={{ fontSize: 12, color: 'warning.main', flexShrink: 0 }} />}
-                                    </Box>
-                                );
-                            })}
-                          </Box>
-                      </Box>
-                  )}
+        {/* MAIN STUDIO */}
+        <div className="flex-1 rounded-[2rem] border border-primary/20 bg-card p-6 md:p-10 shadow-sm flex flex-col items-center justify-center min-h-[500px]">
+          {flashcards.length === 0 ? (
+            <div className="text-center max-w-sm">
+              <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] border-2 border-primary/20 bg-primary/5 text-primary">
+                {generating ? <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/30 border-t-primary" /> : <Sparkles size={48} />}
+              </div>
+              <h2 className="text-2xl font-black mb-3">Ready to Study?</h2>
+              <p className="text-muted-foreground font-medium text-sm leading-relaxed">
+                Select a lecture and click "Generate" to create a personalized deck of AI flashcards.
+              </p>
+            </div>
+          ) : sessionComplete ? (
+            <div className="text-center max-w-sm animate-in zoom-in-95 duration-500">
+              <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-xl shadow-emerald-500/20">
+                <Trophy size={48} />
+              </div>
+              <h2 className="text-3xl font-black mb-3">Session Complete!</h2>
+              <p className="text-muted-foreground font-medium mb-8">
+                You mastered {masteredCount} out of {flashcards.length} cards.
+              </p>
+              <button
+                onClick={handleRestart}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-md transition hover:bg-primary/90"
+              >
+                <RefreshCw size={18} /> Study Again
+              </button>
+            </div>
+          ) : (
+            <div className="w-full max-w-2xl flex flex-col h-full">
+              {/* Controls */}
+              <div className="flex items-center justify-between mb-6">
+                <button
+                  onClick={handlePrev}
+                  disabled={currentIndex === 0}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background transition hover:bg-muted disabled:opacity-30"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <div className="text-sm font-bold text-muted-foreground uppercase tracking-widest">
+                  Card {currentIndex + 1} of {flashcards.length}
+                </div>
+                <button
+                  onClick={handleNext}
+                  disabled={currentIndex === flashcards.length - 1 && ratings[currentIndex]}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background transition hover:bg-muted disabled:opacity-30"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
 
-                  {flashcards.length === 0 && !generating && (
-                      <Box sx={{ textAlign: 'center', py: 4, opacity: 0.5 }}>
-                          <PsychologyIcon sx={{ fontSize: 48, mb: 1 }} />
-                          <Typography variant="body2">No cards yet. Select a lecture and generate!</Typography>
-                      </Box>
-                  )}
-              </Box>
-          </Box>
+              {/* Flashcard */}
+              <div className="perspective-1000 flex-1 relative min-h-[300px]">
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.div
+                    key={currentIndex + (isFlipped ? '-back' : '-front')}
+                    initial={{ rotateX: isFlipped ? -90 : 90, opacity: 0 }}
+                    animate={{ rotateX: 0, opacity: 1 }}
+                    exit={{ rotateX: isFlipped ? 90 : -90, opacity: 0 }}
+                    transition={{ duration: 0.3, type: "spring", stiffness: 200, damping: 20 }}
+                    onClick={() => setIsFlipped(!isFlipped)}
+                    className="absolute inset-0 w-full h-full cursor-pointer"
+                  >
+                    <div className={cn(
+                      "flex h-full w-full flex-col items-center justify-center rounded-[2rem] border-2 p-10 text-center shadow-lg transition-colors",
+                      isFlipped ? "border-primary/50 bg-primary/5" : "border-primary/20 bg-background hover:border-primary/30"
+                    )}>
+                      <button
+                        onClick={toggleBookmark}
+                        className="absolute right-6 top-6 text-muted-foreground hover:text-amber-500 transition"
+                      >
+                        <Bookmark size={24} className={bookmarked.has(currentIndex) ? "fill-amber-500 text-amber-500" : ""} />
+                      </button>
 
-          {/* === MAIN STUDY AREA === */}
-          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: { xs: 2, md: 4 }, overflow: 'auto' }}>
-              {flashcards.length === 0 ? (
-                  /* Empty State */
-                  <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Box sx={{ textAlign: 'center', maxWidth: 400 }}>
-                          {generating ? (
-                              <>
-                                  <CircularProgress size={64} sx={{ mb: 3 }} />
-                                  <Typography variant="h5" fontWeight={700} gutterBottom>Generating Flashcards...</Typography>
-                                  <Typography variant="body2" color="text.secondary">Our AI is creating personalized flashcards from your lecture content.</Typography>
-                              </>
-                          ) : (
-                              <>
-                                  <Box sx={{ 
-                                      width: 120, height: 120, borderRadius: '24px',
-                                      bgcolor: 'rgba(19,127,236,0.08)', border: '2px solid rgba(19,127,236,0.15)',
-                                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                      mx: 'auto', mb: 4
-                                  }}>
-                                      <SparkleIcon sx={{ fontSize: 56, color: 'primary.main' }} />
-                                  </Box>
-                                  <Typography variant="h4" fontWeight={800} gutterBottom>
-                                      Ready to Study?
-                                  </Typography>
-                                  <Typography variant="body1" color="text.secondary" sx={{ mb: 4, lineHeight: 1.7 }}>
-                                      Select a lecture note above and click "Generate Cards" to create AI-powered flashcards tailored to your content.
-                                  </Typography>
-                                  <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
-                                      {['Smart AI generation', 'Spaced repetition', 'Keyboard shortcuts'].map(f => (
-                                          <Chip key={f} label={f} size="small" sx={{ fontWeight: 600 }} />
-                                      ))}
-                                  </Box>
-                              </>
-                          )}
-                      </Box>
-                  </Box>
-              ) : sessionComplete ? (
-                  /* Session Complete */
-                  <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Paper sx={{ p: 6, borderRadius: '24px', border: '1px solid', borderColor: 'divider', maxWidth: 480, width: '100%', textAlign: 'center' }}>
-                          <Box sx={{ 
-                              width: 96, height: 96, borderRadius: '50%', 
-                              bgcolor: 'rgba(16,185,129,0.1)', border: '2px solid rgba(16,185,129,0.3)',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              mx: 'auto', mb: 4
-                          }}>
-                              <TrophyIcon sx={{ fontSize: 48, color: '#10B981' }} />
-                          </Box>
-                          <Typography variant="h4" fontWeight={800} gutterBottom>Session Complete!</Typography>
-                          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                              You've reviewed all {flashcards.length} flashcards.
-                          </Typography>
-                          <Grid container spacing={2} sx={{ mb: 4 }}>
-                              {[
-                                  { label: 'Easy', count: Object.values(ratings).filter(r => r === 'easy').length, color: '#10B981' },
-                                  { label: 'Good', count: Object.values(ratings).filter(r => r === 'good').length, color: '#137fec' },
-                                  { label: 'Hard', count: Object.values(ratings).filter(r => r === 'hard').length, color: '#F59E0B' },
-                                  { label: 'Again', count: Object.values(ratings).filter(r => r === 'again').length, color: '#EF4444' },
-                              ].map(s => (
-                                  <Grid size={{ xs: 3 }} key={s.label}>
-                                      <Box sx={{ textAlign: 'center' }}>
-                                          <Typography variant="h3" fontWeight={800} sx={{ color: s.color }}>{s.count}</Typography>
-                                          <Typography variant="caption" color="text.secondary">{s.label}</Typography>
-                                      </Box>
-                                  </Grid>
-                              ))}
-                          </Grid>
-                          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-                              <Button variant="outlined" startIcon={<RestartIcon />} onClick={handleRestart} sx={{ fontWeight: 700 }}>
-                                  Study Again
-                              </Button>
-                              <Button variant="contained" startIcon={<ShuffleIcon />} onClick={handleShuffle} sx={{ fontWeight: 700 }}>
-                                  Shuffle & Retry
-                              </Button>
-                          </Box>
-                      </Paper>
-                  </Box>
-              ) : (
-                  /* Active Study Mode */
-                  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: 800, mx: 'auto', width: '100%' }}>
-                      {/* Progress Bar */}
-                      <Box sx={{ width: '100%', mb: 4 }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                              <Typography variant="body2" fontWeight={600} color="text.secondary">
-                                  Card {currentIndex + 1} of {flashcards.length}
-                              </Typography>
-                              <Box sx={{ display: 'flex', gap: 1 }}>
-                                  <Tooltip title="Shuffle">
-                                      <IconButton size="small" onClick={handleShuffle} sx={{ color: 'text.secondary' }}>
-                                          <ShuffleIcon fontSize="small" />
-                                      </IconButton>
-                                  </Tooltip>
-                                  <Tooltip title="Restart">
-                                      <IconButton size="small" onClick={handleRestart} sx={{ color: 'text.secondary' }}>
-                                          <RestartIcon fontSize="small" />
-                                      </IconButton>
-                                  </Tooltip>
-                              </Box>
-                          </Box>
-                          <LinearProgress 
-                              variant="determinate" 
-                              value={progress}
-                              sx={{ height: 8, borderRadius: 4, bgcolor: 'action.hover', '& .MuiLinearProgress-bar': { borderRadius: 4 } }} 
-                          />
-                          <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
-                              {['easy', 'good', 'hard', 'again'].map(r => {
-                                  const count = Object.values(ratings).filter(v => v === r).length;
-                                  if (count === 0) return null;
-                                  const colors = { easy: '#10B981', good: '#137fec', hard: '#F59E0B', again: '#EF4444' };
-                                  return (
-                                      <Typography key={r} variant="caption" sx={{ color: colors[r], fontWeight: 700 }}>
-                                          {r}: {count}
-                                      </Typography>
-                                  );
-                              })}
-                          </Box>
-                      </Box>
+                      <div className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-6">
+                        {isFlipped ? "Answer" : "Question"}
+                      </div>
+                      
+                      <div className="text-xl md:text-3xl font-bold leading-relaxed text-foreground">
+                        {isFlipped ? currentCard?.back : currentCard?.front}
+                      </div>
 
-                      {/* THE FLASHCARD */}
-                      <Box sx={{ 
-                          width: '100%', flex: 1, 
-                          minHeight: 320,
-                          maxHeight: 420,
-                          perspective: '1200px', 
-                          mb: 4,
-                          position: 'relative'
-                      }}>
-                          <AnimatePresence initial={false} custom={direction} mode="wait">
-                              <motion.div
-                                  key={currentIndex}
-                                  custom={direction}
-                                  initial={{ x: direction > 0 ? 200 : -200, opacity: 0 }}
-                                  animate={{ x: 0, opacity: 1, transition: { duration: 0.3, ease: 'easeOut' } }}
-                                  exit={{ x: direction > 0 ? -200 : 200, opacity: 0, transition: { duration: 0.2 } }}
-                                  style={{ position: 'absolute', inset: 0 }}
-                              >
-                                  <Box
-                                      onClick={() => setIsFlipped(f => !f)}
-                                      sx={{
-                                          width: '100%', height: '100%',
-                                          cursor: 'pointer',
-                                          transformStyle: 'preserve-3d',
-                                          transition: 'transform 0.55s cubic-bezier(0.4, 0.0, 0.2, 1)',
-                                          transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                                          position: 'relative'
-                                      }}
-                                  >
-                                      {/* Front */}
-                                      <Paper elevation={0} sx={{
-                                          position: 'absolute', inset: 0, backfaceVisibility: 'hidden',
-                                          borderRadius: '20px', overflow: 'hidden',
-                                          border: '1px solid', borderColor: currentRating ? ratingColors[currentRating]?.[2] : 'divider',
-                                          display: 'flex', flexDirection: 'column',
-                                          background: theme.palette.mode === 'dark' 
-                                              ? 'linear-gradient(135deg, #1a212a 0%, #111822 100%)'
-                                              : 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
-                                      }}>
-                                          {/* Card header */}
-                                          <Box sx={{ px: 3, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid', borderColor: 'divider' }}>
-                                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                  <Chip 
-                                                      label="CONCEPT" 
-                                                      size="small" 
-                                                      sx={{ fontWeight: 800, fontSize: '0.6rem', height: 20, bgcolor: 'rgba(19,127,236,0.1)', color: 'primary.main', borderRadius: '4px' }} 
-                                                  />
-                                                  {currentRating && (
-                                                      <Chip 
-                                                          label={currentRating.toUpperCase()} 
-                                                          size="small" 
-                                                          sx={{ fontWeight: 800, fontSize: '0.6rem', height: 20, borderRadius: '4px',
-                                                              bgcolor: ratingColors[currentRating][1],
-                                                              color: ratingColors[currentRating][0]
-                                                          }} 
-                                                      />
-                                                  )}
-                                              </Box>
-                                              <IconButton size="small" onClick={toggleBookmark} sx={{ color: bookmarked.has(currentIndex) ? 'warning.main' : 'text.disabled' }}>
-                                                  {bookmarked.has(currentIndex) ? <BookmarkIcon fontSize="small" /> : <BookmarkBorderIcon fontSize="small" />}
-                                              </IconButton>
-                                          </Box>
-                                          
-                                          {/* Card content */}
-                                          <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4, textAlign: 'center', overflowY: 'auto' }}>
-                                              <Typography 
-                                                  variant="h5" 
-                                                  fontWeight={700}
-                                                  sx={{ lineHeight: 1.5, color: 'text.primary', wordBreak: 'break-word' }}
-                                              >
-                                                  {currentCard?.front}
-                                              </Typography>
-                                          </Box>
+                      <div className="absolute bottom-6 flex items-center gap-2 text-xs font-semibold text-muted-foreground opacity-50">
+                        <PlayCircle size={14} /> Click space to flip
+                      </div>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
 
-                                          {/* Footer hint */}
-                                          <Box sx={{ p: 2, textAlign: 'center', borderTop: '1px solid', borderColor: 'divider' }}>
-                                              <Typography variant="caption" color="text.disabled" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                                                  Click or press <Chip label="Space" size="small" sx={{ height: 16, fontSize: '0.6rem', fontWeight: 700 }} /> to reveal answer
-                                              </Typography>
-                                          </Box>
-                                      </Paper>
+              {/* Spaced Repetition Ratings */}
+              <div className={cn(
+                "mt-8 grid grid-cols-4 gap-3 transition-all duration-300",
+                isFlipped ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+              )}>
+                <button onClick={() => handleRate('again')} className="rounded-xl border border-red-200 bg-red-50 py-3 text-center font-bold text-red-600 transition hover:bg-red-100 dark:bg-red-500/10 dark:border-red-500/20">
+                  <span className="block text-xs uppercase tracking-widest opacity-70 mb-0.5">Again</span>
+                  &lt;1m
+                </button>
+                <button onClick={() => handleRate('hard')} className="rounded-xl border border-amber-200 bg-amber-50 py-3 text-center font-bold text-amber-600 transition hover:bg-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20">
+                  <span className="block text-xs uppercase tracking-widest opacity-70 mb-0.5">Hard</span>
+                  1d
+                </button>
+                <button onClick={() => handleRate('good')} className="rounded-xl border border-blue-200 bg-blue-50 py-3 text-center font-bold text-blue-600 transition hover:bg-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20">
+                  <span className="block text-xs uppercase tracking-widest opacity-70 mb-0.5">Good</span>
+                  3d
+                </button>
+                <button onClick={() => handleRate('easy')} className="rounded-xl border border-emerald-200 bg-emerald-50 py-3 text-center font-bold text-emerald-600 transition hover:bg-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20">
+                  <span className="block text-xs uppercase tracking-widest opacity-70 mb-0.5">Easy</span>
+                  5d
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
-                                      {/* Back */}
-                                      <Paper elevation={0} sx={{
-                                          position: 'absolute', inset: 0, backfaceVisibility: 'hidden',
-                                          transform: 'rotateY(180deg)',
-                                          borderRadius: '20px', overflow: 'hidden',
-                                          border: '1px solid', borderColor: 'rgba(19,127,236,0.3)',
-                                          display: 'flex', flexDirection: 'column',
-                                          background: theme.palette.mode === 'dark'
-                                              ? 'linear-gradient(135deg, rgba(19,127,236,0.12) 0%, #111822 100%)'
-                                              : 'linear-gradient(135deg, rgba(19,127,236,0.05) 0%, #ffffff 100%)',
-                                      }}>
-                                          <Box sx={{ px: 3, py: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid', borderColor: 'divider' }}>
-                                              <Chip label="ANSWER" size="small" sx={{ fontWeight: 800, fontSize: '0.6rem', height: 20, bgcolor: 'rgba(19,127,236,0.15)', color: 'primary.main', borderRadius: '4px' }} />
-                                              <IconButton size="small" onClick={toggleBookmark} sx={{ color: bookmarked.has(currentIndex) ? 'warning.main' : 'text.disabled' }}>
-                                                  {bookmarked.has(currentIndex) ? <BookmarkIcon fontSize="small" /> : <BookmarkBorderIcon fontSize="small" />}
-                                              </IconButton>
-                                          </Box>
-                                          <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 4, textAlign: 'center', overflowY: 'auto' }}>
-                                              <Typography variant="h5" fontWeight={800} color="primary.main" sx={{ lineHeight: 1.5, mb: 2, wordBreak: 'break-word' }}>
-                                                  {currentCard?.back}
-                                              </Typography>
-                                          </Box>
-                                          <Box sx={{ p: 2, textAlign: 'center', borderTop: '1px solid', borderColor: 'divider' }}>
-                                              <Typography variant="caption" color="text.disabled">Rate your confidence below</Typography>
-                                          </Box>
-                                      </Paper>
-                                  </Box>
-                              </motion.div>
-                          </AnimatePresence>
-                      </Box>
-
-                      {/* Controls */}
-                      <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                          {/* SRS Buttons (visible after flipping) */}
-                          <AnimatePresence>
-                              {isFlipped && (
-                                  <motion.div
-                                      initial={{ opacity: 0, y: 20 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      exit={{ opacity: 0, y: 10 }}
-                                      transition={{ duration: 0.2 }}
-                                  >
-                                      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1.5, mb: 2 }}>
-                                          {[
-                                              { key: 'again', label: 'Again', sublabel: '< 1m', color: 'error' },
-                                              { key: 'hard', label: 'Hard', sublabel: '3 days', color: 'warning' },
-                                              { key: 'good', label: 'Good', sublabel: '7 days', color: 'primary' },
-                                              { key: 'easy', label: 'Easy', sublabel: '14 days', color: 'success' },
-                                          ].map(btn => (
-                                              <Button
-                                                  key={btn.key}
-                                                  variant={currentRating === btn.key ? 'contained' : 'outlined'}
-                                                  color={btn.color}
-                                                  onClick={() => handleRate(btn.key)}
-                                                  sx={{ 
-                                                      flexDirection: 'column', 
-                                                      py: 1.5, 
-                                                      borderRadius: '12px',
-                                                      fontWeight: 700,
-                                                      gap: 0.25
-                                                  }}
-                                              >
-                                                  <Typography variant="caption" fontWeight={800} sx={{ textTransform: 'uppercase', fontSize: '0.7rem' }}>{btn.label}</Typography>
-                                                  <Typography variant="caption" sx={{ fontSize: '0.65rem', opacity: 0.7 }}>{btn.sublabel}</Typography>
-                                              </Button>
-                                          ))}
-                                      </Box>
-                                  </motion.div>
-                              )}
-                          </AnimatePresence>
-
-                          {/* Navigation Buttons */}
-                          <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Button 
-                                  variant="outlined" 
-                                  startIcon={<KeyboardArrowLeft />} 
-                                  onClick={handlePrev}
-                                  disabled={currentIndex === 0}
-                                  sx={{ fontWeight: 700, borderColor: 'divider', color: 'text.primary' }}
-                              >
-                                  Previous
-                              </Button>
-                              <Button 
-                                  variant="text" 
-                                  onClick={() => setIsFlipped(f => !f)}
-                                  sx={{ fontWeight: 700, color: 'text.secondary' }}
-                              >
-                                  {isFlipped ? 'Hide Answer' : 'Show Answer'}
-                              </Button>
-                              <Button 
-                                  variant="outlined" 
-                                  endIcon={<KeyboardArrowRight />} 
-                                  onClick={handleNext}
-                                  sx={{ fontWeight: 700, borderColor: 'divider', color: 'text.primary' }}
-                              >
-                                  {currentIndex >= flashcards.length - 1 ? 'Finish' : 'Next'}
-                              </Button>
-                          </Box>
-                      </Box>
-                  </Box>
-              )}
-          </Box>
-      </Box>
-      )}
-
-      {activeTab === 1 && (
-          <Box sx={{ flex: 1, p: { xs: 2, md: 4 }, overflowY: 'auto' }}>
-              <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '16px' }}>
-                  <Table>
-                      <TableHead sx={{ bgcolor: 'action.hover' }}>
-                          <TableRow>
-                              <TableCell sx={{ fontWeight: 800 }}>Front (Concept)</TableCell>
-                              <TableCell sx={{ fontWeight: 800 }}>Back (Answer)</TableCell>
-                              <TableCell sx={{ fontWeight: 800 }}>Ease Factor</TableCell>
-                              <TableCell sx={{ fontWeight: 800 }}>Interval (Days)</TableCell>
-                          </TableRow>
-                      </TableHead>
-                      <TableBody>
-                          {flashcards.length === 0 ? (
-                              <TableRow>
-                                  <TableCell colSpan={4} align="center" sx={{ py: 6, color: 'text.secondary' }}>No flashcards found. Generate some first!</TableCell>
-                              </TableRow>
-                          ) : (
-                              flashcards.map(c => (
-                                  <TableRow key={c.id}>
-                                      <TableCell sx={{ maxWidth: 300 }}>{c.front}</TableCell>
-                                      <TableCell sx={{ maxWidth: 300 }}>{c.back}</TableCell>
-                                      <TableCell>{c.ease_factor || 2.5}</TableCell>
-                                      <TableCell>{c.interval || 0}</TableCell>
-                                  </TableRow>
-                              ))
-                          )}
-                      </TableBody>
-                  </Table>
-              </TableContainer>
-          </Box>
-      )}
-    </Box>
+      </div>
+    </div>
   );
 }

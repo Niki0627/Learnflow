@@ -1,36 +1,12 @@
 import React, { useState } from "react";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
-import {
-  Alert,
-  Box,
-  Button,
-  Container,
-  Divider,
-  Grid,
-  Link,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@/src/components/tailwind/mui";
-import {
-  ArrowForward as ArrowForwardIcon,
-  Login as LoginIcon,
-  Quiz as QuizIcon,
-  School as SchoolIcon,
-  Star as StarIcon,
-} from "@/src/components/tailwind/icons";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, GraduationCap, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-
-const benefits = [
-  "Adaptive quizzes from your lecture notes",
-  "One dashboard for priorities and weak topics",
-  "Study plans and flashcards in the same flow",
-];
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -41,330 +17,114 @@ export default function Login() {
     event.preventDefault();
     setError("");
     setLoading(true);
-
     const result = await login(username, password);
     if (result.success) {
       navigate("/dashboard");
     } else {
       setError(result.error || "Sign in failed. Please check your credentials.");
     }
-
     setLoading(false);
   };
 
-  const handleGoogleLogin = () => {
-    navigate("/google-login");
-  };
-
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        background:
-          "radial-gradient(circle at top left, rgba(37,99,235,0.12) 0, transparent 28%), radial-gradient(circle at 85% 18%, rgba(124,58,237,0.12) 0, transparent 24%), linear-gradient(180deg, #F7FAFF 0%, #EEF4FF 100%)",
-        py: { xs: 3, md: 5 },
-      }}
-    >
-      <Container maxWidth="lg">
-        <Grid container spacing={3.5} alignItems="stretch">
-          <Grid size={{ xs: 12, md: 5 }} sx={{ display: "flex" }}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: { xs: 3, md: 4 },
-                borderRadius: 4,
-                color: "#fff",
-                background:
-                  "linear-gradient(160deg, #1D4ED8 0%, #5B21B6 58%, #C026D3 100%)",
-                boxShadow: "0 24px 70px rgba(37,99,235,0.28)",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                minHeight: { md: 720 },
-                width: "100%",
-              }}
-            >
-              <Stack spacing={3}>
-                <Box sx={{ display: "inline-flex", alignItems: "center", gap: 1.2 }}>
-                  <Box
-                    sx={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 2,
-                      bgcolor: "rgba(255,255,255,0.18)",
-                      display: "grid",
-                      placeItems: "center",
-                      fontWeight: 900,
-                    }}
-                  >
-                    LF
-                  </Box>
-                  <Box>
-                    <Typography sx={{ fontWeight: 900, color: "inherit" }}>
-                      LearnFlow
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "rgba(255,255,255,0.8)" }}
-                    >
-                      Premium light-first study workspace
-                    </Typography>
-                  </Box>
-                </Box>
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+      {/* Background glow */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-200/50 blur-[120px]" />
+      </div>
 
-                <Box>
-                  <Typography
-                    variant="overline"
-                    sx={{ color: "rgba(255,255,255,0.82)", letterSpacing: "0.14em" }}
-                  >
-                    Welcome back
-                  </Typography>
-                  <Typography
-                    variant="h3"
-                    sx={{
-                      mt: 1,
-                      fontWeight: 900,
-                      letterSpacing: "-0.04em",
-                      color: "inherit",
-                    }}
-                  >
-                    Sign in to continue your learning loop.
-                  </Typography>
-                  <Typography
-                    sx={{
-                      mt: 2,
-                      color: "rgba(255,255,255,0.9)",
-                      maxWidth: 440,
-                      lineHeight: 1.7,
-                    }}
-                  >
-                    Keep your dashboard, lecture notes, quizzes, flashcards, and
-                    study plan in one place.
-                  </Typography>
-                </Box>
+      <div className="relative z-10 w-full max-w-md">
+        {/* Logo */}
+        <Link to="/" className="mb-10 flex items-center justify-center gap-3 outline-none">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 shadow-lg shadow-violet-500/30 text-white">
+            <GraduationCap size={22} strokeWidth={2.3} />
+          </div>
+          <span className="text-2xl font-black tracking-tight text-slate-900">
+            <span className="text-violet-600">Learn</span>Flow
+          </span>
+        </Link>
 
-                <Stack spacing={1.5}>
-                  {benefits.map((benefit) => (
-                    <Box
-                      key={benefit}
-                      sx={{ display: "flex", gap: 1.2, alignItems: "flex-start" }}
-                    >
-                      <Box
-                        sx={{
-                          width: 26,
-                          height: 26,
-                          borderRadius: "50%",
-                          bgcolor: "rgba(255,255,255,0.16)",
-                          display: "grid",
-                          placeItems: "center",
-                          flexShrink: 0,
-                        }}
-                      >
-                        <StarIcon sx={{ fontSize: 14, color: "#fff" }} />
-                      </Box>
-                      <Typography sx={{ color: "rgba(255,255,255,0.92)" }}>
-                        {benefit}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Stack>
+        {/* Card */}
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/50">
+          <h1 className="mb-2 text-3xl font-black text-slate-900">Welcome back</h1>
+          <p className="mb-8 text-base text-slate-500">Sign in to continue your learning flow.</p>
 
-                <Stack direction="row" spacing={1.5} sx={{ flexWrap: "wrap" }}>
-                  <Box
-                    sx={{
-                      flex: 1,
-                      minWidth: 140,
-                      p: 2,
-                      borderRadius: 3,
-                      bgcolor: "rgba(255,255,255,0.12)",
-                      border: "1px solid rgba(255,255,255,0.16)",
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "rgba(255,255,255,0.78)" }}
-                    >
-                      Practice mode
-                    </Typography>
-                    <Typography
-                      variant="h5"
-                      sx={{ fontWeight: 900, color: "inherit", mt: 0.3 }}
-                    >
-                      Faster
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      flex: 1,
-                      minWidth: 140,
-                      p: 2,
-                      borderRadius: 3,
-                      bgcolor: "rgba(255,255,255,0.12)",
-                      border: "1px solid rgba(255,255,255,0.16)",
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "rgba(255,255,255,0.78)" }}
-                    >
-                      Study flow
-                    </Typography>
-                    <Typography
-                      variant="h5"
-                      sx={{ fontWeight: 900, color: "inherit", mt: 0.3 }}
-                    >
-                      Clearer
-                    </Typography>
-                  </Box>
-                </Stack>
-              </Stack>
+          {error && (
+            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-600">
+              {error}
+            </div>
+          )}
 
-              <Box sx={{ mt: 4, display: { xs: "none", md: "block" } }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 1.5,
-                    alignItems: "center",
-                    p: 2,
-                    borderRadius: 3,
-                    bgcolor: "rgba(255,255,255,0.12)",
-                    border: "1px solid rgba(255,255,255,0.14)",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 2,
-                      display: "grid",
-                      placeItems: "center",
-                      bgcolor: "rgba(255,255,255,0.16)",
-                    }}
-                  >
-                    <SchoolIcon />
-                  </Box>
-                  <Box>
-                    <Typography sx={{ fontWeight: 800, color: "inherit" }}>
-                      Focused learning
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "rgba(255,255,255,0.84)" }}
-                    >
-                      Every screen keeps the next step visible.
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-            </Paper>
-          </Grid>
+          {/* Google */}
+          <button
+            type="button"
+            onClick={() => navigate("/google-login")}
+            className="mb-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-slate-300"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 12 4.9c1.69 0 3.21.6 4.4 1.58l3.28-3.28A11.94 11.94 0 0 0 12 .9C8.17.9 4.83 2.85 2.96 5.82l2.31 3.94Z"/><path fill="#34A853" d="M16.04 18.01A7.08 7.08 0 0 1 12 19.1c-2.9 0-5.38-1.74-6.56-4.26l-3.3 2.55C4.1 21 7.78 23.1 12 23.1c2.97 0 5.7-1.04 7.78-2.74l-3.74-2.35Z"/><path fill="#FBBC05" d="M19.78 20.36C21.86 18.38 23.1 15.42 23.1 12c0-.88-.1-1.73-.27-2.55H12v4.82h6.24a5.4 5.4 0 0 1-2.22 3.55l3.76 2.54Z"/><path fill="#4285F4" d="M5.44 14.84A7.15 7.15 0 0 1 4.9 12c0-.99.17-1.94.47-2.83L3.06 5.23A11.93 11.93 0 0 0 .9 12c0 1.96.47 3.8 1.3 5.43l3.24-2.59Z"/></svg>
+            Continue with Google
+          </button>
 
-          <Grid size={{ xs: 12, md: 7 }} sx={{ display: "flex" }}>
-            <Paper
-              elevation={0}
-              sx={{
-                p: { xs: 3, md: 4 },
-                borderRadius: 4,
-                border: "1px solid",
-                borderColor: "divider",
-                bgcolor: "rgba(255,255,255,0.92)",
-                boxShadow: "0 20px 54px rgba(19,32,58,0.10)",
-                width: "100%",
-              }}
-            >
-              <Stack spacing={3}>
-                <Box>
-                  <Typography
-                    variant="overline"
-                    sx={{ color: "primary.main", fontWeight: 800 }}
-                  >
-                    Sign in
-                  </Typography>
-                  <Typography
-                    variant="h4"
-                    sx={{ mt: 0.5, fontWeight: 900, letterSpacing: "-0.04em" }}
-                  >
-                    Welcome back to LearnFlow
-                  </Typography>
-                  <Typography color="text.secondary" sx={{ mt: 1 }}>
-                    Use your existing account or continue with Google.
-                  </Typography>
-                </Box>
+          <div className="mb-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-slate-200" />
+            <span className="text-xs font-bold text-slate-400">or continue with email</span>
+            <div className="h-px flex-1 bg-slate-200" />
+          </div>
 
-                {error ? <Alert severity="error">{error}</Alert> : null}
-
-                <Button
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="mb-2 block text-sm font-bold text-slate-700">Email</label>
+              <input
+                type="email"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="email"
+                required
+                placeholder="you@example.com"
+                className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 text-sm font-medium text-slate-900 placeholder-slate-400 outline-none transition focus:border-violet-500 focus:bg-white focus:ring-2 focus:ring-violet-500/20"
+              />
+            </div>
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-sm font-bold text-slate-700">Password</label>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                  placeholder="••••••••"
+                  className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 pr-12 text-sm font-medium text-slate-900 placeholder-slate-400 outline-none transition focus:border-violet-500 focus:bg-white focus:ring-2 focus:ring-violet-500/20"
+                />
+                <button
                   type="button"
-                  variant="outlined"
-                  onClick={handleGoogleLogin}
-                  startIcon={<LoginIcon />}
-                  sx={{ py: 1.4, borderRadius: 3 }}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 >
-                  Continue with Google
-                </Button>
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
 
-                <Divider>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: "text.secondary", px: 1 }}
-                  >
-                    or sign in with email
-                  </Typography>
-                </Divider>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-sm font-black text-white shadow-lg shadow-violet-500/30 transition hover:scale-[1.02] hover:shadow-violet-500/40 active:scale-[0.98] disabled:opacity-60 disabled:scale-100 disabled:cursor-not-allowed mt-2"
+            >
+              {loading ? "Signing in..." : <>Sign in <ArrowRight size={16} /></>}
+            </button>
+          </form>
 
-                <Box component="form" onSubmit={handleSubmit}>
-                  <Stack spacing={2}>
-                    <TextField
-                      label="Email"
-                      value={username}
-                      onChange={(event) => setUsername(event.target.value)}
-                      autoComplete="email"
-                      type="email"
-                      required
-                      fullWidth
-                    />
-                    <TextField
-                      label="Password"
-                      type="password"
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      autoComplete="current-password"
-                      required
-                      fullWidth
-                      helperText="Use the same password you created during registration."
-                    />
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      size="large"
-                      disabled={loading}
-                      endIcon={<ArrowForwardIcon />}
-                    >
-                      {loading ? "Signing in..." : "Sign in"}
-                    </Button>
-                  </Stack>
-                </Box>
-
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ textAlign: "center" }}
-                >
-                  Don&apos;t have an account? {" "}
-                  <Link
-                    component={RouterLink}
-                    to="/register"
-                    underline="hover"
-                    sx={{ fontWeight: 800 }}
-                  >
-                    Create one
-                  </Link>
-                </Typography>
-              </Stack>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
-    </Box>
+          <p className="mt-8 text-center text-sm font-medium text-slate-500">
+            Don't have an account?{" "}
+            <Link to="/register" className="font-black text-violet-600 hover:text-violet-700 transition">
+              Create one
+            </Link>
+          </p>
+        </div>
+      </div>
+    </main>
   );
 }

@@ -1,76 +1,41 @@
 import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Container,
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  InputAdornment,
-  CircularProgress,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  Chip,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-} from "@/src/components/tailwind/mui";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Quiz as QuizIcon } from "@/src/components/tailwind/icons";
-import { ArrowForward as ArrowForwardIcon } from "@/src/components/tailwind/icons";
-import { Timer as TimerIcon } from "@/src/components/tailwind/icons";
-import { AllInclusive as AllInclusiveIcon } from "@/src/components/tailwind/icons";
+import { ArrowRight, BookOpen, Clock, Loader2, Check, Brain } from "lucide-react";
+import { cn } from "../lib/utils";
+
+const TIMER_OPTIONS = [
+  { label: "15s", value: 15 },
+  { label: "30s", value: 30 },
+  { label: "45s", value: 45 },
+  { label: "60s", value: 60 },
+  { label: "90s", value: 90 },
+  { label: "∞", value: 0 },
+];
 
 export default function QuizEntry() {
   const { api: API } = useAuth();
   const [selectedNoteIds, setSelectedNoteIds] = useState([]);
   const [numQuestions, setNumQuestions] = useState(10);
-  const [timerDuration, setTimerDuration] = useState(30); // seconds; 0 = no timer
+  const [timerDuration, setTimerDuration] = useState(30);
   const [loading, setLoading] = useState(false);
   const [lectures, setLectures] = useState([]);
   const [fetchingLectures, setFetchingLectures] = useState(true);
   const navigate = useNavigate();
 
-  const TIMER_OPTIONS = [
-    { label: '15s', value: 15 },
-    { label: '30s', value: 30 },
-    { label: '45s', value: 45 },
-    { label: '60s', value: 60 },
-    { label: '90s', value: 90 },
-    { label: '∞', value: 0 },
-  ];
-
-  // Fetch lectures on mount
   React.useEffect(() => {
-    const fetchLectures = async () => {
+    (async () => {
       try {
-        setFetchingLectures(true);
-        const response = await API.get('lectures/');
-        
-        // Handle both array and object responses
-        const lectureData = Array.isArray(response.data) ? response.data : response.data.results || [];
-        
-        setLectures(lectureData);
-      } catch (error) {
-        setLectures([]);
-      } finally {
-        setFetchingLectures(false);
-      }
-    };
-    fetchLectures();
+        const response = await API.get("lectures/");
+        const data = Array.isArray(response.data) ? response.data : response.data.results || [];
+        setLectures(data);
+      } catch { setLectures([]); }
+      finally { setFetchingLectures(false); }
+    })();
   }, [API]);
 
-  const handleToggleLecture = (lectureId) => {
-    setSelectedNoteIds(prev => {
-      if (prev.includes(lectureId)) {
-        return prev.filter(id => id !== lectureId);
-      } else {
-        return [...prev, lectureId];
-      }
-    });
+  const handleToggleLecture = (id) => {
+    setSelectedNoteIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
   };
 
   const startQuiz = () => {
@@ -78,229 +43,161 @@ export default function QuizEntry() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      const noteIdsParam = selectedNoteIds.join(',');
-      navigate(`/quiz-mode?noteIds=${noteIdsParam}&n=${numQuestions}`, {
-        state: { timerDuration },
-      });
+      navigate(`/quiz-mode?noteIds=${selectedNoteIds.join(",")}&n=${numQuestions}`, { state: { timerDuration } });
     }, 500);
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5, mb: 5, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography
-            variant="overline"
-            sx={{ 
-                color: 'primary.main', 
-                fontWeight: 700, 
-                letterSpacing: 2,
-                mb: 1,
-                display: 'block'
-            }}
-        >
-            Practice Arena
-        </Typography>
-        <Typography
-            variant="h3"
-            gutterBottom
-            sx={{
-            fontWeight: 900,
-            letterSpacing: '-0.02em',
-            mb: 2,
-            background: "linear-gradient(135deg, #137fec 0%, #10b981 100%)",
-            backgroundClip: "text",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            }}
-        >
-            Test Your Knowledge
-        </Typography>
-        <Typography
-            variant="body1"
-            color="text.secondary"
-            sx={{ maxWidth: 600, mx: 'auto', fontSize: '1.1rem' }}
-        >
-            Challenge yourself with AI-generated quizzes based on your lecture notes.
-        </Typography>
-      </Box>
+    <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Header */}
+      <div>
+        <p className="text-sm font-bold uppercase tracking-widest text-primary mb-2">Practice Arena</p>
+        <h1 className="text-4xl font-black tracking-tight">Test Your Knowledge</h1>
+        <p className="mt-3 text-lg font-medium text-muted-foreground max-w-xl">
+          Challenge yourself with AI-generated quizzes based on your lecture notes.
+        </p>
+      </div>
 
-      <Card
-        sx={{
-          p: 4,
-          width: '100%',
-          maxWidth: 600,
-          background: "background.paper", // Use theme background
-          boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
-          borderRadius: 4,
-          border: "1px solid",
-          borderColor: "divider",
-        }}
-      >
-        <CardContent sx={{ p: 0 }}>
-          <Stack spacing={4}>
-            <Box>
-              <Typography
-                variant="subtitle2"
-                fontWeight="700"
-                color="text.secondary"
-                sx={{ mb: 1.5, ml: 1, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}
-              >
-                Select Lectures ({selectedNoteIds.length} selected)
-              </Typography>
-              <Box sx={{ 
-                maxHeight: 300, 
-                overflowY: 'auto', 
-                border: '1px solid', 
-                borderColor: 'divider',
-                borderRadius: 3,
-                p: 2
-              }}>
-                {fetchingLectures ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                    <CircularProgress size={24} />
-                  </Box>
-                ) : lectures.length > 0 ? (
-                  <FormGroup>
-                    {lectures.map((lecture) => (
-                      <FormControlLabel
-                        key={lecture.id}
-                        control={
-                          <Checkbox
-                            checked={selectedNoteIds.includes(lecture.id)}
-                            onChange={() => handleToggleLecture(lecture.id)}
-                          />
-                        }
-                        label={lecture.title || `Lecture ${lecture.id}`}
-                        sx={{ mb: 1 }}
-                      />
-                    ))}
-                  </FormGroup>
-                ) : (
-                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
-                    No lectures available. Please upload some lectures first.
-                  </Typography>
-                )}
-              </Box>
+      <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
+        {/* Left — Lecture picker */}
+        <div className="flex flex-col gap-6">
+          <div className="rounded-3xl border bg-card p-8 shadow-sm">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <BookOpen size={20} />
+                </div>
+                <div>
+                  <h2 className="font-bold text-foreground">Select Lectures</h2>
+                  <p className="text-sm text-muted-foreground">{selectedNoteIds.length} selected</p>
+                </div>
+              </div>
               {selectedNoteIds.length > 0 && (
-                <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {selectedNoteIds.map(id => {
-                    const lecture = lectures.find(l => l.id === id);
-                    return (
-                      <Chip
-                        key={id}
-                        label={lecture?.title || `Lecture ${id}`}
-                        onDelete={() => handleToggleLecture(id)}
-                        color="primary"
-                        variant="outlined"
-                      />
-                    );
-                  })}
-                </Box>
+                <button onClick={() => setSelectedNoteIds([])} className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors">
+                  Clear all
+                </button>
               )}
-            </Box>
+            </div>
 
-            <Box>
-              <Typography
-                variant="subtitle2"
-                fontWeight="700"
-                color="text.secondary"
-                sx={{ mb: 1.5, ml: 1, textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}
-              >
-                Configuration
-              </Typography>
-              <TextField
-                type="number"
-                label="Number of Questions"
-                value={numQuestions}
-                onChange={(e) => setNumQuestions(e.target.value)}
-                fullWidth
-                sx={{
-                  mb: 3,
-                  "& .MuiOutlinedInput-root": { height: '56px', borderRadius: 3 },
-                }}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <QuizIcon color="primary" />
-                    </InputAdornment>
-                  ),
-                  inputProps: { min: 1, max: 50 },
-                }}
-              />
+            <div className="max-h-[400px] overflow-y-auto custom-scrollbar space-y-3 pr-1">
+              {fetchingLectures ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="animate-spin text-primary" size={28} />
+                </div>
+              ) : lectures.length > 0 ? (
+                lectures.map((lecture) => {
+                  const selected = selectedNoteIds.includes(lecture.id);
+                  return (
+                    <div
+                      key={lecture.id}
+                      onClick={() => handleToggleLecture(lecture.id)}
+                      className={cn(
+                        "flex items-center gap-4 cursor-pointer rounded-2xl border-2 p-4 transition-all duration-200",
+                        selected ? "border-primary bg-primary/5" : "border-border bg-background hover:border-primary/40 hover:bg-muted/40"
+                      )}
+                    >
+                      <div className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 transition-all", selected ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/30")}>
+                        {selected && <Check size={14} />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm truncate text-foreground">{lecture.title || `Lecture ${lecture.id}`}</p>
+                        {lecture.subject && <p className="text-xs text-muted-foreground">{lecture.subject}</p>}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="rounded-2xl border border-dashed p-8 text-center text-muted-foreground">
+                  <BookOpen size={40} className="mx-auto mb-3 opacity-30" />
+                  <p className="font-semibold">No lectures available</p>
+                  <p className="text-sm mt-1">Upload some lectures first to get started.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-              {/* Timer selector */}
-              <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5, ml: 1 }}>
-                  <TimerIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                  <Typography variant="subtitle2" fontWeight={700} color="text.secondary"
-                    sx={{ textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.05em' }}
-                  >
-                    Time Per Question
-                  </Typography>
-                  {timerDuration === 0 && (
-                    <Chip label="No Timer" size="small" color="default"
-                      sx={{ fontWeight: 700, fontSize: '0.7rem', height: 20 }} />
+        {/* Right — Config + Start */}
+        <div className="flex flex-col gap-6">
+          {/* Questions count */}
+          <div className="rounded-3xl border bg-card p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-500">
+                <Brain size={20} />
+              </div>
+              <div>
+                <h2 className="font-bold text-foreground">Questions</h2>
+                <p className="text-sm text-muted-foreground">How many to answer</p>
+              </div>
+            </div>
+            <div className="flex gap-3 flex-wrap">
+              {[5, 10, 15, 20, 30].map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setNumQuestions(n)}
+                  className={cn(
+                    "flex-1 min-w-[56px] rounded-xl py-3 text-sm font-black transition-all border-2",
+                    numQuestions === n ? "border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "border-border hover:border-primary/50 text-foreground"
                   )}
-                </Box>
-                <ToggleButtonGroup
-                  value={timerDuration}
-                  exclusive
-                  onChange={(_, val) => { if (val !== null) setTimerDuration(val); }}
-                  fullWidth
-                  size="small"
-                  sx={{
-                    '& .MuiToggleButton-root': {
-                      fontWeight: 700, fontSize: '0.82rem', py: 1.2, borderRadius: '10px !important',
-                      border: '1px solid', borderColor: 'divider',
-                      flex: 1,
-                    },
-                    '& .Mui-selected': {
-                      background: 'linear-gradient(135deg, #137fec 0%, #10b981 100%) !important',
-                      color: 'white !important',
-                      borderColor: 'transparent !important',
-                    },
-                    gap: 0.75,
-                  }}
                 >
-                  {TIMER_OPTIONS.map((opt) => (
-                    <ToggleButton key={opt.value} value={opt.value}>
-                      {opt.value === 0 ? <AllInclusiveIcon sx={{ fontSize: 16 }} /> : opt.label}
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
-                <Typography variant="caption" color="text.disabled" sx={{ mt: 0.75, ml: 1, display: 'block' }}>
-                  {timerDuration === 0 ? 'Unlimited time — answer at your own pace' : `${timerDuration} seconds per question — auto-submits on timeout`}
-                </Typography>
-              </Box>
-            </Box>
+                  {n}
+                </button>
+              ))}
+            </div>
+            <div className="mt-4">
+              <label className="mb-2 block text-sm font-bold text-muted-foreground">Or enter custom number</label>
+              <input
+                type="number"
+                min={1} max={50}
+                value={numQuestions}
+                onChange={(e) => setNumQuestions(Number(e.target.value))}
+                className="h-12 w-full rounded-xl border bg-background px-4 text-sm font-bold outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </div>
 
-            <Button
-              variant="contained"
-              fullWidth
-              size="large"
-              onClick={startQuiz}
-              disabled={loading || selectedNoteIds.length === 0 || !numQuestions}
-              endIcon={
-                loading ? (
-                  <CircularProgress size={20} color="inherit" />
-                ) : (
-                  <ArrowForwardIcon />
-                )
-              }
-              sx={{
-                height: "56px",
-                fontSize: "1.1rem",
-                borderRadius: 3,
-                mt: 2,
-                fontWeight: 700,
-                boxShadow: '0 8px 20px -4px rgba(19, 127, 236, 0.4)'
-              }}
-            >
-              Start Quiz Session
-            </Button>
-          </Stack>
-        </CardContent>
-      </Card>
-    </Container>
+          {/* Timer */}
+          <div className="rounded-3xl border bg-card p-8 shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500">
+                <Clock size={20} />
+              </div>
+              <div>
+                <h2 className="font-bold text-foreground">Time per question</h2>
+                <p className="text-sm text-muted-foreground">
+                  {timerDuration === 0 ? "Unlimited time" : `${timerDuration}s per question`}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {TIMER_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setTimerDuration(opt.value)}
+                  className={cn(
+                    "flex-1 min-w-[48px] rounded-xl py-2.5 text-sm font-black transition-all border-2",
+                    timerDuration === opt.value ? "border-amber-500 bg-amber-500/10 text-amber-600" : "border-border hover:border-amber-500/50 text-foreground"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Start button */}
+          <button
+            onClick={startQuiz}
+            disabled={loading || selectedNoteIds.length === 0 || !numQuestions}
+            className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-base font-black text-primary-foreground shadow-xl shadow-primary/30 transition hover:scale-[1.02] hover:shadow-primary/50 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed"
+          >
+            {loading ? <Loader2 className="animate-spin" size={20} /> : <><ArrowRight size={20} /> Start Quiz Session</>}
+          </button>
+          {selectedNoteIds.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground">Select at least one lecture to begin</p>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

@@ -2,252 +2,226 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
-  Bell,
   BookOpen,
   Brain,
+  CheckCircle2,
   GraduationCap,
-  Languages,
-  Library,
-  LockKeyhole,
-  Menu,
-  MonitorPlay,
+  LayoutDashboard,
+  Layers,
   Sparkles,
-  UserRound,
-  WandSparkles,
+  Target,
+  Zap,
 } from "lucide-react";
-import { Button } from "../components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
-import heroIllustration from "../assets/hero_illustration_themed_1765945437565.png";
 
-const heroIllustrationUrl =
-  typeof heroIllustration === "string" ? heroIllustration : heroIllustration.src;
-
-const navItems = ["Home", "Courses", "Lectures", "Quiz", "Flashcards", "Coach"];
-
-const heroStats = [
-  { label: "Study flows", value: "8+" },
-  { label: "AI providers", value: "3" },
-  { label: "Secure stack", value: "Next + Supabase" },
+const features = [
+  {
+    icon: BookOpen,
+    title: "Lecture Workspace",
+    desc: "Upload PDFs, read them in a clean viewer, and keep notes right next to your content.",
+    gradient: "from-blue-500 to-indigo-600",
+  },
+  {
+    icon: Brain,
+    title: "AI Practice Engine",
+    desc: "Automatically generate quizzes, flashcards, summaries, and identify your weak spots.",
+    gradient: "from-violet-500 to-purple-600",
+  },
+  {
+    icon: Target,
+    title: "Exam Readiness",
+    desc: "Build structured study plans and track your progress toward your exam date.",
+    gradient: "from-pink-500 to-rose-600",
+  },
+  {
+    icon: Layers,
+    title: "Flashcard Studio",
+    desc: "Spaced-repetition flashcards built directly from your own lecture content.",
+    gradient: "from-amber-500 to-orange-600",
+  },
+  {
+    icon: LayoutDashboard,
+    title: "Unified Dashboard",
+    desc: "One place to see your streak, weak topics, quiz scores, and next actions.",
+    gradient: "from-teal-500 to-emerald-600",
+  },
+  {
+    icon: Zap,
+    title: "Concept Coach",
+    desc: "Get instant AI-powered explanations for any concept you're struggling with.",
+    gradient: "from-cyan-500 to-blue-600",
+  },
 ];
 
-const featureCards = [
-  {
-    icon: MonitorPlay,
-    title: "Lecture workspace",
-    text: "Upload PDFs and learning material, then keep notes, summaries, and generated practice together.",
-  },
-  {
-    icon: GraduationCap,
-    title: "Adaptive practice",
-    text: "Generate focused quizzes and flashcards from lectures so revision turns into active recall.",
-  },
-  {
-    icon: Library,
-    title: "Study library",
-    text: "Build a premium learning archive with weak topics, exam prep, and plans that stay organized.",
-  },
-];
-
-const flow = [
-  { icon: BookOpen, title: "Capture", text: "Add lectures and documents." },
-  { icon: WandSparkles, title: "Generate", text: "Create summaries, MCQs, and cards." },
-  { icon: Brain, title: "Master", text: "Track weak topics and revise smarter." },
+const steps = [
+  { num: "01", title: "Upload your lecture", desc: "Drop a PDF or paste your notes — LearnFlow ingests and structures your content." },
+  { num: "02", title: "Generate study aids", desc: "With one click, get summaries, quizzes, flashcards, and key concepts from any lecture." },
+  { num: "03", title: "Review & Improve", desc: "The dashboard surfaces your weakest areas so you always study what matters most." },
 ];
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f7f5ff] text-[#16112f]">
-      <div className="absolute -left-32 -top-40 h-[520px] w-[520px] rounded-full bg-[#5b4fe9] opacity-95" />
-      <div className="absolute right-[-120px] top-20 h-[360px] w-[360px] rounded-full bg-[#8f8cff]/35 blur-3xl" />
-      <div className="absolute bottom-[-180px] left-1/2 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-[#5b4fe9]/20 blur-3xl" />
-
-      <section className="relative mx-auto min-h-screen w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-[36px] border border-white/70 bg-white/80 shadow-[0_34px_100px_rgba(50,36,184,0.18)] backdrop-blur-2xl">
-          <header className="relative z-20 flex flex-col gap-4 px-5 py-5 md:flex-row md:items-center md:justify-between lg:px-9">
-            <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#5b4fe9] text-white shadow-[0_16px_34px_rgba(91,79,233,0.32)]">
-                <GraduationCap size={25} strokeWidth={2.4} />
-              </div>
-              <div>
-                <div className="text-2xl font-black tracking-normal">
-                  <span className="text-[#5b4fe9]">Learn</span>Flow
-                </div>
-                <div className="text-xs font-bold text-[#625c85]">
-                  Online education workspace
-                </div>
-              </div>
+    <div className="min-h-screen overflow-x-hidden bg-white text-slate-900">
+      {/* ── Nav ── */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 shadow-lg shadow-violet-500/30">
+              <GraduationCap size={20} strokeWidth={2.5} className="text-white" />
             </div>
+            <span className="text-xl font-black tracking-tight text-slate-900">
+              <span className="text-violet-600">Learn</span>Flow
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/login")}
+              className="rounded-full px-5 py-2 text-sm font-bold text-slate-600 transition hover:text-slate-900"
+            >
+              Sign in
+            </button>
+            <button
+              onClick={() => navigate("/register")}
+              className="flex items-center gap-2 rounded-full bg-violet-600 px-5 py-2 text-sm font-bold text-white shadow-lg shadow-violet-500/30 transition hover:bg-violet-500 hover:shadow-violet-500/40"
+            >
+              Get started <ArrowRight size={15} />
+            </button>
+          </div>
+        </div>
+      </header>
 
-            <nav className="hidden items-center gap-1 rounded-full border border-[#ddd8fa]/80 bg-white/72 p-1.5 shadow-[0_12px_34px_rgba(50,36,184,0.08)] backdrop-blur-xl lg:flex">
-              {navItems.map((item, index) => (
-                <button
-                  key={item}
-                  className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-                    index === 0
-                      ? "bg-[#eeeafe] text-[#3124b8]"
-                      : "text-[#625c85] hover:bg-[#f3f0ff] hover:text-[#3124b8]"
-                  }`}
-                  type="button"
-                >
-                  {item}
-                </button>
-              ))}
-            </nav>
+      {/* ── Hero ── */}
+      <section className="relative flex min-h-screen flex-col items-center justify-center px-6 pt-24 pb-20 text-center">
+        {/* Background glow - subtle for light mode */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-1/2 top-1/3 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-200/50 blur-[100px]" />
+          <div className="absolute left-1/4 top-2/3 h-[400px] w-[400px] rounded-full bg-blue-100/50 blur-[80px]" />
+        </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                className="hidden h-10 items-center gap-2 rounded-full border border-[#ddd8fa] bg-white/70 px-3 text-xs font-bold text-[#16112f] backdrop-blur-xl md:flex"
-                type="button"
-              >
-                <Languages size={16} />
-                English
-              </button>
-              <button
-                className="hidden h-10 w-10 place-items-center rounded-full border border-[#ddd8fa] bg-white/70 text-[#16112f] backdrop-blur-xl md:grid"
-                type="button"
-                aria-label="Notifications"
-              >
-                <Bell size={17} />
-              </button>
-              <Button variant="ghost" onClick={() => navigate("/login")}>
-                <UserRound size={17} />
-                Login
-              </Button>
-              <Button className="hidden sm:inline-flex" onClick={() => navigate("/register")}>
-                Start now
-                <ArrowRight size={17} />
-              </Button>
-              <button
-                className="grid h-10 w-10 place-items-center rounded-full border border-[#ddd8fa] bg-white/70 text-[#16112f] backdrop-blur-xl lg:hidden"
-                type="button"
-                aria-label="Open menu"
-              >
-                <Menu size={19} />
-              </button>
-            </div>
-          </header>
-
-          <div className="relative z-10 grid min-h-[620px] items-center gap-8 px-5 pb-28 pt-10 md:grid-cols-[1.05fr_0.95fr] lg:px-9 lg:pb-36 lg:pt-14">
-            <div className="max-w-3xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#ddd8fa] bg-white/78 px-4 py-2 text-sm font-extrabold text-[#3124b8] shadow-[0_14px_34px_rgba(50,36,184,0.08)] backdrop-blur-xl">
-                <Sparkles size={16} />
-                AI-powered online education
-              </div>
-
-              <h1 className="max-w-3xl text-5xl font-black leading-[1.02] tracking-normal text-[#16112f] sm:text-6xl lg:text-7xl">
-                Online
-                <span className="block text-[#5b4fe9]">Education</span>
-                Rebuilt Premium.
-              </h1>
-
-              <p className="mt-6 max-w-2xl text-lg font-medium leading-8 text-[#625c85]">
-                A calm, high-end study workspace where lecture uploads, summaries,
-                quizzes, flashcards, weak topics, and exam planning all feel like one
-                elegant learning system.
-              </p>
-
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Button size="lg" onClick={() => navigate("/register")}>
-                  Start now
-                  <ArrowRight size={19} />
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate("/login")}>
-                  Open dashboard
-                </Button>
-              </div>
-
-              <div className="mt-8 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
-                {heroStats.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="rounded-2xl border border-[#ddd8fa]/80 bg-white/72 px-4 py-3 shadow-[0_14px_36px_rgba(50,36,184,0.08)] backdrop-blur-xl"
-                  >
-                    <div className="text-2xl font-black text-[#3124b8]">{stat.value}</div>
-                    <div className="text-xs font-bold text-[#625c85]">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative flex items-center justify-center">
-              <div className="absolute h-[420px] w-[420px] rounded-full bg-[#8f8cff]/38 blur-2xl" />
-              <div className="absolute right-2 top-10 h-24 w-24 rounded-full bg-[#5b4fe9]/20" />
-              <div className="absolute bottom-12 left-6 h-16 w-16 rounded-full bg-[#70d6ff]/34" />
-              <img
-                src={heroIllustrationUrl}
-                alt="Student studying online with learning icons"
-                className="relative z-10 w-full max-w-[520px] drop-shadow-[0_32px_50px_rgba(50,36,184,0.18)]"
-              />
-              <Card className="absolute bottom-2 right-1 z-20 hidden w-56 md:block">
-                <CardHeader className="p-4 pb-2">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <LockKeyhole size={17} />
-                    Secure by design
-                  </CardTitle>
-                  <CardDescription>
-                    Supabase auth, private routes, and clean protected flows.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            </div>
+        <div className="relative z-10 max-w-4xl">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-2 text-sm font-bold text-violet-700">
+            <Sparkles size={14} />
+            AI-Powered Study Platform
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 z-0 h-56 bg-[#5b4fe9]">
-            <div className="absolute -top-20 left-[-6%] h-40 w-[112%] rounded-[50%] bg-white" />
+          <h1 className="text-5xl font-black leading-[1.08] tracking-tight text-slate-900 sm:text-6xl lg:text-7xl">
+            Study smarter,
+            <br />
+            <span className="bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              not harder.
+            </span>
+          </h1>
+
+          <p className="mx-auto mt-8 max-w-2xl text-lg font-medium leading-relaxed text-slate-600">
+            Upload your lectures, generate quizzes and flashcards automatically, find your weak spots, and walk into every exam prepared. All in one workspace.
+          </p>
+
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <button
+              onClick={() => navigate("/register")}
+              className="flex items-center gap-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-violet-500/20 transition hover:scale-105 hover:shadow-violet-500/30 active:scale-95"
+            >
+              Start for free <ArrowRight size={18} />
+            </button>
+            <button
+              onClick={() => navigate("/login")}
+              className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-8 py-4 text-base font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"
+            >
+              Sign in to dashboard
+            </button>
           </div>
 
-          <div className="relative z-10 grid gap-5 bg-[#5b4fe9] px-5 pb-8 pt-6 md:grid-cols-3 lg:px-9">
-            {featureCards.map((feature) => {
-              const Icon = feature.icon;
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm font-semibold text-slate-500">
+            {["No credit card required", "Start in under 2 minutes", "Cancel anytime"].map((t) => (
+              <span key={t} className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-500" /> {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How it works ── */}
+      <section className="bg-slate-50 px-6 py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-violet-600">How it works</p>
+            <h2 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">From lecture to mastery</h2>
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-slate-600">Three steps to transform how you study</p>
+          </div>
+          <div className="grid gap-8 md:grid-cols-3">
+            {steps.map((step) => (
+              <div key={step.num} className="relative rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-shadow hover:shadow-md">
+                <div className="mb-6 text-5xl font-black text-slate-100">{step.num}</div>
+                <h3 className="mb-3 text-xl font-black text-slate-900">{step.title}</h3>
+                <p className="text-base leading-relaxed text-slate-600">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Features ── */}
+      <section className="px-6 py-24 sm:py-32">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-violet-600">Everything you need</p>
+            <h2 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">Built for serious students</h2>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f) => {
+              const Icon = f.icon;
               return (
-                <Card
-                  key={feature.title}
-                  className="border-white/24 bg-white/10 text-white shadow-none"
+                <div
+                  key={f.title}
+                  className="group rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-300 hover:border-violet-200 hover:shadow-md hover:-translate-y-1"
                 >
-                  <CardHeader>
-                    <div className="mb-4 grid h-16 w-16 place-items-center rounded-2xl border border-white/30 bg-white/12">
-                      <Icon size={34} strokeWidth={1.8} />
-                    </div>
-                    <CardTitle>{feature.title}</CardTitle>
-                    <CardDescription className="text-white/78">
-                      {feature.text}
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
+                  <div className={`mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${f.gradient} shadow-md text-white`}>
+                    <Icon size={26} strokeWidth={1.8} />
+                  </div>
+                  <h3 className="mb-3 text-lg font-black text-slate-900">{f.title}</h3>
+                  <p className="text-sm leading-relaxed text-slate-600">{f.desc}</p>
+                </div>
               );
             })}
           </div>
         </div>
-
-        <section className="grid gap-5 py-8 md:grid-cols-3">
-          {flow.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Card key={item.title} className="bg-white/72">
-                <CardContent className="flex items-center gap-4 p-5">
-                  <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#eeeafe] text-[#3124b8]">
-                    <Icon size={24} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-black">{item.title}</h2>
-                    <p className="text-sm font-medium leading-6 text-[#625c85]">
-                      {item.text}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </section>
       </section>
-    </main>
+
+      {/* ── CTA ── */}
+      <section className="bg-slate-50 px-6 py-24 sm:py-32">
+        <div className="mx-auto max-w-3xl">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-700 p-12 text-center shadow-2xl shadow-violet-500/20">
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/10 blur-3xl" />
+            </div>
+            <div className="relative text-white">
+              <h2 className="text-4xl font-black tracking-tight">Ready to level up?</h2>
+              <p className="mx-auto mt-5 max-w-xl text-lg font-medium leading-relaxed text-white/90">
+                Join students who turned their scattered notes into a structured, AI-powered study system.
+              </p>
+              <button
+                onClick={() => navigate("/register")}
+                className="mt-8 inline-flex items-center gap-3 rounded-2xl bg-white px-8 py-4 text-base font-black text-violet-700 shadow-xl transition hover:scale-105 active:scale-95"
+              >
+                Create free account <ArrowRight size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-slate-200 bg-white px-6 py-10 text-center text-sm text-slate-500">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-100 text-violet-600">
+            <GraduationCap size={16} />
+          </div>
+          <span className="font-black text-slate-900"><span className="text-violet-600">Learn</span>Flow</span>
+        </div>
+        <p>© {new Date().getFullYear()} LearnFlow. All rights reserved.</p>
+      </footer>
+    </div>
   );
 }

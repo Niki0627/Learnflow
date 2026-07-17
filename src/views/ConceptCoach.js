@@ -1,386 +1,134 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  TextField,
-  IconButton,
-  Stack,
-  Avatar,
-  Chip,
-  CircularProgress,
-  useTheme,
-  Paper,
-  Tooltip,
-  Fade,
-  Divider,
-  Button,
-  Drawer,
-  Alert,
-} from "@/src/components/tailwind/mui";
-import {
-  Send as SendIcon,
-  Person as PersonIcon,
-  SmartToy as SmartToyIcon,
-  Lightbulb as LightbulbIcon,
-  Add as AddIcon,
-  ContentCopy as CopyIcon,
-  ThumbUp as ThumbUpIcon,
-  ThumbDown as ThumbDownIcon,
-  Refresh as RefreshIcon,
-  AutoAwesome as AutoAwesomeIcon,
-  School as SchoolIcon,
-  Calculate as CalculateIcon,
-  Psychology as PsychologyIcon,
-  CheckCircleOutline as CheckCircleOutlineIcon,
-  Mic as MicIcon,
-  Stop as StopIcon,
-  History as HistoryIcon,
-  Close as CloseIcon,
-  BookmarkBorder as BookmarkIcon,
-} from "@/src/components/tailwind/icons";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import API from "../api/api";
 import { useTranslation } from "react-i18next";
+import { cn } from "../lib/utils";
+import {
+  Send,
+  Mic,
+  MicOff,
+  Bot,
+  User,
+  Plus,
+  Copy,
+  ThumbsUp,
+  ThumbsDown,
+  RefreshCw,
+  Lightbulb,
+  Calculator,
+  GraduationCap,
+  Brain,
+  History,
+  X,
+  CheckCircle,
+  AlertCircle,
+  Sparkles,
+  StopCircle,
+  Clock,
+  BookOpen,
+} from "lucide-react";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
+// ─── Helpers ───────────────────────────────────────────────────────────────────
 const formatTime = () =>
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-// ─── Markdown Renderer ───────────────────────────────────────────────────────
-// Uses react-markdown + remark-gfm with custom MUI-styled components
-
-// Context to track whether current list is ordered
-const ListTypeContext = React.createContext(false);
-
-// Proper named component so React Hook rules are satisfied
-const MdListItem = ({ children }) => {
-  const isOrdered = React.useContext(ListTypeContext);
-  return (
-    <Box display="flex" gap={1.5} sx={{ mb: 0.8, alignItems: "flex-start" }}>
-      {isOrdered ? (
-        <Box
-          sx={{
-            minWidth: 24,
-            height: 24,
-            borderRadius: "50%",
-            bgcolor: "primary.main",
-            color: "white",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "0.72rem",
-            fontWeight: 800,
-            flexShrink: 0,
-            mt: 0.15,
-            // CSS counter driven by the parent ol
-            "&::before": { content: "counter(md-ol)" },
-            counterIncrement: "md-ol",
-          }}
-        />
-      ) : (
-        <Box
-          sx={{
-            width: 7,
-            height: 7,
-            borderRadius: "50%",
-            bgcolor: "primary.main",
-            flexShrink: 0,
-            mt: 0.9,
-          }}
-        />
-      )}
-      <Box sx={{ flex: 1, lineHeight: 1.8 }}>{children}</Box>
-    </Box>
-  );
-};
-
+// ─── Markdown Renderer ─────────────────────────────────────────────────────────
 const MarkdownContent = React.memo(({ content }) => {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
-
-  const components = {
-    // Paragraphs
-    p: ({ children }) => (
-      <Typography
-        variant="body1"
-        sx={{ mb: 1.2, lineHeight: 1.85, "&:last-child": { mb: 0 } }}
-      >
-        {children}
-      </Typography>
-    ),
-    // Bold
-    strong: ({ children }) => (
-      <Box component="span" sx={{ fontWeight: 800, color: "text.primary" }}>
-        {children}
-      </Box>
-    ),
-    // Italic
-    em: ({ children }) => (
-      <Box
-        component="span"
-        sx={{ fontStyle: "italic", color: "text.secondary" }}
-      >
-        {children}
-      </Box>
-    ),
-    // Inline code
-    code: ({ inline, children }) =>
-      inline ? (
-        <Box
-          component="code"
-          sx={{
-            px: 0.8,
-            py: 0.15,
-            borderRadius: "5px",
-            bgcolor: isDark ? "rgba(37,99,235,0.15)" : "rgba(37,99,235,0.08)",
-            color: "primary.main",
-            fontFamily: '"Fira Code", "Consolas", monospace',
-            fontSize: "0.87em",
-            fontWeight: 700,
-            border: "1px solid",
-            borderColor: isDark ? "rgba(37,99,235,0.3)" : "rgba(37,99,235,0.2)",
-          }}
-        >
-          {children}
-        </Box>
-      ) : (
-        // Block code
-        <Box
-          sx={{
-            my: 1.5,
-            borderRadius: 2,
-            overflow: "hidden",
-            border: "1px solid",
-            borderColor: "divider",
-          }}
-        >
-          <Box
-            sx={{
-              px: 2,
-              py: 1,
-              bgcolor: isDark ? "rgba(0,0,0,0.4)" : "rgba(0,0,0,0.06)",
-              borderBottom: "1px solid",
-              borderColor: "divider",
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            <Box
-              sx={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                bgcolor: "#ef4444",
-              }}
-            />
-            <Box
-              sx={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                bgcolor: "#f59e0b",
-              }}
-            />
-            <Box
-              sx={{
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                bgcolor: "#10b981",
-              }}
-            />
-          </Box>
-          <Box
-            component="pre"
-            sx={{
-              m: 0,
-              p: 2,
-              bgcolor: isDark ? "rgba(0,0,0,0.3)" : "rgba(248,250,252,1)",
-              fontFamily: '"Fira Code", "Consolas", monospace',
-              fontSize: "0.88rem",
-              lineHeight: 1.7,
-              overflowX: "auto",
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-            }}
-          >
-            <code>{children}</code>
-          </Box>
-        </Box>
-      ),
-    // Headings
-    h1: ({ children }) => (
-      <Typography
-        variant="h5"
-        fontWeight={900}
-        sx={{ mt: 2, mb: 1, letterSpacing: "-0.01em" }}
-      >
-        {children}
-      </Typography>
-    ),
-    h2: ({ children }) => (
-      <Typography
-        variant="h6"
-        fontWeight={800}
-        sx={{ mt: 1.5, mb: 0.8, color: "primary.main" }}
-      >
-        {children}
-      </Typography>
-    ),
-    h3: ({ children }) => (
-      <Typography
-        variant="subtitle1"
-        fontWeight={800}
-        sx={{ mt: 1.5, mb: 0.5, color: "primary.main" }}
-      >
-        {children}
-      </Typography>
-    ),
-    h4: ({ children }) => (
-      <Typography variant="subtitle2" fontWeight={800} sx={{ mt: 1, mb: 0.5 }}>
-        {children}
-      </Typography>
-    ),
-    // Unordered list
-    ul: ({ children }) => (
-      <ListTypeContext.Provider value={false}>
-        <Box component="ul" sx={{ pl: 0, my: 0.5, listStyle: "none" }}>
-          {children}
-        </Box>
-      </ListTypeContext.Provider>
-    ),
-    // Ordered list — resets CSS counter; MdListItem increments it
-    ol: ({ children }) => (
-      <ListTypeContext.Provider value={true}>
-        <Box
-          component="ol"
-          sx={{ pl: 0, my: 0.5, listStyle: "none", counterReset: "md-ol" }}
-        >
-          {children}
-        </Box>
-      </ListTypeContext.Provider>
-    ),
-    // Use the extracted proper component
-    li: MdListItem,
-    // Blockquote — used for hints/tips
-    blockquote: ({ children }) => (
-      <Box
-        sx={{
-          my: 1.5,
-          pl: 2,
-          py: 1,
-          borderLeft: "4px solid",
-          borderColor: "primary.main",
-          bgcolor: isDark ? "rgba(37,99,235,0.07)" : "rgba(37,99,235,0.04)",
-          borderRadius: "0 8px 8px 0",
-          fontStyle: "italic",
-        }}
-      >
-        {children}
-      </Box>
-    ),
-    // Horizontal rule
-    hr: () => <Divider sx={{ my: 2 }} />,
-    // Tables (GFM)
-    table: ({ children }) => (
-      <Box
-        sx={{
-          my: 1.5,
-          overflowX: "auto",
-          borderRadius: 2,
-          border: "1px solid",
-          borderColor: "divider",
-        }}
-      >
-        <Box
-          component="table"
-          sx={{
-            width: "100%",
-            borderCollapse: "collapse",
-            fontSize: "0.88rem",
-          }}
-        >
-          {children}
-        </Box>
-      </Box>
-    ),
-    thead: ({ children }) => (
-      <Box
-        component="thead"
-        sx={{ bgcolor: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)" }}
-      >
-        {children}
-      </Box>
-    ),
-    tbody: ({ children }) => <Box component="tbody">{children}</Box>,
-    tr: ({ children }) => (
-      <Box
-        component="tr"
-        sx={{
-          "&:not(:last-child)": {
-            borderBottom: "1px solid",
-            borderColor: "divider",
-          },
-        }}
-      >
-        {children}
-      </Box>
-    ),
-    th: ({ children }) => (
-      <Box
-        component="th"
-        sx={{
-          px: 2,
-          py: 1.2,
-          textAlign: "left",
-          fontWeight: 800,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {children}
-      </Box>
-    ),
-    td: ({ children }) => (
-      <Box component="td" sx={{ px: 2, py: 1, verticalAlign: "top" }}>
-        {children}
-      </Box>
-    ),
-    // Links
-    a: ({ href, children }) => (
-      <Box
-        component="a"
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        sx={{
-          color: "primary.main",
-          fontWeight: 600,
-          textDecoration: "underline",
-          textDecorationStyle: "dotted",
-        }}
-      >
-        {children}
-      </Box>
-    ),
-  };
-
   return (
-    <Box
-      sx={{ "& > *:first-of-type": { mt: 0 }, "& > *:last-child": { mb: 0 } }}
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => (
+          <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
+        ),
+        strong: ({ children }) => (
+          <strong className="font-bold text-foreground">{children}</strong>
+        ),
+        em: ({ children }) => (
+          <em className="italic text-muted-foreground">{children}</em>
+        ),
+        code: ({ inline, children }) =>
+          inline ? (
+            <code className="px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-mono text-[0.85em] font-semibold border border-primary/20">
+              {children}
+            </code>
+          ) : (
+            <div className="my-3 rounded-xl overflow-hidden border border-border/50">
+              <div className="flex items-center gap-1.5 px-4 py-2 bg-muted/60 border-b border-border/50">
+                <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+              </div>
+              <pre className="m-0 p-4 bg-muted/30 font-mono text-sm leading-relaxed overflow-x-auto whitespace-pre-wrap break-words">
+                <code>{children}</code>
+              </pre>
+            </div>
+          ),
+        h1: ({ children }) => (
+          <h1 className="text-xl font-black mt-4 mb-2">{children}</h1>
+        ),
+        h2: ({ children }) => (
+          <h2 className="text-lg font-bold text-primary mt-3 mb-1.5">{children}</h2>
+        ),
+        h3: ({ children }) => (
+          <h3 className="text-base font-bold text-primary mt-2.5 mb-1">{children}</h3>
+        ),
+        ul: ({ children }) => (
+          <ul className="my-2 space-y-1.5 pl-0 list-none">{children}</ul>
+        ),
+        ol: ({ children }) => (
+          <ol className="my-2 space-y-1.5 pl-0 list-none counter-reset-none">{children}</ol>
+        ),
+        li: ({ children }) => (
+          <li className="flex items-start gap-2.5">
+            <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+            <span className="flex-1 leading-relaxed">{children}</span>
+          </li>
+        ),
+        blockquote: ({ children }) => (
+          <blockquote className="my-3 pl-4 py-2 border-l-4 border-primary bg-primary/5 rounded-r-lg italic text-muted-foreground">
+            {children}
+          </blockquote>
+        ),
+        hr: () => <hr className="my-3 border-border/50" />,
+        table: ({ children }) => (
+          <div className="my-3 overflow-x-auto rounded-xl border border-border/50">
+            <table className="w-full text-sm border-collapse">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => (
+          <thead className="bg-muted/50">{children}</thead>
+        ),
+        tbody: ({ children }) => <tbody>{children}</tbody>,
+        tr: ({ children }) => (
+          <tr className="border-b border-border/50 last:border-0">{children}</tr>
+        ),
+        th: ({ children }) => (
+          <th className="px-3 py-2 text-left font-bold whitespace-nowrap">{children}</th>
+        ),
+        td: ({ children }) => (
+          <td className="px-3 py-2 align-top">{children}</td>
+        ),
+        a: ({ href, children }) => (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary font-semibold underline decoration-dotted hover:decoration-solid"
+          >
+            {children}
+          </a>
+        ),
+      }}
     >
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-        {content}
-      </ReactMarkdown>
-    </Box>
+      {content}
+    </ReactMarkdown>
   );
 });
 
-// ─── Voice Input Hook ─────────────────────────────────────────────────────────
-
+// ─── Voice Input Hook ──────────────────────────────────────────────────────────
 const useSpeechRecognition = ({ onResult, onError, lang = "en-US" }) => {
   const recognitionRef = useRef(null);
   const [listening, setListening] = useState(false);
@@ -395,19 +143,16 @@ const useSpeechRecognition = ({ onResult, onError, lang = "en-US" }) => {
       recognition.continuous = false;
       recognition.interimResults = true;
       recognition.lang = lang;
-
       recognition.onresult = (e) => {
         const transcript = Array.from(e.results)
           .map((r) => r[0].transcript)
           .join("");
         onResult(transcript, e.results[e.results.length - 1].isFinal);
       };
-
       recognition.onerror = (e) => {
         setListening(false);
         onError?.(e.error);
       };
-
       recognition.onend = () => setListening(false);
       recognitionRef.current = recognition;
     }
@@ -415,12 +160,7 @@ const useSpeechRecognition = ({ onResult, onError, lang = "en-US" }) => {
 
   const start = useCallback(() => {
     if (!recognitionRef.current || listening) return;
-    try {
-      recognitionRef.current.start();
-      setListening(true);
-    } catch (e) {
-      /* recognition already started */
-    }
+    try { recognitionRef.current.start(); setListening(true); } catch { /* already started */ }
   }, [listening]);
 
   const stop = useCallback(() => {
@@ -432,40 +172,23 @@ const useSpeechRecognition = ({ onResult, onError, lang = "en-US" }) => {
   return { listening, supported, start, stop };
 };
 
-// ─── Typing indicator ─────────────────────────────────────────────────────────
-
-const TypingIndicator = () => (
-  <Box display="flex" gap={0.5} alignItems="center" sx={{ px: 1, py: 0.5 }}>
+// ─── Typing Dots ───────────────────────────────────────────────────────────────
+const TypingDots = () => (
+  <div className="flex items-center gap-1 px-1 py-0.5">
     {[0, 1, 2].map((i) => (
-      <Box
+      <span
         key={i}
-        sx={{
-          width: 8,
-          height: 8,
-          borderRadius: "50%",
-          bgcolor: "primary.main",
-          animation: "bounce 1.2s ease-in-out infinite",
-          animationDelay: `${i * 0.2}s`,
-          "@keyframes bounce": {
-            "0%, 80%, 100%": { transform: "scale(0.6)", opacity: 0.4 },
-            "40%": { transform: "scale(1)", opacity: 1 },
-          },
-        }}
+        className="w-2 h-2 rounded-full bg-primary inline-block animate-bounce"
+        style={{ animationDelay: `${i * 0.15}s`, animationDuration: "0.9s" }}
       />
     ))}
-  </Box>
+  </div>
 );
 
-// ─── Assistant message bubble ─────────────────────────────────────────────────
-
+// ─── Message Bubbles ───────────────────────────────────────────────────────────
 const AssistantBubble = ({ msg }) => {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
-  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const [thumbed, setThumbed] = useState(null);
-
-  const isError = msg.is_error === true;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(msg.content);
@@ -474,285 +197,180 @@ const AssistantBubble = ({ msg }) => {
   };
 
   return (
-    <Fade in timeout={400}>
-      <Box>
-        <Box display="flex" gap={2} alignItems="flex-start">
-          <Avatar
-            sx={{
-              width: 36,
-              height: 36,
-              background: isError
-                ? "linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)"
-                : "linear-gradient(135deg, #2563EB 0%, #7c3aed 100%)",
-              flexShrink: 0,
-            }}
-          >
-            <SmartToyIcon sx={{ fontSize: 20 }} />
-          </Avatar>
+    <div className="flex gap-3 items-start group animate-in fade-in slide-in-from-bottom-2 duration-300">
+      {/* Avatar */}
+      <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-md shadow-primary/20">
+        <Bot size={16} className="text-white" />
+      </div>
 
-          <Box flex={1} minWidth={0}>
-            <Typography
-              variant="caption"
-              fontWeight={700}
-              color="text.secondary"
-              display="block"
-              mb={0.75}
+      <div className="flex-1 min-w-0 max-w-[85%]">
+        <div className="text-xs font-bold text-muted-foreground mb-1.5">Concept Coach</div>
+
+        <div className={cn(
+          "rounded-2xl rounded-tl-sm p-4 text-sm leading-relaxed border",
+          msg.is_error
+            ? "bg-red-50 border-red-200/60 text-red-800 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-300"
+            : "bg-card border-primary/10 shadow-sm"
+        )}>
+          {msg.is_error && (
+            <div className="flex items-center gap-2 mb-2 text-red-600 dark:text-red-400">
+              <AlertCircle size={14} />
+              <span className="text-xs font-bold uppercase tracking-wide">Error</span>
+            </div>
+          )}
+          <MarkdownContent content={msg.content} />
+        </div>
+
+        {/* Hints */}
+        {msg.hints?.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {msg.hints.map((hint, i) => (
+              <span key={i} className="inline-flex items-center gap-1 rounded-full border border-amber-200/60 bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-300">
+                <Lightbulb size={11} /> {hint}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Actions */}
+        {!msg.is_error && (
+          <div className="mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="text-[10px] font-semibold text-muted-foreground mr-1">{msg.time}</span>
+            <button
+              onClick={handleCopy}
+              className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition"
             >
-              {t("coach_label")}
-            </Typography>
-
-            {/* Main bubble */}
-            <Box
-              sx={{
-                p: 2.5,
-                borderRadius: "0 14px 14px 14px",
-                bgcolor: isError
-                  ? isDark
-                    ? "rgba(245,158,11,0.08)"
-                    : "rgba(245,158,11,0.05)"
-                  : isDark
-                    ? "rgba(28, 37, 46, 0.95)"
-                    : "rgba(248, 250, 252, 1)",
-                border: "1px solid",
-                borderColor: isError
-                  ? isDark
-                    ? "rgba(245,158,11,0.3)"
-                    : "rgba(245,158,11,0.25)"
-                  : isDark
-                    ? "rgba(255,255,255,0.07)"
-                    : "rgba(0,0,0,0.07)",
-                wordBreak: "break-word",
-              }}
+              {copied ? <CheckCircle size={12} className="text-emerald-500" /> : <Copy size={12} />}
+            </button>
+            <button
+              onClick={() => setThumbed("up")}
+              className={cn("h-6 w-6 rounded-md flex items-center justify-center transition", thumbed === "up" ? "text-emerald-500 bg-emerald-500/10" : "text-muted-foreground hover:text-foreground hover:bg-muted")}
             >
-              <MarkdownContent content={msg.content} />
-            </Box>
-
-            {/* Hint chips */}
-            {msg.hints?.length > 0 && (
-              <Box mt={1.5} display="flex" flexWrap="wrap" gap={1}>
-                {msg.hints.map((hint, i) => (
-                  <Chip
-                    key={i}
-                    icon={<LightbulbIcon />}
-                    label={hint}
-                    size="small"
-                    sx={{
-                      bgcolor: "rgba(245,158,11,0.1)",
-                      color: "#f59e0b",
-                      border: "1px solid rgba(245,158,11,0.25)",
-                      fontWeight: 700,
-                      borderRadius: 2,
-                      "& .MuiChip-icon": { color: "#f59e0b", fontSize: 16 },
-                    }}
-                  />
-                ))}
-              </Box>
-            )}
-
-            {/* Action row — hide for error messages */}
-            {!isError && (
-              <Box display="flex" alignItems="center" gap={0.5} mt={0.75}>
-                <Typography
-                  variant="caption"
-                  color="text.disabled"
-                  sx={{ mr: 0.5, fontSize: "0.72rem" }}
-                >
-                  {msg.time}
-                </Typography>
-                <Tooltip title={copied ? t("coach_copied") : t("coach_copy")}>
-                  <IconButton
-                    size="small"
-                    onClick={handleCopy}
-                    sx={{
-                      opacity: 0.45,
-                      "&:hover": { opacity: 1 },
-                      width: 28,
-                      height: 28,
-                    }}
-                  >
-                    <CopyIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={t("coach_helpful")}>
-                  <IconButton
-                    size="small"
-                    onClick={() => setThumbed("up")}
-                    sx={{
-                      opacity: thumbed === "up" ? 1 : 0.45,
-                      color: thumbed === "up" ? "#10b981" : "inherit",
-                      width: 28,
-                      height: 28,
-                      "&:hover": { opacity: 1 },
-                    }}
-                  >
-                    <ThumbUpIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={t("coach_not_helpful")}>
-                  <IconButton
-                    size="small"
-                    onClick={() => setThumbed("down")}
-                    sx={{
-                      opacity: thumbed === "down" ? 1 : 0.45,
-                      color: thumbed === "down" ? "#ef4444" : "inherit",
-                      width: 28,
-                      height: 28,
-                      "&:hover": { opacity: 1 },
-                    }}
-                  >
-                    <ThumbDownIcon sx={{ fontSize: 14 }} />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            )}
-          </Box>
-        </Box>
-      </Box>
-    </Fade>
+              <ThumbsUp size={12} />
+            </button>
+            <button
+              onClick={() => setThumbed("down")}
+              className={cn("h-6 w-6 rounded-md flex items-center justify-center transition", thumbed === "down" ? "text-red-500 bg-red-500/10" : "text-muted-foreground hover:text-foreground hover:bg-muted")}
+            >
+              <ThumbsDown size={12} />
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
-// ─── User message bubble ──────────────────────────────────────────────────────
+const UserBubble = ({ msg }) => (
+  <div className="flex gap-3 items-start flex-row-reverse animate-in fade-in slide-in-from-bottom-2 duration-300">
+    <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-primary flex items-center justify-center shadow-md shadow-primary/20">
+      <User size={16} className="text-primary-foreground" />
+    </div>
+    <div className="flex-1 min-w-0 max-w-[80%]">
+      <div className="text-xs font-bold text-right text-muted-foreground mb-1.5">You</div>
+      <div className="rounded-2xl rounded-tr-sm bg-primary px-4 py-3 text-sm text-primary-foreground shadow-sm shadow-primary/20 whitespace-pre-wrap leading-relaxed">
+        {msg.content}
+      </div>
+      <div className="text-[10px] font-semibold text-right text-muted-foreground mt-1">{msg.time}</div>
+    </div>
+  </div>
+);
 
-const UserBubble = ({ msg }) => {
-  const { t } = useTranslation();
-  return (
-    <Fade in timeout={300}>
-      <Box
-        display="flex"
-        gap={2}
-        alignItems="flex-start"
-        flexDirection="row-reverse"
-      >
-        <Avatar
-          sx={{ width: 36, height: 36, bgcolor: "primary.main", flexShrink: 0 }}
-        >
-          <PersonIcon sx={{ fontSize: 20 }} />
-        </Avatar>
-        <Box>
-          <Typography
-            variant="caption"
-            fontWeight={700}
-            color="text.secondary"
-            display="block"
-            mb={0.75}
-            textAlign="right"
-          >
-            {t("coach_you")}
-          </Typography>
-          <Box
-            sx={{
-              p: 2,
-              borderRadius: "14px 0 14px 14px",
-              bgcolor: "primary.main",
-              color: "white",
-              maxWidth: 520,
-            }}
-          >
-            <Typography
-              variant="body1"
-              sx={{
-                color: "inherit",
-                lineHeight: 1.75,
-                whiteSpace: "pre-wrap",
-              }}
-            >
-              {msg.content}
-            </Typography>
-          </Box>
-          <Typography
-            variant="caption"
-            color="text.disabled"
-            display="block"
-            textAlign="right"
-            mt={0.5}
-            sx={{ fontSize: "0.72rem" }}
-          >
-            {msg.time}
-            </Typography>
-        </Box>
-      </Box>
-    </Fade>
-  );
-};
-
-// ─── Starter prompts ──────────────────────────────────────────────────────────
-
-const StarterGrid = ({ onSelect }) => {
+// ─── Starter Cards ─────────────────────────────────────────────────────────────
+const StarterCards = ({ onSelect }) => {
   const { t } = useTranslation();
   const starters = [
-    {
-      icon: <CalculateIcon />,
-      labelKey: "starter_math",
-      textKey: "starter_math_text",
-    },
-    {
-      icon: <PsychologyIcon />,
-      labelKey: "starter_concept",
-      textKey: "starter_concept_text",
-    },
-    {
-      icon: <SchoolIcon />,
-      labelKey: "starter_check",
-      textKey: "starter_check_text",
-    },
-    {
-      icon: <LightbulbIcon />,
-      labelKey: "starter_hint",
-      textKey: "starter_hint_text",
-    },
+    { icon: Calculator, label: "Solve a Math Problem", text: "Help me solve this math problem step by step:", color: "text-blue-500", bg: "bg-blue-500/10 border-blue-500/20" },
+    { icon: Brain, label: "Explain a Concept", text: "Explain this concept simply with examples:", color: "text-purple-500", bg: "bg-purple-500/10 border-purple-500/20" },
+    { icon: GraduationCap, label: "Check My Answer", text: "Can you check my answer and tell me if it's correct:", color: "text-emerald-500", bg: "bg-emerald-500/10 border-emerald-500/20" },
+    { icon: Lightbulb, label: "Give Me a Hint", text: "I'm stuck on this problem. Give me a hint:", color: "text-amber-500", bg: "bg-amber-500/10 border-amber-500/20" },
   ];
 
-  const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
-
   return (
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: { xs: "1fr 1fr", md: "1fr 1fr 1fr 1fr" },
-        gap: 1.5,
-        mb: 3,
-      }}
-    >
+    <div className="grid grid-cols-2 gap-3 mb-6">
       {starters.map((s, i) => (
-        <Paper
+        <button
           key={i}
-          onClick={() => onSelect(t(s.textKey))}
-          elevation={0}
-          sx={{
-            p: 2,
-            borderRadius: 3,
-            cursor: "pointer",
-            border: "1px solid",
-            borderColor: "divider",
-            bgcolor: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-            transition: "all 0.2s",
-            "&:hover": {
-              borderColor: "primary.main",
-              bgcolor: "rgba(37,99,235,0.04)",
-              transform: "translateY(-2px)",
-              boxShadow: "0 4px 20px rgba(37,99,235,0.1)",
-            },
-          }}
+          onClick={() => onSelect(s.text)}
+          className={cn(
+            "group flex flex-col items-start gap-2 rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-md",
+            s.bg
+          )}
         >
-          <Box sx={{ color: "primary.main", mb: 1, "& svg": { fontSize: 22 } }}>
-            {s.icon}
-          </Box>
-          <Typography variant="body2" fontWeight={700} sx={{ lineHeight: 1.4 }}>
-            {t(s.labelKey)}
-          </Typography>
-        </Paper>
+          <div className={cn("flex h-8 w-8 items-center justify-center rounded-xl bg-background shadow-sm", s.color)}>
+            <s.icon size={16} />
+          </div>
+          <span className={cn("text-sm font-bold", s.color)}>{s.label}</span>
+        </button>
       ))}
-    </Box>
+    </div>
   );
 };
 
-// ─── Main Component ───────────────────────────────────────────────────────────
+// ─── History Drawer ────────────────────────────────────────────────────────────
+const HistoryDrawer = ({ open, onClose, sessions, onNew, onClear }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex" onClick={onClose}>
+      <div
+        className="h-full w-72 bg-card border-r border-border/50 shadow-2xl flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between p-5 border-b border-border/50">
+          <div className="flex items-center gap-2">
+            <History size={18} className="text-primary" />
+            <span className="font-black text-base">Chat History</span>
+          </div>
+          <button onClick={onClose} className="h-7 w-7 rounded-lg hover:bg-muted flex items-center justify-center text-muted-foreground transition">
+            <X size={16} />
+          </button>
+        </div>
 
+        <div className="p-4">
+          <button
+            onClick={() => { onNew(); onClose(); }}
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary/90 transition"
+          >
+            <Plus size={16} /> New Chat
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-2">
+          {sessions.length === 0 ? (
+            <div className="text-center py-8 opacity-50">
+              <History size={32} className="mx-auto mb-2 text-muted-foreground" />
+              <p className="text-sm font-semibold text-muted-foreground">No history yet</p>
+            </div>
+          ) : (
+            sessions.map((s, i) => (
+              <div key={i} className="rounded-xl border border-border/50 p-3 hover:border-primary/30 hover:bg-muted/50 cursor-pointer transition">
+                <p className="text-sm font-bold truncate">{s.preview}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <Clock size={10} className="text-muted-foreground" />
+                  <span className="text-[10px] font-semibold text-muted-foreground">{s.time} · {s.messageCount} msgs</span>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {sessions.length > 0 && (
+          <div className="p-4 border-t border-border/50">
+            <button
+              onClick={onClear}
+              className="w-full rounded-xl border border-red-200 py-2 text-xs font-bold text-red-500 hover:bg-red-50 transition dark:border-red-500/20 dark:hover:bg-red-500/10"
+            >
+              Clear History
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ─── Main Component ─────────────────────────────────────────────────────────────
 export default function ConceptCoach() {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
   const { t, i18n } = useTranslation();
   const location = useLocation();
 
@@ -761,27 +379,24 @@ export default function ConceptCoach() {
   const [loading, setLoading] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [chatSessions, setChatSessions] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('cc_sessions') || '[]'); } catch { return []; }
+    try { return JSON.parse(localStorage.getItem("cc_sessions") || "[]"); } catch { return []; }
   });
+
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const autoExplainFiredRef = useRef(false);
 
-  // Parse URL params for auto-explain from WeakTopics
   const searchParams = new URLSearchParams(location.search);
-  const autoExplainTopic = searchParams.get('topic') || '';
-  const autoExplainSubject = searchParams.get('subject') || '';
-  const shouldAutoExplain = searchParams.get('autoExplain') === 'true';
+  const autoExplainTopic = searchParams.get("topic") || "";
+  const autoExplainSubject = searchParams.get("subject") || "";
+  const shouldAutoExplain = searchParams.get("autoExplain") === "true";
 
-  // Map i18n language to BCP-47 for speech recognition
   const langMap = { en: "en-US", hi: "hi-IN", ta: "ta-IN", fr: "fr-FR" };
   const speechLang = langMap[i18n.language] || "en-US";
 
   const handleVoiceResult = useCallback((transcript, isFinal) => {
     setInputValue(transcript);
     if (isFinal && transcript.trim()) {
-      // Auto-send on final result
-      // (we send after a short delay so the input shows the final text)
       setTimeout(() => {
         setInputValue((prev) => {
           if (prev.trim()) sendMessage(prev.trim());
@@ -792,608 +407,272 @@ export default function ConceptCoach() {
   }, []);
 
   const handleVoiceError = useCallback((err) => {
-    if (err !== "no-speech") {
-      setInputValue("");
-    }
+    if (err !== "no-speech") setInputValue("");
   }, []);
 
-  const {
-    listening,
-    supported: voiceSupported,
-    start: startListening,
-    stop: stopListening,
-  } = useSpeechRecognition({
-    onResult: handleVoiceResult,
-    onError: handleVoiceError,
-    lang: speechLang,
-  });
+  const { listening, supported: voiceSupported, start: startListening, stop: stopListening } =
+    useSpeechRecognition({ onResult: handleVoiceResult, onError: handleVoiceError, lang: speechLang });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Auto-explain on mount when coming from WeakTopics
   useEffect(() => {
     if (shouldAutoExplain && autoExplainTopic && !autoExplainFiredRef.current) {
       autoExplainFiredRef.current = true;
-      const msg = `Please explain **${autoExplainTopic}**${autoExplainSubject ? ` from ${autoExplainSubject}` : ''} in a clear, comprehensive way with:
-1. Simple explanation
-2. A concrete example
-3. Why this is important for exams
-4. A memory tip or mnemonic`;
-      // Small delay to let component mount fully
+      const msg = `Please explain **${autoExplainTopic}**${autoExplainSubject ? ` from ${autoExplainSubject}` : ""} in a clear, comprehensive way.`;
       setTimeout(() => sendMessage(msg), 400);
     }
   }, []);
 
-  // Save session to localStorage on messages change
   useEffect(() => {
     if (messages.length === 0) return;
     const session = {
       id: Date.now(),
-      preview: messages[0]?.content?.slice(0, 60) || 'Session',
+      preview: messages[0]?.content?.slice(0, 60) || "Session",
       time: new Date().toLocaleDateString(),
       messageCount: messages.length,
     };
-    setChatSessions(prev => {
+    setChatSessions((prev) => {
       const updated = [session, ...prev.slice(0, 19)];
-      localStorage.setItem('cc_sessions', JSON.stringify(updated));
+      localStorage.setItem("cc_sessions", JSON.stringify(updated));
       return updated;
     });
   }, [messages.length]);
 
-  const sendMessage = useCallback(
-    async (text) => {
-      const trimmed = text.trim();
-      if (!trimmed || loading) return;
+  const sendMessage = useCallback(async (text) => {
+    const trimmed = text.trim();
+    if (!trimmed || loading) return;
+    const userMsg = { role: "user", content: trimmed, time: formatTime() };
+    setMessages((prev) => [...prev, userMsg]);
+    setInputValue("");
+    setLoading(true);
+    inputRef.current?.focus();
 
-      const userMsg = { role: "user", content: trimmed, time: formatTime() };
-      setMessages((prev) => [...prev, userMsg]);
-      setInputValue("");
-      setLoading(true);
-      inputRef.current?.focus();
-
-      try {
-        const history = messages
-          .slice(-10)
-          .map((m) => ({ role: m.role, content: m.content }));
-        const res = await API.post("/ai-tutor/chat/", {
-          message: trimmed,
-          chat_history: history,
-        });
-
-        const data = res.data;
-        const responseText =
-          data.response ||
-          data.message ||
-          (typeof data === "string" ? data : JSON.stringify(data));
-        const hints = Array.isArray(data.hints) ? data.hints : [];
-        const isError = !!data.is_error;
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: responseText,
-            hints,
-            is_error: isError,
-            time: formatTime(),
-          },
-        ]);
-      } catch (err) {
-        const errMsg =
-          err?.response?.data?.detail ||
-          err?.response?.data?.error ||
-          err.message ||
-          "Unknown error";
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: `**Connection error.**\n\nCould not reach the server: \`${errMsg}\`. Please check the app server is running and try again.`,
-            hints: [],
-            is_error: true,
-            time: formatTime(),
-          },
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [loading, messages],
-  );
+    try {
+      const history = messages.slice(-10).map((m) => ({ role: m.role, content: m.content }));
+      const res = await API.post("/ai-tutor/chat/", { message: trimmed, chat_history: history });
+      const data = res.data;
+      const responseText = data.response || data.message || (typeof data === "string" ? data : JSON.stringify(data));
+      setMessages((prev) => [...prev, { role: "assistant", content: responseText, hints: Array.isArray(data.hints) ? data.hints : [], is_error: !!data.is_error, time: formatTime() }]);
+    } catch (err) {
+      const errMsg = err?.response?.data?.detail || err?.response?.data?.error || err.message || "Unknown error";
+      setMessages((prev) => [...prev, { role: "assistant", content: `**Connection error.**\n\nCould not reach the server: \`${errMsg}\`. Please check the app server is running and try again.`, hints: [], is_error: true, time: formatTime() }]);
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, messages]);
 
   const handleSend = () => sendMessage(inputValue);
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  const handleNewChat = () => {
-    setMessages([]);
-    setInputValue("");
-    inputRef.current?.focus();
-  };
-
-  const toggleVoice = () => {
-    if (!voiceSupported) {
-      alert(t("coach_voice_unsupported"));
-      return;
-    }
-    if (listening) stopListening();
-    else startListening();
-  };
+  const handleKeyDown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } };
+  const handleNewChat = () => { setMessages([]); setInputValue(""); inputRef.current?.focus(); };
 
   const isEmpty = messages.length === 0;
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "calc(100vh - 72px)",
-        maxWidth: 980,
-        mx: "auto",
-        position: "relative",
-      }}
-    >
-      {/* ── HISTORY DRAWER ── */}
-      <Drawer
-        anchor="left"
+    <div className="flex flex-col h-[calc(100vh-72px)] max-w-3xl mx-auto">
+
+      {/* History Drawer */}
+      <HistoryDrawer
         open={historyOpen}
         onClose={() => setHistoryOpen(false)}
-        PaperProps={{ sx: { width: 280, bgcolor: 'background.paper', borderRight: '1px solid', borderColor: 'divider' } }}
-      >
-        <Box sx={{ p: 2.5 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="subtitle1" fontWeight={800}>Chat History</Typography>
-            <IconButton size="small" onClick={() => setHistoryOpen(false)}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </Box>
-          <Button fullWidth variant="contained" startIcon={<AddIcon />}
-            onClick={() => { handleNewChat(); setHistoryOpen(false); }}
-            sx={{ mb: 2, fontWeight: 700, borderRadius: 2, background: 'linear-gradient(135deg, #2563EB, #7c3aed)' }}>
-            New Chat
-          </Button>
-          {chatSessions.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 4, opacity: 0.5 }}>
-              <HistoryIcon sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="body2">No history yet</Typography>
-            </Box>
-          ) : (
-            <Stack spacing={0.75}>
-              {chatSessions.map((s, i) => (
-                <Paper key={i} elevation={0} sx={{
-                  p: 1.5, borderRadius: '10px', cursor: 'pointer',
-                  border: '1px solid', borderColor: 'divider',
-                  '&:hover': { borderColor: 'primary.main', bgcolor: 'rgba(37,99,235,0.04)' },
-                  transition: 'all 0.15s',
-                }}>
-                  <Typography variant="body2" fontWeight={600} noWrap>{s.preview}</Typography>
-                  <Typography variant="caption" color="text.disabled">{s.time} · {s.messageCount} msgs</Typography>
-                </Paper>
-              ))}
-            </Stack>
-          )}
-          {chatSessions.length > 0 && (
-            <Button fullWidth size="small" color="error" sx={{ mt: 2, fontWeight: 600 }}
-              onClick={() => { setChatSessions([]); localStorage.removeItem('cc_sessions'); }}>
-              Clear History
-            </Button>
-          )}
-        </Box>
-      </Drawer>
+        sessions={chatSessions}
+        onNew={handleNewChat}
+        onClear={() => { setChatSessions([]); localStorage.removeItem("cc_sessions"); }}
+      />
 
       {/* ── TOP BAR ── */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          px: 2,
-          py: 1.5,
-          flexShrink: 0,
-        }}
-      >
-        <Box display="flex" alignItems="center" gap={1.5}>
-          <Tooltip title="Chat History">
-            <IconButton size="small" onClick={() => setHistoryOpen(true)}
-              sx={{ borderRadius: 2, border: '1px solid', borderColor: 'divider', width: 36, height: 36 }}>
-              <HistoryIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-          <Box
-            sx={{
-              width: 38, height: 38, borderRadius: "10px",
-              background: "linear-gradient(135deg, #2563EB, #7c3aed)",
-              display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-            }}
+      <div className="flex items-center justify-between px-4 py-3 flex-shrink-0 border-b border-border/50">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setHistoryOpen(true)}
+            className="h-9 w-9 rounded-xl border border-border/50 flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition"
           >
-            <SmartToyIcon sx={{ color: "white", fontSize: 20 }} />
-          </Box>
-          <Box>
-            <Typography variant="subtitle1" fontWeight={800} sx={{ lineHeight: 1.2 }}>
-              {t("coach_title")}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t("coach_subtitle")}
-            </Typography>
-          </Box>
-        </Box>
-        <Tooltip title={t("coach_new_chat")}>
-          <IconButton
-            onClick={handleNewChat}
-            sx={{
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "divider",
-              width: 36,
-              height: 36,
-            }}
-          >
-            <AddIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      </Box>
+            <History size={16} />
+          </button>
+          {/* Logo */}
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-violet-600 shadow-md shadow-primary/20">
+              <Bot size={18} className="text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-black leading-tight">Concept Coach</p>
+              <p className="text-[10px] font-semibold text-muted-foreground leading-tight">AI-powered tutor</p>
+            </div>
+          </div>
+        </div>
 
-      <Divider />
+        <button
+          onClick={handleNewChat}
+          className="flex items-center gap-1.5 rounded-xl border border-border/50 px-3 py-2 text-xs font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition"
+        >
+          <Plus size={14} /> New Chat
+        </button>
+      </div>
 
-      {/* ── MESSAGES ── */}
-      <Box
-        sx={{
-          flex: 1,
-          overflowY: "auto",
-          px: { xs: 2, md: 3 },
-          py: 3,
-          scrollbarWidth: "thin",
-          "&::-webkit-scrollbar": { width: 5 },
-          "&::-webkit-scrollbar-thumb": { bgcolor: "divider", borderRadius: 3 },
-        }}
-      >
-        {/* Auto-Explain Context Banner */}
+      {/* ── MESSAGES AREA ── */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-5 scroll-smooth custom-scrollbar">
+
+        {/* Auto-explain banner */}
         {shouldAutoExplain && autoExplainTopic && (
-          <Fade in timeout={500}>
-            <Alert
-              icon={<SchoolIcon fontSize="inherit" />}
-              severity="info"
-              sx={{
-                mb: 3,
-                borderRadius: '12px',
-                border: '1px solid',
-                borderColor: 'info.main',
-                bgcolor: isDark ? 'rgba(2,136,209,0.1)' : 'rgba(2,136,209,0.05)',
-                '& .MuiAlert-message': { width: '100%' },
-              }}
-              action={
-                <IconButton size="small" onClick={() => window.history.replaceState({}, document.title, window.location.pathname)}>
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              }
+          <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 mb-2">
+            <BookOpen size={16} className="text-primary flex-shrink-0" />
+            <p className="text-sm font-bold text-primary flex-1">
+              Explaining: {autoExplainTopic} {autoExplainSubject ? `(${autoExplainSubject})` : ""}
+            </p>
+            <button
+              onClick={() => window.history.replaceState({}, document.title, window.location.pathname)}
+              className="text-muted-foreground hover:text-foreground"
             >
-              <Typography variant="body2" fontWeight={700}>
-                Teaching: {autoExplainTopic} {autoExplainSubject ? `(${autoExplainSubject})` : ''}
-              </Typography>
-            </Alert>
-          </Fade>
+              <X size={14} />
+            </button>
+          </div>
         )}
 
         {/* Welcome / empty state */}
         {isEmpty && !shouldAutoExplain && (
-          <Fade in timeout={600}>
-            <Box>
-              <Box textAlign="center" mb={5} mt={2}>
-                <Box
-                  sx={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: "18px",
-                    background:
-                      "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(124,58,237,0.15))",
-                    border: "2px solid rgba(37,99,235,0.2)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    mx: "auto",
-                    mb: 3,
-                  }}
-                >
-                  <AutoAwesomeIcon
-                    sx={{ fontSize: 36, color: "primary.main" }}
-                  />
-                </Box>
-                <Typography
-                  variant="h4"
-                  fontWeight={900}
-                  sx={{ letterSpacing: "-0.02em", mb: 1.5 }}
-                >
-                  {t("coach_welcome_title")}
-                </Typography>
-                <Typography
-                  variant="body1"
-                  color="text.secondary"
-                  sx={{ maxWidth: 520, mx: "auto", lineHeight: 1.7 }}
-                >
-                  {t("coach_welcome_subtitle")}
-                </Typography>
-              </Box>
-              <StarterGrid onSelect={setInputValue} />
-              <Typography
-                variant="caption"
-                color="text.disabled"
-                display="block"
-                textAlign="center"
-              >
-                {t("coach_welcome_footer")}
-              </Typography>
-            </Box>
-          </Fade>
+          <div className="flex flex-col items-center pt-6 pb-2 animate-in fade-in duration-500">
+            {/* Hero icon */}
+            <div className="relative mb-6">
+              <div className="h-20 w-20 rounded-3xl bg-gradient-to-br from-primary/20 to-violet-500/20 border-2 border-primary/20 flex items-center justify-center">
+                <Sparkles size={36} className="text-primary" />
+              </div>
+              <div className="absolute -bottom-1 -right-1 h-7 w-7 rounded-xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-md">
+                <Bot size={14} className="text-white" />
+              </div>
+            </div>
+
+            <h2 className="text-2xl font-black text-center mb-2">
+              {t("coach_welcome_title", "How can I help you learn?")}
+            </h2>
+            <p className="text-sm font-medium text-muted-foreground text-center max-w-md mb-8 leading-relaxed">
+              {t("coach_welcome_subtitle", "Ask me anything — a concept, a problem, or 'I don't understand...'")}
+            </p>
+
+            <StarterCards onSelect={setInputValue} />
+
+            <p className="text-[11px] font-semibold text-muted-foreground text-center opacity-60">
+              {t("coach_welcome_footer", "Press Enter to send · Shift+Enter for new line")}
+            </p>
+          </div>
         )}
 
         {/* Messages */}
-        <Stack spacing={4}>
-          {messages.map((msg, idx) =>
-            msg.role === "user" ? (
-              <UserBubble key={idx} msg={msg} />
-            ) : (
-              <AssistantBubble key={idx} msg={msg} />
-            ),
-          )}
-
-          {/* Typing dots */}
-          {loading && (
-            <Fade in timeout={300}>
-              <Box display="flex" gap={2} alignItems="center">
-                <Avatar
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    background: "linear-gradient(135deg, #2563EB, #7c3aed)",
-                    flexShrink: 0,
-                  }}
-                >
-                  <SmartToyIcon sx={{ fontSize: 20 }} />
-                </Avatar>
-                <Box
-                  sx={{
-                    px: 2,
-                    py: 1.5,
-                    borderRadius: "0 14px 14px 14px",
-                    bgcolor: isDark
-                      ? "rgba(28,37,46,0.95)"
-                      : "rgba(248,250,252,1)",
-                    border: "1px solid",
-                    borderColor: isDark
-                      ? "rgba(255,255,255,0.07)"
-                      : "rgba(0,0,0,0.07)",
-                  }}
-                >
-                  <TypingIndicator />
-                </Box>
-              </Box>
-            </Fade>
-          )}
-          <div ref={messagesEndRef} />
-        </Stack>
-      </Box>
-
-      {/* ── INPUT AREA ── */}
-      <Box
-        sx={{
-          flexShrink: 0,
-          px: { xs: 2, md: 3 },
-          pb: 3,
-          pt: 1.5,
-          bgcolor: "background.default",
-          borderTop: "1px solid",
-          borderColor: "divider",
-        }}
-      >
-        {/* Quick chips */}
-        {!isEmpty && (
-          <Box display="flex" gap={1} mb={1.5} flexWrap="wrap">
-            {[
-              {
-                labelKey: "chip_hint",
-                icon: <LightbulbIcon sx={{ fontSize: 14 }} />,
-              },
-              {
-                labelKey: "chip_formula",
-                icon: <CalculateIcon sx={{ fontSize: 14 }} />,
-              },
-              {
-                labelKey: "chip_explain",
-                icon: <RefreshIcon sx={{ fontSize: 14 }} />,
-              },
-              {
-                labelKey: "chip_next",
-                icon: <CheckCircleOutlineIcon sx={{ fontSize: 14 }} />,
-              },
-            ].map((chip, i) => (
-              <Chip
-                key={i}
-                icon={chip.icon}
-                label={t(chip.labelKey)}
-                size="small"
-                clickable
-                onClick={() => sendMessage(t(chip.labelKey))}
-                disabled={loading}
-                sx={{
-                  borderRadius: 2,
-                  fontWeight: 600,
-                  fontSize: "0.76rem",
-                  bgcolor: isDark
-                    ? "rgba(255,255,255,0.04)"
-                    : "rgba(0,0,0,0.04)",
-                  border: "1px solid",
-                  borderColor: "divider",
-                  "&:hover": {
-                    bgcolor: "rgba(37,99,235,0.09)",
-                    borderColor: "primary.main",
-                    color: "primary.main",
-                  },
-                  "& .MuiChip-icon": { color: "inherit" },
-                }}
-              />
-            ))}
-          </Box>
+        {messages.map((msg, idx) =>
+          msg.role === "user" ? (
+            <UserBubble key={idx} msg={msg} />
+          ) : (
+            <AssistantBubble key={idx} msg={msg} />
+          )
         )}
 
-        {/* Voice listening banner */}
+        {/* Typing indicator */}
+        {loading && (
+          <div className="flex gap-3 items-start animate-in fade-in duration-200">
+            <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-violet-600 flex items-center justify-center shadow-md shadow-primary/20">
+              <Bot size={16} className="text-white" />
+            </div>
+            <div className="rounded-2xl rounded-tl-sm bg-card border border-primary/10 px-4 py-3 shadow-sm">
+              <TypingDots />
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* ── INPUT AREA ── */}
+      <div className="flex-shrink-0 px-4 pb-5 pt-3 border-t border-border/50 bg-background/80 backdrop-blur-sm">
+
+        {/* Quick suggestion chips — only after conversation starts */}
+        {!isEmpty && (
+          <div className="flex gap-2 mb-3 flex-wrap">
+            {[
+              { label: "Give a hint", icon: Lightbulb },
+              { label: "Show formula", icon: Calculator },
+              { label: "Explain again", icon: RefreshCw },
+              { label: "Next step", icon: GraduationCap },
+            ].map((chip, i) => (
+              <button
+                key={i}
+                onClick={() => sendMessage(chip.label)}
+                disabled={loading}
+                className="flex items-center gap-1.5 rounded-full border border-border/50 bg-background px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition disabled:opacity-40"
+              >
+                <chip.icon size={12} />
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Voice indicator */}
         {listening && (
-          <Fade in>
-            <Box
-              sx={{
-                mb: 1.5,
-                px: 2,
-                py: 1,
-                borderRadius: 2,
-                bgcolor: "rgba(239,68,68,0.08)",
-                border: "1px solid rgba(239,68,68,0.2)",
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-              }}
-            >
-              <Box
-                sx={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: "50%",
-                  bgcolor: "#ef4444",
-                  animation: "pulse 1s ease-in-out infinite",
-                  "@keyframes pulse": {
-                    "0%,100%": { opacity: 1 },
-                    "50%": { opacity: 0.3 },
-                  },
-                }}
-              />
-              <Typography variant="caption" fontWeight={700} color="error.main">
-                {t("coach_listening")}
-              </Typography>
-            </Box>
-          </Fade>
+          <div className="flex items-center gap-2 mb-2 rounded-xl border border-red-200/60 bg-red-50 px-3 py-2 dark:bg-red-500/10 dark:border-red-500/20">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span className="text-xs font-bold text-red-600 dark:text-red-400">Listening…</span>
+          </div>
         )}
 
         {/* Input box */}
-        <Paper
-          elevation={0}
-          sx={{
-            display: "flex",
-            alignItems: "flex-end",
-            gap: 1,
-            p: "10px 14px",
-            borderRadius: 4,
-            border: "1px solid",
-            borderColor: "divider",
-            bgcolor: isDark ? "rgba(28,37,46,0.9)" : "white",
-            boxShadow: isDark ? "none" : "0 2px 12px rgba(0,0,0,0.07)",
-            transition: "border-color 0.2s, box-shadow 0.2s",
-            "&:focus-within": {
-              borderColor: "primary.main",
-              boxShadow: "0 0 0 3px rgba(37,99,235,0.12)",
-            },
-          }}
-        >
-          <TextField
-            inputRef={inputRef}
-            fullWidth
-            multiline
-            maxRows={6}
-            placeholder={
-              isEmpty
-                ? t("coach_placeholder_empty")
-                : t("coach_placeholder_followup")
-            }
-            variant="standard"
-            InputProps={{
-              disableUnderline: true,
-              sx: { fontSize: "0.96rem", lineHeight: 1.6, pt: 0.5, pb: 0.5 },
-            }}
+        <div className="flex items-end gap-2 rounded-2xl border border-primary/20 bg-card px-4 py-3 shadow-sm transition focus-within:border-primary/50 focus-within:shadow-md focus-within:shadow-primary/10">
+          <textarea
+            ref={inputRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={loading}
+            placeholder={
+              isEmpty
+                ? t("coach_placeholder_empty", "Ask me anything — a problem, a concept, or 'I don't understand...'")
+                : t("coach_placeholder_followup", "Ask a follow-up question...")
+            }
+            rows={1}
+            className="flex-1 resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground/60 leading-relaxed max-h-32 overflow-y-auto disabled:opacity-60 font-medium"
+            style={{ minHeight: "24px" }}
+            onInput={(e) => {
+              e.target.style.height = "auto";
+              e.target.style.height = Math.min(e.target.scrollHeight, 128) + "px";
+            }}
           />
 
           {/* Voice button */}
-          <Tooltip title={listening ? t("coach_mic_stop") : t("coach_mic_tip")}>
-            <IconButton
-              onClick={toggleVoice}
-              disabled={loading}
-              sx={{
-                width: 38,
-                height: 38,
-                borderRadius: 2,
-                flexShrink: 0,
-                color: listening ? "#ef4444" : "text.secondary",
-                bgcolor: listening ? "rgba(239,68,68,0.1)" : "transparent",
-                border: listening
-                  ? "1px solid rgba(239,68,68,0.3)"
-                  : "1px solid transparent",
-                "&:hover": {
-                  bgcolor: listening ? "rgba(239,68,68,0.2)" : "action.hover",
-                },
-                transition: "all 0.2s",
-              }}
-            >
-              {listening ? (
-                <StopIcon sx={{ fontSize: 18 }} />
-              ) : (
-                <MicIcon sx={{ fontSize: 18 }} />
-              )}
-            </IconButton>
-          </Tooltip>
+          <button
+            onClick={listening ? stopListening : startListening}
+            disabled={loading || !voiceSupported}
+            className={cn(
+              "flex-shrink-0 h-8 w-8 rounded-xl flex items-center justify-center transition",
+              listening
+                ? "bg-red-500/10 text-red-500 border border-red-500/30"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+            )}
+          >
+            {listening ? <StopCircle size={16} /> : <Mic size={16} />}
+          </button>
 
           {/* Send button */}
-          <Tooltip title={loading ? t("coach_thinking") : t("coach_send")}>
-            <span>
-              <IconButton
-                onClick={handleSend}
-                disabled={!inputValue.trim() || loading}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 2,
-                  flexShrink: 0,
-                  background:
-                    inputValue.trim() && !loading
-                      ? "linear-gradient(135deg, #2563EB, #7c3aed)"
-                      : undefined,
-                  color:
-                    inputValue.trim() && !loading ? "white" : "text.disabled",
-                  "&:hover": {
-                    background:
-                      inputValue.trim() && !loading
-                        ? "linear-gradient(135deg, #1d4ed8, #6d28d9)"
-                        : undefined,
-                  },
-                  transition: "all 0.2s",
-                }}
-              >
-                {loading ? (
-                  <CircularProgress size={17} color="inherit" />
-                ) : (
-                  <SendIcon sx={{ fontSize: 18 }} />
-                )}
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Paper>
+          <button
+            onClick={handleSend}
+            disabled={!inputValue.trim() || loading}
+            className={cn(
+              "flex-shrink-0 h-8 w-8 rounded-xl flex items-center justify-center transition-all",
+              inputValue.trim() && !loading
+                ? "bg-primary text-primary-foreground shadow-md shadow-primary/30 hover:bg-primary/90"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
+            )}
+          >
+            {loading ? (
+              <span className="h-4 w-4 rounded-full border-2 border-current border-t-transparent animate-spin" />
+            ) : (
+              <Send size={14} />
+            )}
+          </button>
+        </div>
 
-        <Typography
-          variant="caption"
-          color="text.disabled"
-          display="block"
-          textAlign="center"
-          mt={1.5}
-        >
-          {t("coach_footer_tip")}
-        </Typography>
-      </Box>
-    </Box>
+        <p className="text-center text-[10px] font-semibold text-muted-foreground mt-2 opacity-60">
+          {t("coach_footer_tip", "Press Enter to send · Shift+Enter for new line")}
+        </p>
+      </div>
+    </div>
   );
 }

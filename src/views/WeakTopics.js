@@ -1,132 +1,64 @@
 import React, { useState, useEffect, useCallback } from "react";
 import API from "../api/api";
-import {
-  Button,
-  Typography,
-  Box,
-  Chip,
-  Stack,
-  LinearProgress,
-  Popover,
-  Paper,
-  CircularProgress,
-  Alert,
-} from "@/src/components/tailwind/mui";
-import {
-  AutoAwesome as AutoAwesomeIcon,
-  PlayArrow as PlayArrowIcon,
-  Psychology as PsychologyIcon,
-  Warning as WarningIcon,
-  TrendingDown as TrendingDownIcon,
-  Refresh as RefreshIcon,
-} from "@/src/components/tailwind/icons";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  ActionBar,
-  AsyncContent,
-  PageHeader,
-  SurfaceCard,
-} from "../components/ui";
+import { ArrowRight, RefreshCw, Loader2, TrendingDown, CheckCircle2, AlertTriangle, Play } from "lucide-react";
+import { cn } from "../lib/utils";
 
-import { SUBJECT_COLORS } from "../theme";
-const getSubjectColor = (subject, allSubjects) => {
-  const idx = allSubjects.indexOf(subject);
-  return SUBJECT_COLORS[idx % SUBJECT_COLORS.length];
+const getSeverity = (pct) => {
+  if (pct < 40) return { bg: "bg-red-500/10", text: "text-red-600", border: "border-red-500/20", dot: "bg-red-500", label: "Critical" };
+  if (pct < 70) return { bg: "bg-amber-500/10", text: "text-amber-600", border: "border-amber-500/20", dot: "bg-amber-500", label: "Needs Work" };
+  return { bg: "bg-emerald-500/10", text: "text-emerald-600", border: "border-emerald-500/20", dot: "bg-emerald-500", label: "Fair" };
 };
 
-// Chip color based on accuracy/severity
-const getSeverityColor = (pct) => {
-  if (pct < 40) return { bg: 'rgba(239,68,68,0.12)', color: '#EF4444', label: 'Critical' };
-  if (pct < 70) return { bg: 'rgba(245,158,11,0.12)', color: '#F59E0B', label: 'Needs Work' };
-  return { bg: 'rgba(16,185,129,0.12)', color: '#10B981', label: 'Fair' };
-};
+const SUBJECT_COLORS = ["#2563EB", "#7C3AED", "#DB2777", "#EA580C", "#16A34A", "#0891B2"];
 
-// Topic chip with hover popover
-const TopicChip = ({ topic, subject, accuracy, noteId, onNavigate }) => {
-  const [anchor, setAnchor] = useState(null);
-  const severity = getSeverityColor(accuracy);
-
-  const handleExplain = () => {
-    setAnchor(null);
-    onNavigate('explain', topic, subject, noteId);
-  };
-  const handlePractice = () => {
-    setAnchor(null);
-    onNavigate('practice', topic, subject, noteId);
-  };
-
+function TopicChip({ topic, subject, accuracy, noteId, onNavigate }) {
+  const [showPopup, setShowPopup] = useState(false);
+  const sev = getSeverity(accuracy);
   return (
-    <>
-      <Chip
-        label={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <span style={{ fontWeight: 700 }}>{topic}</span>
-            <span style={{ opacity: 0.7, fontSize: '0.75em' }}>{accuracy}%</span>
-          </Box>
-        }
-        onClick={(e) => setAnchor(e.currentTarget)}
-        size="medium"
-        sx={{
-          bgcolor: severity.bg,
-          color: severity.color,
-          border: `1.5px solid ${severity.color}40`,
-          fontWeight: 600,
-          cursor: 'pointer',
-          height: 32,
-          transition: 'all 0.15s ease',
-          '&:hover': {
-            bgcolor: severity.bg,
-            borderColor: severity.color,
-            transform: 'translateY(-1px)',
-            boxShadow: `0 4px 12px ${severity.color}30`,
-          },
-          '& .MuiChip-label': { px: 1.5 },
-        }}
-      />
-      <Popover
-        open={Boolean(anchor)}
-        anchorEl={anchor}
-        onClose={() => setAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        PaperProps={{ sx: { borderRadius: '16px', border: '1px solid', borderColor: 'divider', boxShadow: '0 12px 40px rgba(0,0,0,0.15)', p: 0, overflow: 'hidden', minWidth: 260 } }}
+    <div className="relative">
+      <button
+        onClick={() => setShowPopup(!showPopup)}
+        className={cn("flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold transition-all hover:-translate-y-0.5", sev.bg, sev.text, sev.border)}
       >
-        <Box sx={{ p: 2.5 }}>
-          <Typography variant="subtitle2" fontWeight={800} gutterBottom>{topic}</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 1.5 }}>
-            <Chip label={severity.label} size="small"
-              sx={{ bgcolor: severity.bg, color: severity.color, fontWeight: 700, fontSize: '0.7rem', height: 20 }} />
-            <Typography variant="caption" color="text.secondary">{accuracy}% accuracy</Typography>
-          </Box>
-          <Box sx={{ mb: 1 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-              <Typography variant="caption" color="text.secondary">Mastery level</Typography>
-              <Typography variant="caption" fontWeight={700} sx={{ color: severity.color }}>{accuracy}%</Typography>
-            </Box>
-            <LinearProgress variant="determinate" value={accuracy}
-              sx={{ height: 5, borderRadius: 3, bgcolor: `${severity.color}18`,
-                '& .MuiLinearProgress-bar': { bgcolor: severity.color, borderRadius: 3 } }} />
-          </Box>
-        </Box>
-        <Box sx={{ px: 2.5, pb: 2, display: 'flex', gap: 1 }}>
-          <Button variant="contained" size="small" startIcon={<PlayArrowIcon />}
-            onClick={handlePractice}
-            sx={{ flex: 1, fontWeight: 700, borderRadius: '8px', fontSize: '0.8rem',
-              background: 'linear-gradient(135deg, #2563EB 0%, #4F46E5 100%)' }}>
-            Practice
-          </Button>
-          <Button variant="outlined" size="small" startIcon={<AutoAwesomeIcon />}
-            onClick={handleExplain}
-            sx={{ flex: 1, fontWeight: 700, borderRadius: '8px', fontSize: '0.8rem',
-              borderColor: '#7C3AED', color: '#7C3AED',
-              '&:hover': { bgcolor: 'rgba(124,58,237,0.08)', borderColor: '#7C3AED' } }}>
-            Explain
-          </Button>
-        </Box>
-      </Popover>
-    </>
+        <span>{topic}</span>
+        <span className="opacity-60 text-xs">{accuracy}%</span>
+      </button>
+
+      {showPopup && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={() => setShowPopup(false)} />
+          <div className="absolute z-40 top-full mt-2 left-0 w-64 rounded-2xl border bg-card shadow-2xl p-5 animate-in fade-in zoom-in-95 duration-150">
+            <h4 className="font-black text-sm mb-1">{topic}</h4>
+            <div className="flex items-center gap-2 mb-4">
+              <span className={cn("rounded-full px-2.5 py-0.5 text-xs font-bold", sev.bg, sev.text)}>{sev.label}</span>
+              <span className="text-xs text-muted-foreground">{accuracy}% accuracy</span>
+            </div>
+            <div className="mb-4">
+              <div className="flex justify-between mb-1">
+                <span className="text-xs text-muted-foreground">Mastery</span>
+                <span className={cn("text-xs font-bold", sev.text)}>{accuracy}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <div className={cn("h-full rounded-full transition-all", sev.dot.replace('bg-', 'bg-'))} style={{ width: `${accuracy}%`, backgroundColor: accuracy < 40 ? '#ef4444' : accuracy < 70 ? '#f59e0b' : '#10b981' }} />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => { setShowPopup(false); onNavigate('practice', topic, subject, noteId); }}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-black text-primary-foreground transition hover:bg-primary/90">
+                <Play size={13} /> Practice
+              </button>
+              <button onClick={() => { setShowPopup(false); onNavigate('explain', topic, subject, noteId); }}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition hover:bg-muted">
+                Explain
+              </button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   );
-};
+}
 
 function WeakTopics() {
   const [topics, setTopics] = useState([]);
@@ -136,14 +68,10 @@ function WeakTopics() {
   const navigate = useNavigate();
 
   const fetchWeakTopics = useCallback(() => {
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     API.get(`weak-topics/?note_id=${noteId}`)
-      .then((res) => setTopics(res.data.weak_topics || []))
-      .catch((err) => {
-        setTopics([]);
-        setError("We could not load weak topics right now.");
-      })
+      .then(res => setTopics(res.data.weak_topics || []))
+      .catch(() => { setTopics([]); setError("We could not load weak topics right now."); })
       .finally(() => setLoading(false));
   }, [noteId]);
 
@@ -151,171 +79,123 @@ function WeakTopics() {
 
   const handleNavigate = (action, topic, subject, nId) => {
     if (action === 'explain') {
-      navigate(
-        `/concept-coach?topic=${encodeURIComponent(topic)}&subject=${encodeURIComponent(subject || '')}&autoExplain=true`
-      );
+      navigate(`/concept-coach?topic=${encodeURIComponent(topic)}&subject=${encodeURIComponent(subject || '')}&autoExplain=true`);
     } else {
       navigate(`/quiz/${nId || noteId}`);
     }
   };
 
-  // Map topics: enrich with accuracy %, sort by severity
   const enrichedTopics = [...topics]
-    .map((t) => ({
-      ...t,
-      score: Number(t.score || 0),
-      accuracy: Math.max(0, Math.min(100, Math.round((1 - Number(t.score || 0)) * 100))),
-      subject: t.subject || 'General',
-    }))
-    .sort((a, b) => a.accuracy - b.accuracy); // worst first
+    .map(t => ({ ...t, accuracy: Math.max(0, Math.min(100, Math.round((1 - Number(t.score || 0)) * 100))), subject: t.subject || 'General' }))
+    .sort((a, b) => a.accuracy - b.accuracy);
 
-  // Group by subject
-  const subjectGroups = enrichedTopics.reduce((acc, t) => {
-    if (!acc[t.subject]) acc[t.subject] = [];
-    acc[t.subject].push(t);
-    return acc;
-  }, {});
-
+  const subjectGroups = enrichedTopics.reduce((acc, t) => { if (!acc[t.subject]) acc[t.subject] = []; acc[t.subject].push(t); return acc; }, {});
   const allSubjects = Object.keys(subjectGroups);
 
-  // Aggregate stats per subject
-  const subjectStats = allSubjects.map((subj) => {
-    const group = subjectGroups[subj];
-    const avgAcc = Math.round(group.reduce((s, t) => s + t.accuracy, 0) / group.length);
-    return { subject: subj, avgAcc, count: group.length };
-  });
-
   return (
-    <Box sx={{ maxWidth: 1120, mx: "auto", display: "grid", gap: 2.5 }}>
-      <PageHeader
-        title={`Weak Topics · Lecture ${noteId}`}
-        subtitle="Prioritize weak areas — click any topic chip to practice or get an instant explanation."
-      />
+    <div className="flex flex-col gap-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b pb-8">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-widest text-primary mb-2">Weak Topics</p>
+          <h1 className="text-4xl font-black tracking-tight">Lecture {noteId}</h1>
+          <p className="mt-3 text-lg font-medium text-muted-foreground max-w-xl">
+            Prioritize weak areas — click any topic chip to practice or get an instant AI explanation.
+          </p>
+        </div>
+        <button onClick={fetchWeakTopics} className="flex shrink-0 items-center gap-2 rounded-xl border bg-card px-5 py-3 text-sm font-bold hover:bg-muted transition-colors shadow-sm">
+          <RefreshCw size={15} /> Refresh
+        </button>
+      </div>
 
-      <SurfaceCard>
-        <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }}
-          justifyContent="space-between" spacing={1.5}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#EF4444' }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={600}>Critical (&lt;40%)</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#F59E0B' }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={600}>Needs Work (40–70%)</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-              <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: '#10B981' }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={600}>Fair (&gt;70%)</Typography>
-            </Box>
-          </Box>
-          <Button size="small" variant="outlined" onClick={fetchWeakTopics} startIcon={<RefreshIcon />}
-            sx={{ borderRadius: 2.5, fontWeight: 700, borderColor: 'divider', color: 'text.secondary',
-              '&:hover': { borderColor: 'primary.main', color: 'primary.main' } }}>
-            Refresh
-          </Button>
-        </Stack>
-      </SurfaceCard>
+      {/* Legend */}
+      <div className="flex flex-wrap gap-6 rounded-2xl border bg-card p-6">
+        <span className="text-xs font-black uppercase tracking-wider text-muted-foreground">Severity key:</span>
+        {[{ color: 'bg-red-500', label: 'Critical (<40%)' }, { color: 'bg-amber-500', label: 'Needs Work (40–70%)' }, { color: 'bg-emerald-500', label: 'Fair (>70%)' }].map(({ color, label }) => (
+          <div key={label} className="flex items-center gap-2">
+            <div className={`h-3 w-3 rounded-full ${color}`} />
+            <span className="text-sm font-semibold text-muted-foreground">{label}</span>
+          </div>
+        ))}
+      </div>
 
       {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <CircularProgress />
-        </Box>
+        <div className="flex justify-center py-16">
+          <Loader2 className="animate-spin text-primary" size={36} />
+        </div>
       )}
 
       {error && !loading && (
-        <Alert severity="error" action={<Button size="small" onClick={fetchWeakTopics}>Retry</Button>}>
+        <div className="flex items-center justify-between rounded-2xl border border-red-500/20 bg-red-500/10 p-5 text-sm font-semibold text-red-600">
           {error}
-        </Alert>
+          <button onClick={fetchWeakTopics} className="text-xs font-black text-red-600 underline hover:no-underline">Retry</button>
+        </div>
       )}
 
       {!loading && !error && enrichedTopics.length === 0 && (
-        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: '20px', border: '1px dashed', borderColor: 'divider' }}>
-          <TrendingDownIcon sx={{ fontSize: 56, color: 'text.disabled', mb: 2, opacity: 0.4 }} />
-          <Typography variant="h6" fontWeight={700} gutterBottom>No weak topics yet</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Complete a quiz for this lecture to surface weak concepts and recommendations.
-          </Typography>
-          <Button variant="contained" onClick={() => navigate(`/quiz/${noteId}`)} startIcon={<PlayArrowIcon />}
-            sx={{ fontWeight: 700, borderRadius: 2 }}>
-            Go to Quiz
-          </Button>
-        </Paper>
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed py-24 text-center text-muted-foreground">
+          <TrendingDown size={56} className="mb-4 opacity-20" />
+          <h3 className="text-xl font-bold mb-2">No weak topics yet</h3>
+          <p className="text-sm max-w-sm">Complete a quiz for this lecture to surface weak concepts and recommendations.</p>
+          <button onClick={() => navigate(`/quiz/${noteId}`)} className="mt-6 flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-black text-primary-foreground transition hover:bg-primary/90">
+            <Play size={16} /> Go to Quiz
+          </button>
+        </div>
       )}
 
-      {/* Subject-grouped inline chip sections */}
       {!loading && !error && allSubjects.length > 0 && (
-        <Stack spacing={3}>
-          {allSubjects.map((subject) => {
-            const color = getSubjectColor(subject, allSubjects);
-            const stat = subjectStats.find(s => s.subject === subject);
-            const sevColor = getSeverityColor(stat.avgAcc);
+        <div className="flex flex-col gap-6">
+          {allSubjects.map((subject, subjectIdx) => {
+            const color = SUBJECT_COLORS[subjectIdx % SUBJECT_COLORS.length];
+            const group = subjectGroups[subject];
+            const avgAcc = Math.round(group.reduce((s, t) => s + t.accuracy, 0) / group.length);
+            const sev = getSeverity(avgAcc);
+            const worst = group[0];
             return (
-              <Paper key={subject} elevation={0} sx={{
-                p: 2.5, borderRadius: '16px',
-                border: '1px solid', borderColor: 'divider',
-                borderLeft: `4px solid ${color}`,
-              }}>
-                {/* Subject header row */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, flexWrap: 'wrap' }}>
-                  <Typography variant="subtitle1" fontWeight={800} sx={{ color }}>
-                    {subject}
-                  </Typography>
-                  <Chip label={`${stat.count} topic${stat.count > 1 ? 's' : ''}`} size="small"
-                    sx={{ bgcolor: `${color}15`, color, fontWeight: 700, fontSize: '0.7rem', height: 20 }} />
-                  <Chip label={`Avg: ${stat.avgAcc}%`} size="small"
-                    sx={{ bgcolor: sevColor.bg, color: sevColor.color, fontWeight: 700, fontSize: '0.7rem', height: 20 }} />
-                  <Box sx={{ ml: 'auto', display: 'flex', gap: 1 }}>
-                    <Button size="small" variant="outlined" onClick={() => navigate(`/quiz/${noteId}`)}
-                      startIcon={<PlayArrowIcon sx={{ fontSize: '14px !important' }} />}
-                      sx={{ fontWeight: 700, fontSize: '0.75rem', borderRadius: 2, py: 0.5,
-                        borderColor: `${color}50`, color, '&:hover': { borderColor: color, bgcolor: `${color}10` } }}>
-                      Practice All
-                    </Button>
-                  </Box>
-                </Box>
+              <div key={subject} className="rounded-3xl border bg-card shadow-sm overflow-hidden" style={{ borderLeft: `4px solid ${color}` }}>
+                <div className="p-7">
+                  {/* Subject header */}
+                  <div className="flex items-center justify-between flex-wrap gap-4 mb-6">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <h2 className="text-xl font-black" style={{ color }}>{subject}</h2>
+                      <span className="rounded-full px-3 py-0.5 text-sm font-bold" style={{ backgroundColor: `${color}18`, color }}>
+                        {group.length} topic{group.length > 1 ? 's' : ''}
+                      </span>
+                      <span className={cn("rounded-full px-3 py-0.5 text-sm font-bold", sev.bg, sev.text)}>Avg: {avgAcc}%</span>
+                    </div>
+                    <button onClick={() => navigate(`/quiz/${noteId}`)}
+                      className="flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-bold transition hover:bg-muted"
+                      style={{ borderColor: `${color}40`, color }}>
+                      <Play size={13} /> Practice All
+                    </button>
+                  </div>
 
-                {/* Inline topic chips */}
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {subjectGroups[subject].map((t, i) => (
-                    <TopicChip
-                      key={`${t.topic}-${i}`}
-                      topic={t.topic || `Topic ${i + 1}`}
-                      subject={subject}
-                      accuracy={t.accuracy}
-                      noteId={t.note_id || noteId}
-                      onNavigate={handleNavigate}
-                    />
-                  ))}
-                </Box>
+                  {/* Topic chips */}
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {group.map((t, i) => (
+                      <TopicChip key={`${t.topic}-${i}`} topic={t.topic || `Topic ${i + 1}`} subject={subject} accuracy={t.accuracy} noteId={t.note_id || noteId} onNavigate={handleNavigate} />
+                    ))}
+                  </div>
 
-                {/* Bottom: mini accuracy bar for worst topic */}
-                {subjectGroups[subject][0] && (
-                  <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                      <Typography variant="caption" color="text.secondary" fontWeight={600}>
-                        Most critical: <strong>{subjectGroups[subject][0].topic}</strong>
-                      </Typography>
-                      <Typography variant="caption" fontWeight={700}
-                        sx={{ color: getSeverityColor(subjectGroups[subject][0].accuracy).color }}>
-                        {subjectGroups[subject][0].accuracy}%
-                      </Typography>
-                    </Box>
-                    <LinearProgress variant="determinate" value={subjectGroups[subject][0].accuracy}
-                      sx={{ height: 4, borderRadius: 2,
-                        bgcolor: `${getSeverityColor(subjectGroups[subject][0].accuracy).color}18`,
-                        '& .MuiLinearProgress-bar': {
-                          bgcolor: getSeverityColor(subjectGroups[subject][0].accuracy).color,
-                          borderRadius: 2,
-                        } }} />
-                  </Box>
-                )}
-              </Paper>
+                  {/* Worst topic progress bar */}
+                  {worst && (
+                    <div className="rounded-2xl bg-muted/50 p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-bold text-muted-foreground">Most critical: <strong className="text-foreground">{worst.topic}</strong></span>
+                        <span className={cn("text-xs font-black", getSeverity(worst.accuracy).text)}>{worst.accuracy}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${worst.accuracy}%`, backgroundColor: worst.accuracy < 40 ? '#ef4444' : worst.accuracy < 70 ? '#f59e0b' : '#10b981' }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             );
           })}
-        </Stack>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
 

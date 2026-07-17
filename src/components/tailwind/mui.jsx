@@ -101,10 +101,117 @@ const sxToStyle = (sx) => {
       out.paddingTop = typeof value === "number" ? `${value * 8}px` : value;
       out.paddingBottom = out.paddingTop;
     } else if (key === "borderRadius") out.borderRadius = typeof value === "number" ? `${value * 8}px` : value;
+    else if (key === "gap") out.gap = typeof value === "number" ? `${value * 8}px` : value;
+    else if (key === "rowGap") out.rowGap = typeof value === "number" ? `${value * 8}px` : value;
+    else if (key === "columnGap") out.columnGap = typeof value === "number" ? `${value * 8}px` : value;
+    else if (key === "letterSpacing") out.letterSpacing = String(value).startsWith("-") ? "0" : value;
     else if (key === "displayPrint") continue;
     else out[key] = value;
   }
   return out;
+};
+
+const stylePropAliases = {
+  bgcolor: "backgroundColor",
+  m: "margin",
+  mt: "marginTop",
+  mr: "marginRight",
+  mb: "marginBottom",
+  ml: "marginLeft",
+  p: "padding",
+  pt: "paddingTop",
+  pr: "paddingRight",
+  pb: "paddingBottom",
+  pl: "paddingLeft",
+};
+
+const directStyleKeys = new Set([
+  "alignItems",
+  "background",
+  "backgroundColor",
+  "border",
+  "borderBottom",
+  "borderColor",
+  "borderLeft",
+  "borderRadius",
+  "borderRight",
+  "borderTop",
+  "bottom",
+  "boxShadow",
+  "color",
+  "cursor",
+  "display",
+  "flex",
+  "flexDirection",
+  "flexGrow",
+  "flexShrink",
+  "flexWrap",
+  "fontSize",
+  "fontWeight",
+  "gap",
+  "height",
+  "inset",
+  "justifyContent",
+  "left",
+  "letterSpacing",
+  "lineHeight",
+  "maxHeight",
+  "maxWidth",
+  "minHeight",
+  "minWidth",
+  "opacity",
+  "overflow",
+  "overflowX",
+  "overflowY",
+  "position",
+  "right",
+  "textAlign",
+  "top",
+  "transform",
+  "transition",
+  "width",
+  "zIndex",
+  ...Object.keys(stylePropAliases),
+  "mx",
+  "my",
+  "px",
+  "py",
+]);
+
+const spacingValue = (value) => (typeof value === "number" ? `${value * 8}px` : value);
+
+const directPropsToStyle = (props) => {
+  const style = {};
+  const rest = {};
+
+  for (const [key, rawValue] of Object.entries(props)) {
+    if (!directStyleKeys.has(key)) {
+      rest[key] = rawValue;
+      continue;
+    }
+    const value = resolveToken(responsiveValue(rawValue));
+    if (value == null || typeof value === "object") continue;
+    if (key === "mx") {
+      style.marginLeft = spacingValue(value);
+      style.marginRight = spacingValue(value);
+    } else if (key === "my") {
+      style.marginTop = spacingValue(value);
+      style.marginBottom = spacingValue(value);
+    } else if (key === "px") {
+      style.paddingLeft = spacingValue(value);
+      style.paddingRight = spacingValue(value);
+    } else if (key === "py") {
+      style.paddingTop = spacingValue(value);
+      style.paddingBottom = spacingValue(value);
+    } else if (key === "letterSpacing") {
+      style.letterSpacing = String(value).startsWith("-") ? "0" : value;
+    } else {
+      style[stylePropAliases[key] || key] =
+        key.length <= 2 || ["borderRadius", "gap"].includes(key) ? spacingValue(value) : value;
+    }
+  }
+
+  return { style, rest };
 };
 
 const splitProps = ({
@@ -121,15 +228,35 @@ const splitProps = ({
   ModalProps,
   anchorOrigin,
   transformOrigin,
+  SelectProps,
+  InputProps,
   inputProps,
   InputLabelProps,
+  ownerState,
+  theme: ignoredTheme,
+  variant,
+  size,
+  edge,
+  underline,
+  selected,
+  expandIcon,
+  exclusive,
+  anchor,
+  anchorEl,
+  onClose,
+  position,
+  defaultExpanded,
   ...props
-}) => ({
-  className,
-  style: { ...sxToStyle(sx), ...style },
-  component,
-  props,
-});
+}) => {
+  const { style: directStyle, rest } = directPropsToStyle(props);
+  return {
+    className,
+    style: { ...directStyle, ...sxToStyle(sx), ...style },
+    component,
+    props: rest,
+    defaultExpanded,
+  };
+};
 
 const make = (Tag, base = "") =>
   React.forwardRef((input, ref) => {
@@ -139,8 +266,8 @@ const make = (Tag, base = "") =>
   });
 
 export const Box = make("div");
-export const Paper = make("div", "rounded-3xl border border-violet-200/70 bg-white/75 shadow-card backdrop-blur-2xl");
-export const Card = make("div", "rounded-3xl border border-violet-200/70 bg-white/75 shadow-card backdrop-blur-2xl");
+export const Paper = make("div", "rounded-lg border border-violet-200/70 bg-white/75 shadow-card backdrop-blur-2xl");
+export const Card = make("div", "rounded-lg border border-violet-200/70 bg-white/75 shadow-card backdrop-blur-2xl");
 export const CardContent = make("div", "p-6");
 export const Container = React.forwardRef(({ maxWidth = "lg", className, sx, style, ...props }, ref) => (
   <div
@@ -199,10 +326,19 @@ const variantClasses = {
   caption: "text-xs font-semibold",
   overline: "text-xs font-extrabold uppercase",
 };
-export const Typography = React.forwardRef(({ variant = "body1", color, noWrap, className, sx, style, component, ...props }, ref) => {
+export const Typography = React.forwardRef(({ variant = "body1", color, noWrap, className, sx, style, component, gutterBottom, display, mb, paragraph, fontWeight, lineHeight, letterSpacing, align, ...props }, ref) => {
   const Comp = component || variantTags[variant] || "p";
   const colorStyle = color ? { color: resolveToken(color) } : {};
-  return <Comp ref={ref} className={cn(variantClasses[variant], noWrap && "truncate", className)} style={{ ...colorStyle, ...sxToStyle(sx), ...style }} {...props} />;
+  const extraStyle = {
+    ...(gutterBottom ? { marginBottom: "0.35em" } : {}),
+    ...(display ? { display } : {}),
+    ...(mb != null ? { marginBottom: `${mb * 8}px` } : {}),
+    ...(fontWeight ? { fontWeight } : {}),
+    ...(lineHeight ? { lineHeight } : {}),
+    ...(letterSpacing ? { letterSpacing } : {}),
+    ...(align ? { textAlign: align } : {}),
+  };
+  return <Comp ref={ref} className={cn(variantClasses[variant], noWrap && "truncate", className)} style={{ ...colorStyle, ...extraStyle, ...sxToStyle(sx), ...style }} {...props} />;
 });
 
 export const Button = React.forwardRef(({ variant = "text", size = "medium", color, startIcon, endIcon, disabled, fullWidth, className, sx, style, component, ...props }, ref) => {
@@ -235,8 +371,8 @@ export const Chip = React.forwardRef(({ label, icon, className, sx, style, ...pr
   <span ref={ref} className={cn("inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-100/70 px-3 py-1 text-xs font-extrabold text-violet-900", className)} style={{ ...sxToStyle(sx), ...style }} {...props}>{icon}{label || props.children}</span>
 ));
 
-export const TextField = React.forwardRef(({ label, helperText, error, select, children, multiline, rows, InputProps, fullWidth, className, sx, style, ...props }, ref) => {
-  const common = cn("w-full rounded-2xl border bg-white/80 px-4 py-3 text-sm outline-none backdrop-blur-xl transition focus:border-violet-500", error ? "border-rose-400" : "border-violet-200", className);
+export const TextField = React.forwardRef(({ label, helperText, error, select, children, multiline, rows, InputProps, SelectProps, inputProps, InputLabelProps, fullWidth, className, sx, style, ...props }, ref) => {
+  const common = cn("w-full rounded-lg border bg-white/80 px-4 py-3 text-sm outline-none backdrop-blur-xl transition focus:border-violet-500", error ? "border-rose-400" : "border-violet-200", className);
   return (
     <label className="block w-full" style={{ ...sxToStyle(sx), ...style }}>
       {label && <span className="mb-1.5 block text-sm font-bold text-violet-950/75">{label}</span>}
@@ -256,26 +392,52 @@ export const TextField = React.forwardRef(({ label, helperText, error, select, c
   );
 });
 
-export const MenuItem = React.forwardRef(({ value, className, sx, style, ...props }, ref) => (
-  <option ref={ref} value={value} className={className} style={{ ...sxToStyle(sx), ...style }} {...props} />
-));
+const textFromChildren = (children) => {
+  if (children == null || typeof children === "boolean") return "";
+  if (typeof children === "string" || typeof children === "number") return String(children);
+  if (Array.isArray(children)) return children.map(textFromChildren).join(" ").replace(/\s+/g, " ").trim();
+  if (React.isValidElement(children)) return textFromChildren(children.props.children);
+  return "";
+};
 
-export const Select = React.forwardRef(({ children, className, sx, style, ...props }, ref) => (
-  <select ref={ref} className={cn("w-full rounded-2xl border border-violet-200 bg-white/80 px-4 py-3 text-sm", className)} style={{ ...sxToStyle(sx), ...style }} {...props}>{children}</select>
+export const MenuItem = React.forwardRef(({ value, className, sx, style, children, selected, ...props }, ref) => {
+  const itemStyle = { ...sxToStyle(sx), ...style };
+  if (value !== undefined) {
+    return (
+      <option ref={ref} value={value} className={className} style={itemStyle} {...props}>
+        {textFromChildren(children)}
+      </option>
+    );
+  }
+  return (
+    <button
+      ref={ref}
+      type="button"
+      className={cn("flex w-full items-center rounded-xl px-3 py-2 text-left text-sm font-semibold text-violet-950 hover:bg-violet-50", selected && "bg-violet-50 text-violet-700", className)}
+      style={itemStyle}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+});
+
+export const Select = React.forwardRef(({ children, className, sx, style, SelectProps, inputProps, InputLabelProps, size, variant, ...props }, ref) => (
+  <select ref={ref} className={cn("w-full rounded-lg border border-violet-200 bg-white/80 px-4 py-3 text-sm", className)} style={{ ...sxToStyle(sx), ...style }} {...props}>{children}</select>
 ));
 
 export const FormControl = make("div", "space-y-1");
 export const InputLabel = make("label", "text-sm font-bold text-violet-950/70");
 export const InputAdornment = make("span", "inline-flex items-center");
 export const FormGroup = make("div", "space-y-2");
-export const FormControlLabel = ({ control, label, ...props }) => <label className="flex items-center gap-2 text-sm font-medium" {...props}>{control}{label}</label>;
-export const Checkbox = ({ checked, ...props }) => <input type="checkbox" checked={checked} className="h-4 w-4 accent-violet-600" {...props} />;
-export const Switch = ({ checked, ...props }) => <input type="checkbox" role="switch" checked={checked} className="h-5 w-10 accent-violet-600" {...props} />;
-export const Slider = ({ value, ...props }) => <input type="range" value={value} className="w-full accent-violet-600" {...props} />;
+export const FormControlLabel = ({ control, label, sx, style, ...props }) => <label className="flex items-center gap-2 text-sm font-medium" style={{ ...sxToStyle(sx), ...style }} {...props}>{control}{label}</label>;
+export const Checkbox = ({ checked, sx, style, size, ...props }) => <input type="checkbox" checked={checked} className="h-4 w-4 accent-violet-600" style={{ ...sxToStyle(sx), ...style }} {...props} />;
+export const Switch = ({ checked, sx, style, size, ...props }) => <input type="checkbox" role="switch" checked={checked} className="h-5 w-10 accent-violet-600" style={{ ...sxToStyle(sx), ...style }} {...props} />;
+export const Slider = ({ value, sx, style, size, ...props }) => <input type="range" value={value} className="w-full accent-violet-600" style={{ ...sxToStyle(sx), ...style }} {...props} />;
 
 export const CircularProgress = ({ size = 24, className }) => <span className={cn("inline-block animate-spin rounded-full border-2 border-current border-r-transparent", className)} style={{ width: size, height: size }} />;
 export const LinearProgress = ({ value, className, sx, style }) => <div className={cn("h-2 overflow-hidden rounded-full bg-violet-100", className)} style={{ ...sxToStyle(sx), ...style }}><div className="h-full rounded-full bg-grad-primary" style={{ width: `${value ?? 45}%` }} /></div>;
-export const Skeleton = ({ height = 80, className, sx, style }) => <div className={cn("animate-pulse rounded-2xl bg-violet-100/80", className)} style={{ height, ...sxToStyle(sx), ...style }} />;
+export const Skeleton = ({ height = 80, className, sx, style }) => <div className={cn("animate-pulse rounded-lg bg-violet-100/80", className)} style={{ height, ...sxToStyle(sx), ...style }} />;
 
 export const Divider = React.forwardRef(({ children, className, sx, style, ...props }, ref) => (
   <div
@@ -292,14 +454,14 @@ export const Avatar = React.forwardRef(({ src, children, className, sx, style, .
 export const Badge = ({ badgeContent, children }) => <span className="relative inline-flex">{children}{badgeContent ? <span className="absolute -right-1 -top-1 rounded-full bg-rose-500 px-1.5 text-[10px] font-black text-white">{badgeContent}</span> : null}</span>;
 export const Tooltip = ({ children }) => <>{children}</>;
 
-export const Alert = React.forwardRef(({ severity = "info", className, sx, style, ...props }, ref) => <div ref={ref} role="alert" className={cn("rounded-2xl border px-4 py-3 text-sm font-semibold", severity === "error" ? "border-rose-200 bg-rose-50 text-rose-700" : severity === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-violet-200 bg-violet-50 text-violet-900", className)} style={{ ...sxToStyle(sx), ...style }} {...props} />);
+export const Alert = React.forwardRef(({ severity = "info", className, sx, style, ...props }, ref) => <div ref={ref} role="alert" className={cn("rounded-lg border px-4 py-3 text-sm font-semibold", severity === "error" ? "border-rose-200 bg-rose-50 text-rose-700" : severity === "success" ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-violet-200 bg-violet-50 text-violet-900", className)} style={{ ...sxToStyle(sx), ...style }} {...props} />);
 
-export const Dialog = ({ open, children }) => open ? <div className="fixed inset-0 z-50 grid place-items-center bg-[#16112f]/45 p-4 backdrop-blur-sm"><div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-3xl border border-violet-200 bg-white p-0 shadow-[0_36px_90px_rgba(22,17,47,0.28)]">{children}</div></div> : null;
+export const Dialog = ({ open, children }) => open ? <div className="fixed inset-0 z-50 grid place-items-center bg-[#16112f]/45 p-4 backdrop-blur-sm"><div className="max-h-[90vh] w-full max-w-2xl overflow-auto rounded-xl border border-violet-200 bg-white p-0 shadow-[0_36px_90px_rgba(22,17,47,0.28)]">{children}</div></div> : null;
 export const DialogTitle = make("div", "px-6 pt-6 text-xl font-black");
 export const DialogContent = make("div", "p-6");
 export const DialogActions = make("div", "flex justify-end gap-2 px-6 pb-6");
 export const Drawer = ({ open, onClose, children }) => open ? <div className="fixed inset-0 z-50 bg-[#16112f]/30" onClick={onClose}><div className="h-full w-72 bg-white/95 shadow-card backdrop-blur-2xl" onClick={(e) => e.stopPropagation()}>{children}</div></div> : null;
-export const Menu = ({ open, children }) => open ? <div className="fixed right-4 top-16 z-50 min-w-56 rounded-2xl border border-violet-200 bg-white/95 p-2 shadow-card backdrop-blur-2xl">{children}</div> : null;
+export const Menu = ({ open, children }) => open ? <div className="fixed right-4 top-16 z-50 min-w-56 rounded-xl border border-violet-200 bg-white/95 p-2 shadow-card backdrop-blur-2xl">{children}</div> : null;
 export const Popover = Menu;
 export const Snackbar = ({ open, message, children }) => open ? <div className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-2xl bg-violet-950 px-4 py-3 text-white shadow-card">{children || message}</div> : null;
 
@@ -314,9 +476,12 @@ export const ListItemAvatar = make("span");
 export const Link = make("a", "font-bold text-violet-700");
 export const Tabs = make("div", "flex gap-1 rounded-2xl bg-violet-100/60 p-1");
 export const Tab = make("button", "rounded-xl px-4 py-2 text-sm font-bold hover:bg-white/80");
-export const ToggleButtonGroup = make("div", "inline-flex rounded-2xl border border-violet-200 p-1");
+export const ToggleButtonGroup = make("div", "inline-flex rounded-xl border border-violet-200 p-1");
 export const ToggleButton = make("button", "rounded-xl px-3 py-2 text-sm font-bold hover:bg-violet-100");
-export const Accordion = make("details", "rounded-2xl border border-violet-200 bg-white/75 p-3");
+export const Accordion = React.forwardRef((input, ref) => {
+  const { className, style, props, defaultExpanded } = splitProps(input);
+  return <details ref={ref} open={defaultExpanded} className={cn("rounded-xl border border-violet-200 bg-white/75 p-3", className)} style={style} {...props} />;
+});
 export const AccordionSummary = make("summary", "cursor-pointer font-bold");
 export const AccordionDetails = make("div", "pt-3");
 export const Collapse = ({ in: show = true, children }) => show ? children : null;

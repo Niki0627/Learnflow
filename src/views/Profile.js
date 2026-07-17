@@ -2,51 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import API from '../api/api';
 import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Grid,
-  Avatar,
-  Button,
-  TextField,
-  MenuItem,
-  Chip,
-  Switch,
-  IconButton,
-  Divider,
-  useTheme,
-  LinearProgress,
-  Badge
-} from "@/src/components/tailwind/mui";
-import {
-  Edit as EditIcon,
-  Share as ShareIcon,
-  PhotoCamera as PhotoCameraIcon,
-  School as SchoolIcon,
-  EmojiEvents as EmojiEventsIcon,
-  MilitaryTech as MilitaryTechIcon,
-  Psychology as PsychologyIcon,
-  RocketLaunch as RocketLaunchIcon,
-  Lock as LockIcon,
-  Badge as BadgeIcon,
-  AutoAwesome as AutoAwesomeIcon,
-  Close as CloseIcon,
-  Add as AddIcon,
-  NotificationsActive as NotificationsActiveIcon,
-  Schedule as ScheduleIcon,
-  Mail as MailIcon,
+  Camera,
+  Share,
+  Edit,
+  GraduationCap,
+  Award,
+  Flame,
+  Medal,
+  BrainCircuit,
+  Lock,
+  UserCircle,
+  Settings,
+  BellRing,
+  Clock,
+  Mail,
   Link as LinkIcon,
-  GitHub as GitHubIcon,
-  Google as GoogleIcon,
-  Microsoft as MicrosoftIcon
-} from "@/src/components/tailwind/icons";
+  CheckCircle2,
+  AlertCircle
+} from 'lucide-react';
+import { cn } from '../lib/utils';
 
 export default function Profile() {
   const { user } = useAuth();
-  const theme = useTheme();
   
-  // State for profile data
   const [profile, setProfile] = useState({
     bio: '',
     school: 'Westside High School',
@@ -128,323 +106,281 @@ export default function Profile() {
       }));
   };
 
+  if (loading) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-primary"></div>
+      </div>
+    );
+  }
+
+  const userInitial = user?.username ? user.username[0].toUpperCase() : 'U';
+
   return (
-    <Box sx={{ pb: 12 }}>
+    <div className="mx-auto max-w-5xl pb-24 space-y-6">
+      
       {/* Header Info */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h2" fontWeight={900} color="text.primary" sx={{ letterSpacing: '-0.02em', mb: 1 }}>My Profile</Typography>
-        <Typography variant="body1" color="text.secondary" fontWeight={500}>Manage your personal information, achievements, and account settings.</Typography>
-      </Box>
+      <div className="mb-8">
+        <h1 className="text-3xl font-black text-foreground">My Profile</h1>
+        <p className="text-muted-foreground font-medium">Manage your personal information, achievements, and account settings.</p>
+      </div>
 
       {/* Banner & Avatar Card */}
-      <Paper elevation={0} sx={{ borderRadius: '16px', overflow: 'hidden', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', mb: 6 }}>
-        <Box sx={{ 
-            height: 140, 
-            background: `linear-gradient(135deg, ${theme.palette.primary.main}30, ${theme.palette.background.paper} 80%)`,
-            borderBottom: '1px solid', borderColor: 'divider'
-        }} />
-        <Box sx={{ px: 4, pb: 4, mt: -6 }}>
-            <Grid container spacing={4} alignItems="flex-start">
-                <Grid>
-                    <Box sx={{ position: 'relative' }}>
-                        <Avatar 
-                            src={`https://api.dicebear.com/7.x/initials/svg?seed=${user?.username}&backgroundColor=${theme.palette.primary.main.slice(1)}`} 
-                            sx={{ width: 128, height: 128, border: `4px solid ${theme.palette.background.paper}`, boxShadow: theme.shadows[3] }}
-                        />
-                        <IconButton 
-                            size="small"
-                            sx={{ 
-                                position: 'absolute', bottom: 4, right: 4, 
-                                bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider',
-                                '&:hover': { bgcolor: 'action.hover' }
-                            }}
-                        >
-                            <PhotoCameraIcon fontSize="small" />
-                        </IconButton>
-                    </Box>
-                </Grid>
-                <Grid size="grow">
-                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { md: 'flex-start' }, gap: 2, pt: { xs: 0, md: 7 } }}>
-                        <Box>
-                            <Typography variant="h4" fontWeight={800}>{user?.first_name ? `${user.first_name} ${user.last_name}` : user?.username}</Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1, mb: 2, flexWrap: 'wrap' }}>
-                                <Typography variant="body2" fontWeight={500} color="text.secondary">Student at {profile.school}</Typography>
-                                <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'text.secondary' }} />
-                                <Typography variant="body2" color="text.secondary">{profile.grade}</Typography>
-                                <Chip label="PRO" size="small" sx={{ height: 20, fontSize: '0.65rem', fontWeight: 800, bgcolor: 'primary.main', color: 'white' }} />
-                            </Box>
-                            <Paper variant="outlined" sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.05)', maxWidth: 600 }}>
-                                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                                    "{profile.bio || "No bio set yet."}"
-                                </Typography>
-                            </Paper>
-                        </Box>
-                        <Box sx={{ display: 'flex', gap: 2, mt: { xs: 2, md: 0 } }}>
-                            <Button variant="outlined" startIcon={<ShareIcon />} sx={{ borderRadius: '12px', fontWeight: 700, textTransform: 'none', borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'primary.main', bgcolor: 'rgba(19, 127, 236, 0.05)' } }}>Share Profile</Button>
-                            <Button variant="contained" startIcon={<EditIcon />} sx={{ borderRadius: '12px', fontWeight: 700, textTransform: 'none', boxShadow: 'none' }}>Edit Bio</Button>
-                        </Box>
-                    </Box>
-                </Grid>
-            </Grid>
-        </Box>
-      </Paper>
+      <div className="rounded-[2rem] border border-primary/20 bg-card overflow-hidden shadow-sm">
+        <div className="h-32 w-full bg-gradient-to-r from-violet-500/20 via-primary/20 to-blue-500/20 border-b border-border/50" />
+        <div className="px-6 md:px-10 pb-8">
+            <div className="flex flex-col md:flex-row gap-6 items-start md:items-end -mt-12 md:-mt-16 mb-4">
+                <div className="relative group">
+                    <div className="h-24 w-24 md:h-32 md:w-32 rounded-3xl border-4 border-card bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-white text-4xl font-black shadow-xl shadow-primary/20">
+                      {userInitial}
+                    </div>
+                    <button className="absolute bottom-2 right-2 h-8 w-8 rounded-xl bg-background border border-border/50 flex items-center justify-center text-foreground shadow-sm hover:bg-muted transition">
+                        <Camera size={14} />
+                    </button>
+                </div>
+                <div className="flex-1">
+                    <h2 className="text-2xl font-black">{user?.first_name ? `${user.first_name} ${user.last_name || ''}` : user?.username}</h2>
+                    <div className="flex flex-wrap items-center gap-2 mt-1 mb-2 text-sm font-semibold text-muted-foreground">
+                        <span>Student at {profile.school}</span>
+                        <span className="h-1 w-1 rounded-full bg-muted-foreground"></span>
+                        <span>{profile.grade}</span>
+                        <span className="rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-primary">PRO</span>
+                    </div>
+                    {profile.bio && (
+                      <p className="text-sm font-medium text-muted-foreground/80 italic max-w-2xl">
+                          "{profile.bio}"
+                      </p>
+                    )}
+                </div>
+                <div className="flex gap-3 w-full md:w-auto mt-4 md:mt-0">
+                    <button className="flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-bold text-foreground shadow-sm hover:bg-muted transition w-full md:w-auto justify-center">
+                        <Share size={16} /> Share
+                    </button>
+                    <button className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 transition w-full md:w-auto justify-center">
+                        <Edit size={16} /> Edit Bio
+                    </button>
+                </div>
+            </div>
+        </div>
+      </div>
 
       {/* Stats Row */}
-      <Grid container spacing={3} sx={{ mb: 6 }}>
-          {[
-              { label: 'Quizzes Done', value: stats.total_quizzes, unit: '', color: 'primary.main', bg: 'rgba(19,127,236,0.08)' },
-              { label: 'Avg. Score', value: `${stats.average_score}%`, unit: '', color: '#10B981', bg: 'rgba(16,185,129,0.08)' },
-              { label: 'Study Streak', value: stats.streak_days, unit: ' days', color: '#F59E0B', bg: 'rgba(245,158,11,0.08)' },
-          ].map(s => (
-              <Grid size={{ xs: 12, sm: 4 }} key={s.label}>
-                  <Paper elevation={0} sx={{ p: 3, borderRadius: '16px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Box sx={{ width: 48, height: 48, borderRadius: '12px', bgcolor: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <Typography variant="h5" fontWeight={800} sx={{ color: s.color }}>{typeof s.value === 'number' ? s.value : s.value.split('%')[0]}<Typography component="span" variant="body2" sx={{ color: s.color }}>%</Typography></Typography>
-                      </Box>
-                      <Box>
-                          <Typography variant="h5" fontWeight={800}>{s.value}{s.unit}</Typography>
-                          <Typography variant="body2" color="text.secondary">{s.label}</Typography>
-                      </Box>
-                  </Paper>
-              </Grid>
-          ))}
-      </Grid>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="rounded-[2rem] border border-blue-500/20 bg-card p-6 shadow-sm flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-500">
+                  <CheckCircle2 size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                  <div className="text-2xl font-black text-foreground">{stats.total_quizzes}</div>
+                  <div className="text-sm font-bold text-muted-foreground">Quizzes Done</div>
+              </div>
+          </div>
+          <div className="rounded-[2rem] border border-emerald-500/20 bg-card p-6 shadow-sm flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500">
+                  <Award size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                  <div className="text-2xl font-black text-foreground">{stats.average_score}%</div>
+                  <div className="text-sm font-bold text-muted-foreground">Avg. Score</div>
+              </div>
+          </div>
+          <div className="rounded-[2rem] border border-amber-500/20 bg-card p-6 shadow-sm flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
+                  <Flame size={24} strokeWidth={2.5} />
+              </div>
+              <div>
+                  <div className="text-2xl font-black text-foreground">{stats.streak_days} days</div>
+                  <div className="text-sm font-bold text-muted-foreground">Study Streak</div>
+              </div>
+          </div>
+      </div>
 
-      {/* Forms Layout */}
-
-      <Box component="form" noValidate autoComplete="off">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-        {/* Badges Section */}
-        <Box sx={{ mb: 6 }}>
-             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3,  borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <EmojiEventsIcon sx={{ color: '#f59e0b' }} />
-                    <Typography variant="h5" fontWeight={800} color="text.primary">Badges & Achievements</Typography>
-                </Box>
-                <Button size="small" sx={{ fontWeight: 700, textTransform: 'none', color: 'primary.main', borderRadius: '8px' }}>View All</Button>
-             </Box>
-             <Grid container spacing={3}>
-                {[
-                    { icon: <MilitaryTechIcon sx={{ fontSize: 32 }} />, color: 'warning', title: 'Math Whiz', sub: 'Top 10% in Calculus' },
-                    { icon: <PsychologyIcon sx={{ fontSize: 32 }} />, color: 'secondary', title: 'Consistent Mind', sub: `${stats.streak_days} Day Streak` },
-                    { icon: <RocketLaunchIcon sx={{ fontSize: 32 }} />, color: 'info', title: 'Fast Learner', sub: 'Completed 5 modules' },
-                ].map((badge, idx) => (
-                    <Grid size={{ xs: 12, sm: 6, md: 3 }} key={idx}>
-                         <Paper elevation={0} sx={{ p: '24px !important', borderRadius: '16px', border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', textAlign: 'center', transition: 'all 0.2s', '&:hover': { transform: 'translateY(-4px)', borderColor: 'primary.main', boxShadow: '0 10px 20px -10px rgba(0,0,0,0.5)' } }}>
-                             <Avatar sx={{ width: 56, height: 56, bgcolor: `${badge.color}.light`, color: `${badge.color}.main`, mx: 'auto', mb: 2, borderRadius: '12px' }}>
-                                 {badge.icon}
-                             </Avatar>
-                             <Typography variant="subtitle1" fontWeight={800} color="text.primary">{badge.title}</Typography>
-                             <Typography variant="body2" color="text.secondary" fontWeight={500}>{badge.sub}</Typography>
-                         </Paper>
-                    </Grid>
-                ))}
-                 <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                    <Paper elevation={0} variant="outlined" sx={{ p: '24px !important', borderRadius: '16px', border: '1px dashed', borderColor: 'divider', textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', bgcolor: 'transparent' }}>
-                         <Avatar sx={{ width: 56, height: 56, bgcolor: 'rgba(255,255,255,0.05)', color: 'text.disabled', mb: 2, borderRadius: '12px' }}>
-                             <LockIcon fontSize="large" />
-                         </Avatar>
-                         <Typography variant="body1" fontWeight={700} color="text.secondary">Next Reward</Typography>
-                         <Typography variant="body2" color="text.disabled" fontWeight={500}>Level 6 Scholar</Typography>
-                    </Paper>
-                </Grid>
-             </Grid>
-        </Box>
+          <div className="lg:col-span-2 space-y-6">
+              {/* Badges */}
+              <div className="rounded-[2rem] border border-amber-500/20 bg-card p-6 md:p-8 shadow-sm">
+                  <div className="flex items-center justify-between mb-6 pb-4 border-b border-border/50">
+                      <div className="flex items-center gap-3">
+                          <Medal className="text-amber-500" size={24} />
+                          <h2 className="text-xl font-black">Achievements</h2>
+                      </div>
+                      <button className="text-sm font-bold text-primary hover:underline">View All</button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      {[
+                          { icon: <Medal size={28} />, color: 'text-blue-500', bg: 'bg-blue-500/10', title: 'Math Whiz', sub: 'Top 10% in Calculus' },
+                          { icon: <BrainCircuit size={28} />, color: 'text-purple-500', bg: 'bg-purple-500/10', title: 'Consistent Mind', sub: `${stats.streak_days} Day Streak` },
+                          { icon: <Flame size={28} />, color: 'text-orange-500', bg: 'bg-orange-500/10', title: 'Fast Learner', sub: 'Completed 5 modules' },
+                      ].map((b, i) => (
+                          <div key={i} className="rounded-2xl border border-border/50 bg-background p-4 text-center hover:border-primary/50 hover:shadow-md transition">
+                              <div className={cn("mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl", b.bg, b.color)}>
+                                  {b.icon}
+                              </div>
+                              <div className="text-sm font-bold">{b.title}</div>
+                              <div className="text-xs font-semibold text-muted-foreground mt-1">{b.sub}</div>
+                          </div>
+                      ))}
+                  </div>
+              </div>
 
-        {/* Personal Info */}
-        <Box sx={{ mb: 6 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4, borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
-                <BadgeIcon color="primary" />
-                <Typography variant="h5" fontWeight={800} color="text.primary">Personal Information</Typography>
-            </Box>
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <TextField label="First Name" fullWidth defaultValue={user?.first_name || "Alex"} variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <TextField label="Last Name" fullWidth defaultValue={user?.last_name || "Johnson"} variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
-                </Grid>
-                <Grid size={{ xs: 12, md: 12 }}>
-                    <TextField label="Email Address" fullWidth defaultValue={user?.email || "alex@example.com"} variant="outlined" sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }} />
-                </Grid>
-                <Grid size={{ xs: 12 }}>
-                    <TextField 
-                        label="Bio / About Me" 
-                        fullWidth 
-                        multiline 
-                        rows={3} 
-                        value={profile.bio} 
-                        onChange={(e) => handleChange('bio', e.target.value)}
-                        helperText="250 characters left"
-                        variant="outlined"
-                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '16px' } }}
-                    />
-                </Grid>
-            </Grid>
-        </Box>
+              {/* Personal Info Form */}
+              <div className="rounded-[2rem] border border-primary/20 bg-card p-6 md:p-8 shadow-sm">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
+                      <UserCircle className="text-primary" size={24} />
+                      <h2 className="text-xl font-black">Personal Information</h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                          <label className="text-sm font-bold text-muted-foreground block mb-1.5">First Name</label>
+                          <input type="text" className="w-full rounded-xl border border-border/50 bg-background px-4 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" defaultValue={user?.first_name || ""} />
+                      </div>
+                      <div>
+                          <label className="text-sm font-bold text-muted-foreground block mb-1.5">Last Name</label>
+                          <input type="text" className="w-full rounded-xl border border-border/50 bg-background px-4 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" defaultValue={user?.last_name || ""} />
+                      </div>
+                      <div className="md:col-span-2">
+                          <label className="text-sm font-bold text-muted-foreground block mb-1.5">Email Address</label>
+                          <input type="email" disabled className="w-full rounded-xl border border-border/50 bg-muted/50 px-4 py-3 text-sm font-medium text-muted-foreground outline-none" defaultValue={user?.email || ""} />
+                      </div>
+                      <div className="md:col-span-2">
+                          <label className="text-sm font-bold text-muted-foreground block mb-1.5">Bio / About Me</label>
+                          <textarea 
+                              rows={3}
+                              className="w-full rounded-xl border border-border/50 bg-background px-4 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                              value={profile.bio}
+                              onChange={(e) => handleChange('bio', e.target.value)}
+                              placeholder="Tell us a little about yourself..."
+                          />
+                      </div>
+                  </div>
+              </div>
 
-        {/* Academic Details */}
-        <Box sx={{ mb: 6 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4, borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
-                <SchoolIcon color="primary" />
-                <Typography variant="h5" fontWeight={800} color="text.primary">Academic Details</Typography>
-            </Box>
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <TextField 
-                        label="School / University" 
-                        fullWidth 
-                        value={profile.school} 
-                        onChange={(e) => handleChange('school', e.target.value)}
-                        variant="outlined"
-                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-                    />
-                </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
-                    <TextField 
-                        select 
-                        label="Current Grade/Level" 
-                        fullWidth 
-                        value={profile.grade}
-                        onChange={(e) => handleChange('grade', e.target.value)}
-                        variant="outlined"
-                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px' } }}
-                    >
-                        <MenuItem value="9th Grade">9th Grade</MenuItem>
-                        <MenuItem value="10th Grade">10th Grade</MenuItem>
-                        <MenuItem value="11th Grade">11th Grade</MenuItem>
-                        <MenuItem value="12th Grade">12th Grade</MenuItem>
-                        <MenuItem value="Undergraduate">Undergraduate</MenuItem>
-                    </TextField>
-                </Grid>
-            </Grid>
-        </Box>
+              {/* Academic Details Form */}
+              <div className="rounded-[2rem] border border-primary/20 bg-card p-6 md:p-8 shadow-sm">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
+                      <GraduationCap className="text-primary" size={24} />
+                      <h2 className="text-xl font-black">Academic Details</h2>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                          <label className="text-sm font-bold text-muted-foreground block mb-1.5">School / University</label>
+                          <input 
+                              type="text" 
+                              className="w-full rounded-xl border border-border/50 bg-background px-4 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                              value={profile.school}
+                              onChange={(e) => handleChange('school', e.target.value)}
+                          />
+                      </div>
+                      <div>
+                          <label className="text-sm font-bold text-muted-foreground block mb-1.5">Grade Level</label>
+                          <select 
+                              className="w-full rounded-xl border border-border/50 bg-background px-4 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" 
+                              value={profile.grade}
+                              onChange={(e) => handleChange('grade', e.target.value)}
+                          >
+                              <option>9th Grade</option>
+                              <option>10th Grade</option>
+                              <option>11th Grade</option>
+                              <option>12th Grade</option>
+                              <option>Undergraduate</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+          </div>
 
-        {/* AI Preferences */}
-        <Box sx={{ mb: 6 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4, borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
-                <AutoAwesomeIcon color="primary" />
-                <Typography variant="h5" fontWeight={800} color="text.primary">AI Learning Preferences</Typography>
-            </Box>
-            <Paper elevation={0} variant="outlined" sx={{ p: '32px !important', borderRadius: '16px', borderColor: 'divider', bgcolor: 'background.paper' }}>
-                <Grid container spacing={4}>
-                    <Grid size={{ xs: 12, md: 8 }}>
-                        <Typography variant="subtitle1" fontWeight={700} color="text.primary">Target Subjects</Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 3, mt: 0.5 }}>Select subjects for AI daily recommendations.</Typography>
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                            {profile.subjects.map(sub => (
-                                <Chip key={sub} label={sub} onDelete={() => {}} sx={{ fontWeight: 600, borderRadius: '8px', bgcolor: 'rgba(19, 127, 236, 0.1)', color: 'primary.main', border: '1px solid', borderColor: 'primary.main' }} />
-                            ))}
-                            <Chip icon={<AddIcon />} label="Add Subject" onClick={() => {}} variant="outlined" sx={{ fontWeight: 600, borderRadius: '8px', color: 'text.primary', borderColor: 'divider', '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' } }} />
-                        </Box>
-                    </Grid>
-                    <Grid size={{ xs: 12 }}><Divider /></Grid>
-                    {[
-                        { label: 'Adaptive Difficulty', value: 'adaptiveDifficulty', desc: 'AI adjusts question hardness based on performance.' },
-                        { label: 'Strict Exam Mode', value: 'strictMode', desc: 'Disable hints and timer pauses during practice exams.' }
-                    ].map((pref) => (
-                        <Grid size={{ xs: 12 }} key={pref.value}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Box>
-                                    <Typography variant="subtitle1" fontWeight={700} color="text.primary">{pref.label}</Typography>
-                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>{pref.desc}</Typography>
-                                </Box>
-                                <Switch checked={profile.preferences[pref.value]} onChange={() => handlePreferenceChange(pref.value)} color="primary" />
-                            </Box>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Paper>
-        </Box>
+          <div className="space-y-6">
+              {/* Preferences */}
+              <div className="rounded-[2rem] border border-primary/20 bg-card p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
+                      <Settings className="text-primary" size={24} />
+                      <h2 className="text-xl font-black">Preferences</h2>
+                  </div>
+                  
+                  <div className="space-y-4">
+                      {[
+                          { key: 'adaptiveDifficulty', label: 'Adaptive Difficulty', desc: 'AI adjusts question hardness.' },
+                          { key: 'strictMode', label: 'Strict Exam Mode', desc: 'Disable hints during practice.' },
+                          { key: 'studyReminders', label: 'Study Reminders', desc: 'Daily nudges to hit goals.' },
+                          { key: 'weeklyReport', label: 'Weekly Report', desc: 'Summary via email.' }
+                      ].map(pref => (
+                          <div key={pref.key} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0 last:pb-0">
+                              <div className="pr-4">
+                                  <div className="text-sm font-bold">{pref.label}</div>
+                                  <div className="text-xs font-semibold text-muted-foreground">{pref.desc}</div>
+                              </div>
+                              <button 
+                                  onClick={() => handlePreferenceChange(pref.key)}
+                                  className={cn(
+                                      "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                                      profile.preferences[pref.key] ? "bg-primary" : "bg-muted"
+                                  )}
+                              >
+                                  <span className={cn(
+                                      "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out",
+                                      profile.preferences[pref.key] ? "translate-x-5" : "translate-x-0"
+                                  )} />
+                              </button>
+                          </div>
+                      ))}
+                  </div>
+              </div>
 
-        {/* Notifications */}
-        <Box sx={{ mb: 6 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4, borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
-                <NotificationsActiveIcon color="primary" />
-                <Typography variant="h5" fontWeight={800} color="text.primary">Notification Preferences</Typography>
-            </Box>
-             <Paper elevation={0} variant="outlined" sx={{ borderRadius: '16px', overflow: 'hidden', borderColor: 'divider', bgcolor: 'background.paper' }}>
-                {[
-                    { icon: <ScheduleIcon color="primary" />, label: 'Study Reminders', desc: 'Daily nudges to complete your study goals', key: 'studyReminders' },
-                    { icon: <EmojiEventsIcon sx={{ color: '#f59e0b' }} />, label: 'Achievement Unlocks', desc: 'Get notified when you earn new badges', key: 'achievementUnlocks' },
-                    { icon: <MailIcon sx={{ color: '#0bda5b' }} />, label: 'Weekly Progress Report', desc: 'Receive a summary via email every Monday', key: 'weeklyReport' },
-                ].map((item, i) => (
-                    <Box key={item.key} sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: i < 2 ? '1px solid' : 'none', borderColor: 'divider', transition: 'background-color 0.2s', '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' } }}>
-                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                            <Box sx={{ width: 40, height: 40, borderRadius: '10px', bgcolor: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                {item.icon}
-                            </Box>
-                            <Box>
-                                <Typography variant="subtitle2" fontWeight={700} color="text.primary">{item.label}</Typography>
-                                <Typography variant="body2" color="text.secondary" fontWeight={500}>{item.desc}</Typography>
-                            </Box>
-                        </Box>
-                        <Switch checked={profile.preferences[item.key]} onChange={() => handlePreferenceChange(item.key)} color="primary" />
-                    </Box>
-                ))}
-            </Paper>
-        </Box>
+              {/* Linked Accounts */}
+              <div className="rounded-[2rem] border border-primary/20 bg-card p-6 shadow-sm">
+                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-border/50">
+                      <LinkIcon className="text-primary" size={24} />
+                      <h2 className="text-xl font-black">Connections</h2>
+                  </div>
+                  <div className="space-y-4">
+                      <div className="flex items-center justify-between rounded-xl border border-border/50 bg-background p-3">
+                          <div className="flex items-center gap-3">
+                              <div className="bg-white p-1 rounded-lg">
+                                  <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#EA4335" d="M5.27 9.76A7.08 7.08 0 0 1 12 4.9c1.69 0 3.21.6 4.4 1.58l3.28-3.28A11.94 11.94 0 0 0 12 .9C8.17.9 4.83 2.85 2.96 5.82l2.31 3.94Z"/><path fill="#34A853" d="M16.04 18.01A7.08 7.08 0 0 1 12 19.1c-2.9 0-5.38-1.74-6.56-4.26l-3.3 2.55C4.1 21 7.78 23.1 12 23.1c2.97 0 5.7-1.04 7.78-2.74l-3.74-2.35Z"/><path fill="#FBBC05" d="M19.78 20.36C21.86 18.38 23.1 15.42 23.1 12c0-.88-.1-1.73-.27-2.55H12v4.82h6.24a5.4 5.4 0 0 1-2.22 3.55l3.76 2.54Z"/><path fill="#4285F4" d="M5.44 14.84A7.15 7.15 0 0 1 4.9 12c0-.99.17-1.94.47-2.83L3.06 5.23A11.93 11.93 0 0 0 .9 12c0 1.96.47 3.8 1.3 5.43l3.24-2.59Z"/></svg>
+                              </div>
+                              <div>
+                                  <div className="text-sm font-bold flex items-center gap-2">Google <span className="text-[10px] bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded uppercase">Connected</span></div>
+                                  <div className="text-xs font-semibold text-muted-foreground truncate w-32">{user?.email}</div>
+                              </div>
+                          </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between rounded-xl border border-border/50 bg-background p-3">
+                          <div className="flex items-center gap-3">
+                              <div className="bg-foreground text-background p-1.5 rounded-lg">
+                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                              </div>
+                              <div>
+                                  <div className="text-sm font-bold">GitHub</div>
+                                  <div className="text-xs font-semibold text-muted-foreground">Not connected</div>
+                              </div>
+                          </div>
+                          <button className="text-xs font-bold text-primary hover:underline">Connect</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
 
-        {/* Linked Accounts */}
-        <Box sx={{ mb: 6 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4, borderBottom: '1px solid', borderColor: 'divider', pb: 2 }}>
-                <LinkIcon color="primary" />
-                <Typography variant="h5" fontWeight={800} color="text.primary">Linked Accounts</Typography>
-            </Box>
-             <Paper elevation={0} variant="outlined" sx={{ borderRadius: '16px', overflow: 'hidden', borderColor: 'divider', bgcolor: 'background.paper' }}>
-                 {/* Google */}
-                 <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid', borderColor: 'divider' }}>
-                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                         <Avatar sx={{ bgcolor: 'white', p: 0.5, width: 40, height: 40, borderRadius: '10px' }}>
-                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5uqCYrxY_4EjKRXpTwNc8pnrdTqWkzqdUGGp7JZku9a8BscAGdaVSpmZBGfwsvNnmUh6x4hTJuTuIdp7VOGhZxTN3LL-WatZMjQuPri6Gf4Gylt2C2SYV9dAWmcPxWByb5CM5l9zBXbWuXQdKs0988UMZ2oUELviMlUi1gP3KZIhiVHyNJBhrTtP-rOq6svyi5gnqoGr6rRbxsfZ3D_HfQStF0ll7N9UnzslLCcHmSObPPzMBFDXG7GRTPHrmVJAaSEX33Et98cI" width="24" height="24" alt="G" />
-                         </Avatar>
-                         <Box>
-                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Typography variant="subtitle1" fontWeight={700} color="text.primary">Google</Typography>
-                                <Chip label="Connected" size="small" color="success" sx={{ height: 24, fontSize: '0.75rem', fontWeight: 700, borderRadius: '6px', bgcolor: 'rgba(11, 218, 91, 0.1)', color: '#0bda5b' }} />
-                             </Box>
-                             <Typography variant="body2" color="text.secondary" fontWeight={500}>{user?.email}</Typography>
-                         </Box>
-                     </Box>
-                     <Button sx={{ color: '#ef4444', fontWeight: 700, textTransform: 'none', borderRadius: '8px' }}>Disconnect</Button>
-                 </Box>
-                 {/* GitHub */}
-                  <Box sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                         <Avatar sx={{ bgcolor: 'white', color: 'black', width: 40, height: 40, borderRadius: '10px' }}>
-                            <GitHubIcon />
-                         </Avatar>
-                         <Box>
-                             <Typography variant="subtitle1" fontWeight={700} color="text.primary">GitHub</Typography>
-                             <Typography variant="body2" color="text.secondary" fontWeight={500}>Link repositories for coding assignments</Typography>
-                         </Box>
-                     </Box>
-                     <Button sx={{ color: 'text.primary', fontWeight: 700, textTransform: 'none', borderRadius: '8px', border: '1px solid', borderColor: 'divider' }}>Connect</Button>
-                 </Box>
-             </Paper>
-        </Box>
+      </div>
 
-        {/* Footer Actions */}
-        <Box sx={{ 
-            position: 'fixed', bottom: 0, left: 0, right: 0, 
-            bgcolor: 'background.paper', borderTop: '1px solid', borderColor: 'divider', 
-            p: 2, zIndex: 10, display: 'flex', justifyContent: 'flex-end', gap: 2 
-        }}>
-            <Container maxWidth="lg" sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                <Button variant="text" size="large" sx={{ fontWeight: 700, textTransform: 'none', borderRadius: '12px', color: 'text.secondary' }}>Cancel</Button>
-                <Button 
-                    variant="contained" 
-                    size="large" 
-                    sx={{ px: 4, fontWeight: 700, borderRadius: '12px', textTransform: 'none', boxShadow: 'none' }}
-                    onClick={handleSave}
-                    disabled={saving}
-                >
-                    {saving ? 'Saving...' : 'Save Changes'}
-                </Button>
-            </Container>
-        </Box>
+      {/* Save Action Footer */}
+      <div className="fixed bottom-0 left-0 right-0 md:pl-64 z-40 bg-background/80 backdrop-blur-md border-t border-primary/20 p-4">
+          <div className="max-w-5xl mx-auto flex justify-end gap-3">
+              <button className="px-6 py-2.5 rounded-xl text-sm font-bold text-muted-foreground hover:bg-muted transition">
+                  Cancel
+              </button>
+              <button 
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="px-6 py-2.5 rounded-xl bg-primary text-sm font-bold text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 transition flex items-center gap-2"
+              >
+                  {saving ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" /> : <CheckCircle2 size={16} />}
+                  Save Changes
+              </button>
+          </div>
+      </div>
 
-      </Box>
-    </Box>
+    </div>
   );
 }
