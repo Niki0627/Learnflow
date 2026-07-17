@@ -75,7 +75,9 @@ const MarkdownText = ({ children, sx = {} }) => (
       ...sx,
     }}
   >
-    <div className="markdown-body"><ReactMarkdown</ReactMarkdown></div>
+    <div className="markdown-body">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{children || ""}</ReactMarkdown>
+    </div>
   </Box>
 );
 
@@ -454,7 +456,11 @@ function GenerateQuestions() {
                           "& strong": { fontWeight: 800 },
                         }}
                       >
-                        <div className="markdown-body"><ReactMarkdown</ReactMarkdown></div>
+                        <div className="markdown-body">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {q.question_text || ""}
+                          </ReactMarkdown>
+                        </div>
                       </Box>
                       {q.topic && (
                         <Chip
