@@ -63,7 +63,7 @@ const AnswerText = ({ text }) => {
             '& strong': { fontWeight: 800, color: 'primary.light' },
             '& ul, & ol': { pl: 3, mb: 1, mt: 0.5 }
         }}>
-            <ReactMarkdown className="markdown-body" remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
+            <div className="markdown-body"><ReactMarkdown</ReactMarkdown></div>
         </Box>
     );
 };
@@ -119,9 +119,7 @@ const QuestionCard = ({ q, index }) => {
                      '& strong': { fontWeight: 900, color: 'primary.main' },
                      mb: 1
                 }}>
-                    <ReactMarkdown className="markdown-body" remarkPlugins={[remarkGfm]}>
-                        {q.question_text || q.title || ''}
-                    </ReactMarkdown>
+                    <div className="markdown-body"><ReactMarkdown</ReactMarkdown></div>
                 </Box>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
                     <Typography variant="caption" color="text.secondary">
