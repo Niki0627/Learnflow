@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
-  FileText, PlayCircle, Loader2, Search, Plus, UploadCloud, X, Check, Trash2, Maximize, ExternalLink, CalendarDays, BookOpen, Layers
+  FileText, PlayCircle, Loader2, Search, Plus, UploadCloud, X, Check, Trash2, Maximize, ExternalLink, CalendarDays, BookOpen, Layers,
+  ChevronLeft, ChevronRight, ZoomIn, ZoomOut
 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -43,6 +44,20 @@ const FileViewer = ({ lecture }) => {
     const [selectedText, setSelectedText] = useState('');
     const [previewError, setPreviewError] = useState('');
     const viewerRef = useRef(null);
+
+    // Keyboard Navigation for PDF
+    useEffect(() => {
+        if (getFileType(lecture?.file) !== 'pdf') return;
+        const handleKeyDown = (e) => {
+            if (e.key === 'ArrowLeft') {
+                setPageNumber(p => Math.max(1, p - 1));
+            } else if (e.key === 'ArrowRight') {
+                setPageNumber(p => Math.min(numPages || p, p + 1));
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [lecture?.file, numPages]);
 
     const fileType = getFileType(lecture?.file);
     const fileUrl = getFileUrl(lecture?.file);
@@ -114,21 +129,41 @@ const FileViewer = ({ lecture }) => {
                         </p>
                     </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex shrink-0 items-center gap-4">
                     {fileType === 'pdf' && (
-                        <div className="flex items-center gap-2 rounded-md border bg-background px-2 py-1">
-                            <button disabled={pageNumber <= 1} onClick={() => setPageNumber(p => Math.max(1, p - 1))} className="p-1 hover:bg-muted disabled:opacity-50 rounded">-</button>
-                            <span className="text-xs font-bold w-12 text-center">{Math.round(scale * 100)}%</span>
-                            <button onClick={() => setScale(s => +(s + 0.1).toFixed(1))} className="p-1 hover:bg-muted rounded">+</button>
-                        </div>
+                        <>
+                            {/* Pagination Group */}
+                            <div className="flex items-center gap-1 rounded-lg border border-border/50 bg-background/50 px-1 py-1 shadow-sm">
+                                <button disabled={pageNumber <= 1} onClick={() => setPageNumber(p => Math.max(1, p - 1))} className="p-1 hover:bg-muted disabled:opacity-30 rounded-md transition-colors text-muted-foreground hover:text-foreground">
+                                    <ChevronLeft size={16} />
+                                </button>
+                                <span className="text-xs font-bold w-16 text-center tabular-nums text-foreground">
+                                    {pageNumber} <span className="text-muted-foreground font-medium">/ {numPages || '?'}</span>
+                                </span>
+                                <button disabled={numPages && pageNumber >= numPages} onClick={() => setPageNumber(p => Math.min(numPages || p, p + 1))} className="p-1 hover:bg-muted disabled:opacity-30 rounded-md transition-colors text-muted-foreground hover:text-foreground">
+                                    <ChevronRight size={16} />
+                                </button>
+                            </div>
+
+                            {/* Zoom Group */}
+                            <div className="flex items-center gap-1 rounded-lg border border-border/50 bg-background/50 px-1 py-1 shadow-sm">
+                                <button disabled={scale <= 0.5} onClick={() => setScale(s => Math.max(0.5, +(s - 0.2).toFixed(1)))} className="p-1 hover:bg-muted disabled:opacity-30 rounded-md transition-colors text-muted-foreground hover:text-foreground">
+                                    <ZoomOut size={16} />
+                                </button>
+                                <span className="text-xs font-bold w-12 text-center tabular-nums">{Math.round(scale * 100)}%</span>
+                                <button disabled={scale >= 3.0} onClick={() => setScale(s => Math.min(3.0, +(s + 0.2).toFixed(1)))} className="p-1 hover:bg-muted disabled:opacity-30 rounded-md transition-colors text-muted-foreground hover:text-foreground">
+                                    <ZoomIn size={16} />
+                                </button>
+                            </div>
+                        </>
                     )}
-                    <a href={fileUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center p-2 rounded-md hover:bg-muted border bg-background transition-colors text-muted-foreground hover:text-foreground">
-                        <ExternalLink size={18} />
+                    <a href={fileUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center p-2 rounded-lg hover:bg-muted border border-border/50 bg-background/50 shadow-sm transition-colors text-muted-foreground hover:text-foreground" title="Open in new tab">
+                        <ExternalLink size={16} />
                     </a>
                 </div>
             </div>
 
-            <div className={cn("flex flex-1 flex-col items-center overflow-y-auto p-4 custom-scrollbar", fileType === 'pdf' ? 'bg-[#1e1e2e]' : 'bg-muted/30')}>
+            <div className={cn("flex flex-1 flex-col items-center overflow-y-auto p-6 custom-scrollbar relative", fileType === 'pdf' ? 'bg-[#0f0f13]' : 'bg-muted/30')}>
                 {previewError ? (
                     <div className="rounded-xl bg-blue-500/10 p-4 text-blue-500 border border-blue-500/20 max-w-lg text-sm">
                         {previewError}
@@ -136,18 +171,21 @@ const FileViewer = ({ lecture }) => {
                 ) : fileType === 'pdf' ? (
                     <Document
                         file={fileUrl}
-                        loading={<div className="flex items-center justify-center py-12"><Loader2 className="animate-spin text-white w-8 h-8" /></div>}
+                        loading={<div className="flex flex-col items-center justify-center py-20 gap-4"><Loader2 className="animate-spin text-primary w-10 h-10" /><span className="text-sm font-medium text-muted-foreground">Loading PDF...</span></div>}
                         onLoadSuccess={({ numPages: loadedPages }) => setNumPages(loadedPages)}
                         onLoadError={() => setPreviewError('This PDF preview is not available, but the lecture text was saved and can still be used for study aids.')}
-                        error={<div className="text-white">PDF preview is not available.</div>}
+                        error={<div className="text-white text-sm bg-red-500/20 p-4 rounded-xl border border-red-500/30">PDF preview is not available.</div>}
+                        className="flex flex-col items-center"
                     >
-                        <Page
-                            pageNumber={Math.min(pageNumber, numPages || pageNumber)}
-                            scale={scale}
-                            renderTextLayer
-                            renderAnnotationLayer={false}
-                            className="shadow-2xl rounded overflow-hidden"
-                        />
+                        <div className="relative group transition-transform duration-200">
+                            <Page
+                                pageNumber={Math.min(pageNumber, numPages || pageNumber)}
+                                scale={scale}
+                                renderTextLayer
+                                renderAnnotationLayer={false}
+                                className="shadow-2xl shadow-black/40 rounded-sm overflow-hidden border border-white/10"
+                            />
+                        </div>
                     </Document>
                 ) : fileType === 'image' ? (
                     <img src={fileUrl} alt={lecture.title} className="max-w-full rounded-xl object-contain shadow-lg" />
