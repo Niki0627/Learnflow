@@ -26,16 +26,19 @@ const getFileType = (filename) => {
     if (['mp3', 'wav', 'aac'].includes(ext)) return 'audio';
     return 'unknown';
 };
-
+// Only return a URL we can actually load in react-pdf (must be absolute)
 const getFileUrl = (file) => {
     if (!file) return null;
-    if (file.startsWith('http') || file.startsWith('blob:') || file.startsWith('data:')) return file;
-    const baseUrl = process.env.NEXT_PUBLIC_MEDIA_BASE_URL || process.env.NEXT_PUBLIC_API_URL || '';
-    if (baseUrl) return `${baseUrl.replace(/\/$/, '')}/${file.replace(/^\//, '')}`;
-    return file.startsWith('/') ? file : `/${file}`;
+    if (/^(https?:|blob:|data:)/.test(file)) return file;
+    // Relative path — try to prepend the media base URL if configured
+    const baseUrl = (process.env.NEXT_PUBLIC_MEDIA_BASE_URL || '').replace(/\/$/, '');
+    if (baseUrl) return `${baseUrl}/${file.replace(/^\//, '')}`;
+    // If just a filename with no base URL, we cannot load it
+    return null;
 };
 
-const hasPreviewableFileUrl = (fileUrl) => Boolean(fileUrl && /^(https?:|blob:|data:|\/)/.test(fileUrl));
+// Only flag as previewable when we have a real fetchable URL
+const hasPreviewableFileUrl = (fileUrl) => Boolean(fileUrl && /^(https?:|blob:|data:)/.test(fileUrl));
 
 const FileViewer = ({ lecture }) => {
     const [numPages, setNumPages] = useState(0);
@@ -102,32 +105,50 @@ const FileViewer = ({ lecture }) => {
     }
 
     if (!lecture.file || !canPreviewFile) {
+        // Determine if this is an old-format lecture (file_path = just a filename, not a URL)
+        const hasFilename = Boolean(lecture.file && !lecture.file.startsWith('http'));
+
         return (
-            <div className="flex h-full flex-col p-6 md:p-12 overflow-y-auto custom-scrollbar bg-card">
+            <div className="flex h-full flex-col p-6 md:p-10 overflow-y-auto custom-scrollbar bg-card">
                 <div className="mx-auto w-full max-w-3xl">
-                    <div className="mb-10 flex items-center gap-5 text-muted-foreground border-b border-border/50 pb-6">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-sm border border-primary/10">
-                            <FileText size={28} />
+                    {/* Header */}
+                    <div className="mb-8 flex items-start gap-4 pb-6 border-b border-border/50">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary border border-primary/10">
+                            <FileText size={24} />
                         </div>
-                        <div>
-                            <h3 className="text-2xl font-black text-foreground mb-1 tracking-tight">
-                                {lecture.file ? 'Uploaded Document Text' : 'Text-based Lesson'}
+                        <div className="flex-1 min-w-0">
+                            <h3 className="text-xl font-black text-foreground mb-1">
+                                {lecture.file ? 'Document Content' : 'Text Lesson'}
                             </h3>
-                            <p className="text-sm font-semibold text-muted-foreground/80">
-                                {lecture.file ? 'Original file preview unavailable. Displaying extracted text.' : 'Standard text content for this lesson.'}
+                            <p className="text-sm font-medium text-muted-foreground">
+                                {lecture.file ? 'Displaying extracted text content.' : 'This lecture was added as plain text.'}
                             </p>
                         </div>
                     </div>
-                    
-                    <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-foreground/90 leading-relaxed font-medium">
+
+                    {/* Notice banner for old-format uploads */}
+                    {hasFilename && (
+                        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200/60 bg-amber-50 px-4 py-3 dark:border-amber-500/20 dark:bg-amber-500/10">
+                            <span className="mt-0.5 flex-shrink-0 text-amber-500">⚠️</span>
+                            <div>
+                                <p className="text-sm font-bold text-amber-800 dark:text-amber-300">PDF preview not available for this lecture</p>
+                                <p className="text-xs font-medium text-amber-700/80 dark:text-amber-400/80 mt-0.5">
+                                    This file was uploaded before PDF storage was enabled. Re-upload the PDF to enable live preview. The extracted text is shown below.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Content */}
+                    <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-foreground/90 leading-relaxed">
                         {lecture.content ? (
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                 {lecture.content}
                             </ReactMarkdown>
                         ) : (
-                            <div className="rounded-2xl border-2 border-dashed border-border/50 bg-background/50 p-12 text-center shadow-sm">
+                            <div className="rounded-2xl border-2 border-dashed border-border/50 bg-background/50 p-12 text-center">
                                 <FileText size={48} className="mx-auto mb-4 opacity-20" />
-                                <p className="text-base font-bold text-muted-foreground">No preview or text content available.</p>
+                                <p className="text-base font-bold text-muted-foreground">No text content available for this lecture.</p>
                             </div>
                         )}
                     </div>
@@ -135,6 +156,7 @@ const FileViewer = ({ lecture }) => {
             </div>
         );
     }
+
 
     const showPdfSelectionButton = fileType === 'pdf' && Boolean(selectedText) && !previewError;
 
