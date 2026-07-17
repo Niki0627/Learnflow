@@ -29,10 +29,10 @@ const getFileType = (filename) => {
 
 const getFileUrl = (file) => {
     if (!file) return null;
-    const baseUrl = process.env.NEXT_PUBLIC_MEDIA_BASE_URL || '';
     if (file.startsWith('http') || file.startsWith('blob:') || file.startsWith('data:')) return file;
-    if (!baseUrl && !file.startsWith('/')) return null;
-    return `${baseUrl}${file.startsWith('/') ? '' : '/'}${file}`;
+    const baseUrl = process.env.NEXT_PUBLIC_MEDIA_BASE_URL || process.env.NEXT_PUBLIC_API_URL || '';
+    if (baseUrl) return `${baseUrl.replace(/\/$/, '')}/${file.replace(/^\//, '')}`;
+    return file.startsWith('/') ? file : `/${file}`;
 };
 
 const hasPreviewableFileUrl = (fileUrl) => Boolean(fileUrl && /^(https?:|blob:|data:|\/)/.test(fileUrl));
@@ -103,11 +103,34 @@ const FileViewer = ({ lecture }) => {
 
     if (!lecture.file || !canPreviewFile) {
         return (
-            <div className="flex h-full flex-col items-center justify-center gap-4 py-16 text-muted-foreground">
-                <FileText size={80} className="opacity-20" />
-                <h3 className="text-xl font-bold">{lecture.file ? 'Uploaded lecture content' : 'Text-based lecture'}</h3>
-                <div className="max-h-[400px] w-full max-w-2xl overflow-y-auto whitespace-pre-wrap px-6 text-left text-sm custom-scrollbar">
-                    {lecture.content ? lecture.content.slice(0, 2500) : 'No preview available for this lecture type.'}
+            <div className="flex h-full flex-col p-6 md:p-12 overflow-y-auto custom-scrollbar bg-card">
+                <div className="mx-auto w-full max-w-3xl">
+                    <div className="mb-10 flex items-center gap-5 text-muted-foreground border-b border-border/50 pb-6">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-sm border border-primary/10">
+                            <FileText size={28} />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black text-foreground mb-1 tracking-tight">
+                                {lecture.file ? 'Uploaded Document Text' : 'Text-based Lesson'}
+                            </h3>
+                            <p className="text-sm font-semibold text-muted-foreground/80">
+                                {lecture.file ? 'Original file preview unavailable. Displaying extracted text.' : 'Standard text content for this lesson.'}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-foreground/90 leading-relaxed font-medium">
+                        {lecture.content ? (
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {lecture.content}
+                            </ReactMarkdown>
+                        ) : (
+                            <div className="rounded-2xl border-2 border-dashed border-border/50 bg-background/50 p-12 text-center shadow-sm">
+                                <FileText size={48} className="mx-auto mb-4 opacity-20" />
+                                <p className="text-base font-bold text-muted-foreground">No preview or text content available.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         );
