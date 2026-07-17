@@ -20,7 +20,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn, formatUsername } from '../lib/utils';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -99,9 +99,8 @@ export default function Profile() {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
 
-  const userInitial = user?.first_name && user?.last_name
-    ? `${user.first_name[0]}${user.last_name[0]}`.toUpperCase()
-    : user?.username?.substring(0, 2).toUpperCase() || "U";
+  const displayName = user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : formatUsername(user?.username || user?.email);
+  const userInitial = displayName.charAt(0).toUpperCase() || "U";
 
 
   const handlePreferenceChange = (key) => {
@@ -142,7 +141,7 @@ export default function Profile() {
                     </button>
                 </div>
                 <div className="flex-1">
-                    <h2 className="text-2xl font-black">{user?.first_name ? `${user.first_name} ${user.last_name || ''}` : user?.username}</h2>
+                    <h2 className="text-2xl font-black">{displayName}</h2>
                     <div className="flex flex-wrap items-center gap-2 mt-1 mb-2 text-sm font-semibold text-muted-foreground">
                         <span>Student at {profile.school}</span>
                         <span className="h-1 w-1 rounded-full bg-muted-foreground"></span>

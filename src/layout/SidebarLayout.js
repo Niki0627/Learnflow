@@ -19,7 +19,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import i18n from "../i18n";
-import { cn } from "../lib/utils";
+import { cn, formatUsername } from "../lib/utils";
 
 const SIDEBAR_WIDTH = "w-64";
 
@@ -27,7 +27,9 @@ const getInitials = (user) => {
   if (!user) return "U";
   if (user.first_name && user.last_name)
     return `${user.first_name[0]}${user.last_name[0]}`.toUpperCase();
-  return user.username ? user.username.substring(0, 2).toUpperCase() : "U";
+  
+  const name = formatUsername(user.username || user.email);
+  return name.charAt(0).toUpperCase() || "U";
 };
 
 const useNavItems = (t) =>
@@ -120,8 +122,8 @@ function SidebarContent({ navItems, location, handleLogout, user, t, onNavClick 
           {initials}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-foreground truncate">
-            {user?.first_name ? `${user.first_name} ${user.last_name || ""}`.trim() : user?.username || "Student"}
+          <p className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
+            {user?.first_name ? `${user.first_name} ${user.last_name || ""}`.trim() : formatUsername(user?.username || user?.email)}
           </p>
           <p className="text-xs text-muted-foreground truncate">Student</p>
         </div>
