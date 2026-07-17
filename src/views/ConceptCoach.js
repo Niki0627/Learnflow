@@ -37,7 +37,7 @@ const formatTime = () =>
 // ─── Markdown Renderer ─────────────────────────────────────────────────────────
 const MarkdownContent = React.memo(({ content }) => {
   return (
-    <ReactMarkdown
+    <ReactMarkdown className="markdown-body"
       remarkPlugins={[remarkGfm]}
       components={{
         p: ({ children }) => (

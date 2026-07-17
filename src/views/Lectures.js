@@ -142,7 +142,7 @@ const FileViewer = ({ lecture }) => {
                     {/* Content */}
                     <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none text-foreground/90 leading-relaxed">
                         {lecture.content ? (
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            <ReactMarkdown className="markdown-body" remarkPlugins={[remarkGfm]}>
                                 {lecture.content}
                             </ReactMarkdown>
                         ) : (
@@ -276,7 +276,7 @@ const StudyAidsPanel = ({ lecture }) => {
                 {tab === 'notes' && (
                     lecture?.study_notes ? (
                         <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{lecture.study_notes}</ReactMarkdown>
+                            <ReactMarkdown className="markdown-body" remarkPlugins={[remarkGfm]}>{lecture.study_notes}</ReactMarkdown>
                         </div>
                     ) : (
                         <div className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">No study notes generated yet.</div>
@@ -359,7 +359,7 @@ const LectureDetailsModal = ({ open, onClose, lecture, details, detailLecture, l
                                                 <div className="mb-4 flex items-start justify-between gap-4">
                                                     <div className="prose prose-sm dark:prose-invert font-semibold">
                                                         <span>{idx + 1}. </span>
-                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{q.question_text || ''}</ReactMarkdown>
+                                                        <ReactMarkdown className="markdown-body" remarkPlugins={[remarkGfm]}>{q.question_text || ''}</ReactMarkdown>
                                                     </div>
                                                     <div className="flex shrink-0 flex-wrap gap-1 justify-end">
                                                         {q.question_type && <span className="rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] font-bold text-blue-600">{q.question_type.replace('_', ' ').toUpperCase()}</span>}
@@ -374,7 +374,7 @@ const LectureDetailsModal = ({ open, onClose, lecture, details, detailLecture, l
                                                             <div className="flex gap-2">
                                                                 <span className="font-bold">{opt}.</span>
                                                                 <div className="prose prose-sm dark:prose-invert">
-                                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{q[`option_${opt.toLowerCase()}`] || ''}</ReactMarkdown>
+                                                                    <ReactMarkdown className="markdown-body" remarkPlugins={[remarkGfm]}>{q[`option_${opt.toLowerCase()}`] || ''}</ReactMarkdown>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -384,7 +384,7 @@ const LectureDetailsModal = ({ open, onClose, lecture, details, detailLecture, l
                                                     <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 text-sm text-muted-foreground">
                                                         <span className="block mb-1 font-bold text-amber-600 uppercase text-[10px] tracking-wider">Explanation</span>
                                                         <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-snug">
-                                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>{q.explanation}</ReactMarkdown>
+                                                            <ReactMarkdown className="markdown-body" remarkPlugins={[remarkGfm]}>{q.explanation}</ReactMarkdown>
                                                         </div>
                                                     </div>
                                                 )}

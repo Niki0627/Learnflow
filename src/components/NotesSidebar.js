@@ -268,7 +268,7 @@ const NotesSidebar = ({ lectureId }) => {
                     </Box>
                   </Box>
                   <Box sx={{ p: 1.5, fontSize: '0.85rem', lineHeight: 1.6, color: 'text.secondary', '& p': { m: 0, mb: 0.5 } }}>
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
+                    <ReactMarkdown className="markdown-body" remarkPlugins={[remarkGfm]}>{note.content}</ReactMarkdown>
                   </Box>
                 </Paper>
               )}
