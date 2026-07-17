@@ -18,7 +18,7 @@ import {
   useTheme,
   LinearProgress,
   Badge
-} from '@mui/material';
+} from "@/src/components/tailwind/mui";
 import {
   Edit as EditIcon,
   Share as ShareIcon,
@@ -40,7 +40,7 @@ import {
   GitHub as GitHubIcon,
   Google as GoogleIcon,
   Microsoft as MicrosoftIcon
-} from '@mui/icons-material';
+} from "@/src/components/tailwind/icons";
 
 export default function Profile() {
   const { user } = useAuth();

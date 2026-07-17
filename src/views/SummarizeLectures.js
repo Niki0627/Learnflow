@@ -3,7 +3,7 @@ import {
   Container, Typography, Box, Button,
   Select, MenuItem, FormControl, InputLabel, CircularProgress,
   Alert, Chip, Paper, Grid, Divider, useTheme, Accordion, AccordionSummary, AccordionDetails
-} from '@mui/material';
+} from "@/src/components/tailwind/mui";
 import {
   ExpandMore as ExpandMoreIcon,
   AutoStories as LectureIcon,
@@ -16,7 +16,7 @@ import {
   Psychology as PsychologyIcon,
   CheckCircle as CheckCircleIcon,
   Warning as WarningIcon
-} from '@mui/icons-material';
+} from "@/src/components/tailwind/icons";
 import mermaid from 'mermaid';
 import API from '../api/api';
 

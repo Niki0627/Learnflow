@@ -16,12 +16,12 @@ import {
   Button,
   Tooltip,
   CircularProgress,
-} from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import DoneAllIcon from "@mui/icons-material/DoneAll";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import CircleIcon from "@mui/icons-material/Circle";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+} from "@/src/components/tailwind/mui";
+import { Notifications as NotificationsIcon } from "@/src/components/tailwind/icons";
+import { DoneAll as DoneAllIcon } from "@/src/components/tailwind/icons";
+import { DeleteOutline as DeleteOutlineIcon } from "@/src/components/tailwind/icons";
+import { Circle as CircleIcon } from "@/src/components/tailwind/icons";
+import { NotificationsNone as NotificationsNoneIcon } from "@/src/components/tailwind/icons";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);

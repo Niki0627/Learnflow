@@ -1,5 +1,5 @@
 import React from "react";
-import { Chip } from "@mui/material";
+import { Chip } from "@/src/components/tailwind/mui";
 
 const toneMap = {
   primary: { bg: "rgba(37,99,235,0.12)", color: "#2563EB" },

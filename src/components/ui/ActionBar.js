@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box } from "@/src/components/tailwind/mui";
 
 export default function ActionBar({ children, sticky = false, sx }) {
   return (

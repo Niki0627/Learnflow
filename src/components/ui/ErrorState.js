@@ -1,6 +1,6 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
-import ErrorOutlineRoundedIcon from "@mui/icons-material/ErrorOutlineRounded";
+import { Box, Typography, Button } from "@/src/components/tailwind/mui";
+import { ErrorOutlineRounded as ErrorOutlineRoundedIcon } from "@/src/components/tailwind/icons";
 import SurfaceCard from "./SurfaceCard";
 
 export default function ErrorState({

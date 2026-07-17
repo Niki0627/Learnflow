@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Typography, Paper, Button, IconButton, Chip, Stack, TextField, Tooltip, CircularProgress } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { Delete as DeleteIcon, Edit as EditIcon, ContentPaste as ContentPasteIcon, Notes as NotesIcon } from '@mui/icons-material';
+import { Box, Typography, Paper, Button, IconButton, Chip, Stack, TextField, Tooltip, CircularProgress } from "@/src/components/tailwind/mui";
+import { useTheme } from "@/src/components/tailwind/mui";
+import { Delete as DeleteIcon, Edit as EditIcon, ContentPaste as ContentPasteIcon, Notes as NotesIcon } from "@/src/components/tailwind/icons";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import API from '../api/api';

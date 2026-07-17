@@ -9,7 +9,7 @@ const hi = {
   nav_summarize: 'लेक्चर सारांश',
   nav_concept_coach: 'कॉन्सेप्ट कोच',
   nav_profile: 'प्रोफ़ाइल',
-  nav_main_feature: '✦ मुख्य विशेषता',
+  nav_main_feature: 'मुख्य विशेषता',
   nav_logout: 'लॉग आउट',
 
   // Concept Coach

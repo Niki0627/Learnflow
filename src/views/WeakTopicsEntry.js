@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Button, Typography, Box, Stack } from "@mui/material";
+import { Button, Typography, Box, Stack } from "@/src/components/tailwind/mui";
 import LectureSelect from "../components/LectureSelect";
 import { useNavigate } from "react-router-dom";
-import { ArrowForward as ArrowForwardIcon } from "@mui/icons-material";
+import { ArrowForward as ArrowForwardIcon } from "@/src/components/tailwind/icons";
 import { PageHeader, SurfaceCard } from "../components/ui";
 
 const PRIMARY_CTA_SX = {

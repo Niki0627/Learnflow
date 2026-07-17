@@ -4,7 +4,7 @@ import {
   MenuItem, Select, FormControl, InputLabel, Chip, IconButton,
   Paper, LinearProgress, Grid, Divider, useTheme, Tooltip,
   Tab, Tabs, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
-} from '@mui/material';
+} from "@/src/components/tailwind/mui";
 import { 
   ArrowForward as NextIcon,
   ArrowBack as PrevIcon,
@@ -21,7 +21,7 @@ import {
   TrendingUp as TrendingUpIcon,
   Close as CloseIcon,
   Check as CheckIcon
-} from '@mui/icons-material';
+} from "@/src/components/tailwind/icons";
 import { motion, AnimatePresence } from 'framer-motion';
 import API from '../api/api';
 

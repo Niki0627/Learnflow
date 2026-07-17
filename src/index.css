@@ -3,22 +3,22 @@
 @tailwind utilities;
 
 :root {
-  --ink: #264653;
-  --teal: #2a9d8f;
-  --sand: #e9c46a;
-  --clay: #f4a261;
-  --coral: #e76f51;
+  --ink: #16112f;
+  --muted: #625c85;
+  --violet: #5b4fe9;
+  --violet-dark: #3124b8;
+  --violet-light: #8f8cff;
+  --lavender: #eeeafe;
+  --sky: #70d6ff;
+  --rose: #ff7ab6;
 
-  --bg-canvas: #f6f1e6;
-  --bg-paper: #fffdf8;
-  --border: #e8dcc9;
+  --bg-canvas: #f7f5ff;
+  --bg-paper: #ffffff;
+  --border: #ddd8fa;
 
-  --grad-primary: linear-gradient(135deg, #264653 0%, #2a9d8f 100%);
-  --grad-aurora: linear-gradient(135deg, #2a9d8f 0%, #e9c46a 45%, #f4a261 100%);
-  --grad-sunset: linear-gradient(135deg, #f4a261 0%, #e76f51 100%);
-  --grad-ocean: linear-gradient(135deg, #264653 0%, #2a9d8f 100%);
-  --grad-cosmic: linear-gradient(135deg, #e76f51 0%, #e9c46a 100%);
-  --grad-mint: linear-gradient(135deg, #2a9d8f 0%, #f4a261 100%);
+  --grad-primary: linear-gradient(135deg, #5b4fe9 0%, #7467f0 52%, #8f8cff 100%);
+  --grad-deep: linear-gradient(135deg, #24176d 0%, #4f3ddb 58%, #7668f3 100%);
+  --grad-accent: linear-gradient(135deg, #70d6ff 0%, #8f8cff 52%, #ff7ab6 100%);
 }
 
 html {
@@ -29,8 +29,6 @@ html {
 body {
   margin: 0;
   font-family:
-    "Lexend",
-    "Noto Sans",
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
@@ -40,19 +38,20 @@ body {
   color: var(--ink);
   background-color: var(--bg-canvas);
   background-image:
+    linear-gradient(180deg, #ffffff 0%, #f7f5ff 42%, #f0ecff 100%),
     radial-gradient(
-      circle at 20% 20%,
-      rgba(42, 157, 143, 0.12) 0%,
+      circle at 12% 18%,
+      rgba(91, 79, 233, 0.14) 0%,
       transparent 46%
     ),
     radial-gradient(
-      circle at 85% 12%,
-      rgba(233, 196, 106, 0.1) 0%,
+      circle at 86% 14%,
+      rgba(143, 140, 255, 0.16) 0%,
       transparent 42%
     ),
     radial-gradient(
-      circle at 74% 82%,
-      rgba(231, 111, 81, 0.1) 0%,
+      circle at 74% 84%,
+      rgba(255, 122, 182, 0.1) 0%,
       transparent 42%
     );
 }
@@ -67,7 +66,7 @@ code {
 }
 
 *:focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--violet);
   outline-offset: 2px;
 }
 
@@ -76,16 +75,16 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(42, 157, 143, 0.08);
+  background: rgba(91, 79, 233, 0.08);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(38, 70, 83, 0.35);
+  background: rgba(91, 79, 233, 0.35);
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(38, 70, 83, 0.5);
+  background: rgba(91, 79, 233, 0.5);
 }
 
 @media (prefers-reduced-motion: reduce) {

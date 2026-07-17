@@ -3,7 +3,7 @@ import {
   Container, Typography, Box, Paper, Chip, TextField,
   InputAdornment, Accordion, AccordionSummary, AccordionDetails,
   Button, Grid, useTheme, Divider, Select, MenuItem, FormControl, InputLabel
-} from '@mui/material';
+} from "@/src/components/tailwind/mui";
 import {
   Search as SearchIcon,
   ExpandMore as ExpandMoreIcon,
@@ -14,7 +14,7 @@ import {
   MenuBook as BookIcon,
   Quiz as QuizIcon,
   Download as DownloadIcon
-} from '@mui/icons-material';
+} from "@/src/components/tailwind/icons";
 import API from '../api/api';
 
 export default function QuestionBank() {

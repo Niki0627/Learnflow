@@ -1,6 +1,6 @@
 import React from "react";
-import { Box, Typography, Button } from "@mui/material";
-import InboxRoundedIcon from "@mui/icons-material/InboxRounded";
+import { Box, Typography, Button } from "@/src/components/tailwind/mui";
+import { InboxRounded as InboxRoundedIcon } from "@/src/components/tailwind/icons";
 import SurfaceCard from "./SurfaceCard";
 
 export default function EmptyState({

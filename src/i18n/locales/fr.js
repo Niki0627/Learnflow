@@ -9,7 +9,7 @@ const fr = {
   nav_summarize: 'Résumer le cours',
   nav_concept_coach: 'Coach Concept',
   nav_profile: 'Profil',
-  nav_main_feature: '✦ FONCTIONNALITÉ PRINCIPALE',
+  nav_main_feature: 'FONCTIONNALITÉ PRINCIPALE',
   nav_logout: 'Déconnexion',
 
   // Concept Coach

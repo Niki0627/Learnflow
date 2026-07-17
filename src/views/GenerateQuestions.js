@@ -28,21 +28,21 @@ import {
   InputLabel,
   Select,
   MenuItem,
-} from "@mui/material";
+} from "@/src/components/tailwind/mui";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import API from "../api/api";
-import AutoStoriesIcon from "@mui/icons-material/AutoStories";
-import LightbulbIcon from "@mui/icons-material/Lightbulb";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import SendIcon from "@mui/icons-material/Send";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import EditIcon from "@mui/icons-material/Edit";
-import QuizIcon from "@mui/icons-material/Quiz";
-import InfoIcon from "@mui/icons-material/Info";
-import SaveIcon from "@mui/icons-material/Save";
-import CloseIcon from "@mui/icons-material/Close";
-import FilterListIcon from "@mui/icons-material/FilterList";
+import { AutoStories as AutoStoriesIcon } from "@/src/components/tailwind/icons";
+import { Lightbulb as LightbulbIcon } from "@/src/components/tailwind/icons";
+import { CheckCircle as CheckCircleIcon } from "@/src/components/tailwind/icons";
+import { Send as SendIcon } from "@/src/components/tailwind/icons";
+import { ExpandMore as ExpandMoreIcon } from "@/src/components/tailwind/icons";
+import { Edit as EditIcon } from "@/src/components/tailwind/icons";
+import { Quiz as QuizIcon } from "@/src/components/tailwind/icons";
+import { Info as InfoIcon } from "@/src/components/tailwind/icons";
+import { Save as SaveIcon } from "@/src/components/tailwind/icons";
+import { Close as CloseIcon } from "@/src/components/tailwind/icons";
+import { FilterList as FilterListIcon } from "@/src/components/tailwind/icons";
 import LectureSelect from "../components/LectureSelect";
 
 // Markdown renderer component with consistent styling
@@ -213,7 +213,7 @@ function GenerateQuestions() {
           mb: 4,
         }}
       >
-        💡 Generate Questions
+        Generate Questions
       </Typography>
 
       {/* INPUT CARD */}
@@ -233,7 +233,7 @@ function GenerateQuestions() {
       >
         <CardContent sx={{ p: 0 }}>
           <Typography variant="h6" sx={{ mb: 3, fontWeight: 600, color: "text.primary" }}>
-            📝 Enter Details
+            Enter Details
           </Typography>
 
           <Stack direction="column" spacing={3} alignItems="stretch">
@@ -345,7 +345,7 @@ function GenerateQuestions() {
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              💡 <strong>Tip:</strong> Select a lecture note and specify how many questions to
+              <strong>Tip:</strong> Select a lecture note and specify how many questions to
               generate. Our AI will create MCQs from your lecture notes with markdown formatting!
             </Typography>
           </Box>
@@ -730,7 +730,7 @@ function GenerateQuestions() {
 
       {/* QUIZ CONFIG DIALOG */}
       <Dialog open={quizDialogOpen} onClose={() => setQuizDialogOpen(false)}>
-        <DialogTitle sx={{ fontWeight: "bold" }}>🎯 Start Quiz</DialogTitle>
+        <DialogTitle sx={{ fontWeight: "bold" }}>Start Quiz</DialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mb: 2, mt: 1 }}>
             How many questions would you like to attempt?

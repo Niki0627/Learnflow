@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, Tab, Box } from "@mui/material";
+import { Tabs, Tab, Box } from "@/src/components/tailwind/mui";
 
 export default function SectionTabs({ value, onChange, tabs = [] }) {
   return (

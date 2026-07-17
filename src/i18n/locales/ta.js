@@ -9,7 +9,7 @@ const ta = {
   nav_summarize: 'விரிவுரை சுருக்கம்',
   nav_concept_coach: 'கான்செப்ட் கோச்',
   nav_profile: 'சுயவிவரம்',
-  nav_main_feature: '✦ முதன்மை அம்சம்',
+  nav_main_feature: 'முதன்மை அம்சம்',
   nav_logout: 'வெளியேறு',
 
   // Concept Coach

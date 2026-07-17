@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Skeleton } from "@mui/material";
+import { Grid, Skeleton } from "@/src/components/tailwind/mui";
 
 export default function LoadingSkeletonPack({ rows = 3, cardHeight = 120 }) {
   return (

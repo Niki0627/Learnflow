@@ -16,13 +16,13 @@ import {
   Stack,
   ToggleButton,
   ToggleButtonGroup,
-} from "@mui/material";
+} from "@/src/components/tailwind/mui";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import QuizIcon from "@mui/icons-material/Quiz";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import TimerIcon from "@mui/icons-material/Timer";
-import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
+import { Quiz as QuizIcon } from "@/src/components/tailwind/icons";
+import { ArrowForward as ArrowForwardIcon } from "@/src/components/tailwind/icons";
+import { Timer as TimerIcon } from "@/src/components/tailwind/icons";
+import { AllInclusive as AllInclusiveIcon } from "@/src/components/tailwind/icons";
 
 export default function QuizEntry() {
   const { api: API } = useAuth();

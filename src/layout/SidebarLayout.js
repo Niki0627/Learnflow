@@ -13,22 +13,25 @@ import {
   Drawer,
   Box,
   Divider,
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import ArticleIcon from "@mui/icons-material/Article";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import AutoStoriesIcon from "@mui/icons-material/AutoStories";
-import StyleIcon from "@mui/icons-material/Style";
-import SummarizeIcon from "@mui/icons-material/Summarize";
-import SchoolIcon from "@mui/icons-material/School";
-import PersonIcon from "@mui/icons-material/Person";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import SmartToyIcon from "@mui/icons-material/SmartToy";
-import TranslateIcon from "@mui/icons-material/Translate";
-import LogoutIcon from "@mui/icons-material/Logout";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+} from "@/src/components/tailwind/mui";
+import {
+  Bot,
+  BookOpen,
+  CalendarDays,
+  ChevronRight,
+  FileQuestion,
+  GraduationCap,
+  Languages,
+  Layers,
+  LayoutDashboard,
+  Library,
+  LogOut,
+  Menu as MenuIcon,
+  Minus,
+  Plus,
+  ScrollText,
+  UserRound,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useColorMode } from "../context/ThemeContext";
 import Notifications from "../components/Notifications";
@@ -39,8 +42,8 @@ const SIDEBAR_WIDTH = 260;
 
 /* ── helpers ────────────────────────────────────────────────── */
 const getAvatarColor = (username) => {
-  if (!username) return "#2563EB";
-  const colors = ["#2563EB", "#7C3AED", "#0891B2", "#059669", "#D97706"];
+  if (!username) return "#5B4FE9";
+  const colors = ["#5B4FE9", "#7467F0", "#0891B2", "#059669", "#D97706"];
   const hash = username.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
   return colors[hash % colors.length];
 };
@@ -92,11 +95,11 @@ const LanguageSwitcher = () => {
             transition: "all 0.2s",
             "&:hover": {
               borderColor: "primary.main",
-              bgcolor: "rgba(37,99,235,0.05)",
+              bgcolor: "rgba(91,79,233,0.05)",
             },
           }}
         >
-          <TranslateIcon sx={{ fontSize: 14, color: "text.secondary" }} />
+          <Languages size={14} color="currentColor" />
           <Typography
             variant="caption"
             sx={{ fontWeight: 700, color: "text.secondary", lineHeight: 1 }}
@@ -115,7 +118,7 @@ const LanguageSwitcher = () => {
             mt: 1,
             minWidth: 140,
             border: "1px solid #e2e8f0",
-            boxShadow: "0 8px 32px rgba(15,23,42,0.12)",
+            boxShadow: "0 8px 32px rgba(22,17,47,0.12)",
           },
         }}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
@@ -144,64 +147,64 @@ const LanguageSwitcher = () => {
 /* ── Nav items ──────────────────────────────────────────────── */
 const NAV_COLORS = {
   dashboard: {
-    color: "#2563EB",
-    light: "rgba(37,99,235,0.12)",
-    grad: "linear-gradient(135deg,#2563EB,#3B82F6)",
+    color: "#5B4FE9",
+    light: "rgba(91,79,233,0.12)",
+    grad: "linear-gradient(135deg,#5B4FE9,#8F8CFF)",
   },
   lectures: {
-    color: "#7C3AED",
-    light: "rgba(124,58,237,0.12)",
-    grad: "linear-gradient(135deg,#7C3AED,#A78BFA)",
+    color: "#7467F0",
+    light: "rgba(116,103,240,0.12)",
+    grad: "linear-gradient(135deg,#7467F0,#8F8CFF)",
   },
   questions: {
-    color: "#F43F5E",
+    color: "#FF7AB6",
     light: "rgba(244,63,94,0.12)",
-    grad: "linear-gradient(135deg,#F43F5E,#FB7185)",
+    grad: "linear-gradient(135deg,#FF7AB6,#FFA6CF)",
   },
   "weak-topics": {
-    color: "#F59E0B",
+    color: "#F6B84B",
     light: "rgba(245,158,11,0.14)",
-    grad: "linear-gradient(135deg,#F59E0B,#FCD34D)",
+    grad: "linear-gradient(135deg,#F6B84B,#FFD88C)",
   },
   "question-bank": {
-    color: "#10B981",
-    light: "rgba(16,185,129,0.12)",
-    grad: "linear-gradient(135deg,#10B981,#34D399)",
+    color: "#18B981",
+    light: "rgba(24,185,129,0.12)",
+    grad: "linear-gradient(135deg,#18B981,#67E8B9)",
   },
   "study-plan": {
-    color: "#10B981",
-    light: "rgba(16,185,129,0.12)",
-    grad: "linear-gradient(135deg,#10B981,#34D399)",
+    color: "#18B981",
+    light: "rgba(24,185,129,0.12)",
+    grad: "linear-gradient(135deg,#18B981,#67E8B9)",
   },
   "exam-preparation": {
-    color: "#F59E0B",
+    color: "#F6B84B",
     light: "rgba(245,158,11,0.12)",
-    grad: "linear-gradient(135deg,#F59E0B,#FCD34D)",
+    grad: "linear-gradient(135deg,#F6B84B,#FFD88C)",
   },
   flashcards: {
-    color: "#06B6D4",
+    color: "#70D6FF",
     light: "rgba(6,182,212,0.12)",
-    grad: "linear-gradient(135deg,#06B6D4,#67E8F9)",
+    grad: "linear-gradient(135deg,#70D6FF,#A8E8FF)",
   },
   summarize: {
-    color: "#0EA5E9",
-    light: "rgba(14,165,233,0.12)",
-    grad: "linear-gradient(135deg,#0EA5E9,#38BDF8)",
+    color: "#70D6FF",
+    light: "rgba(112,214,255,0.12)",
+    grad: "linear-gradient(135deg,#70D6FF,#A8E8FF)",
   },
   "concept-coach": {
-    color: "#7C3AED",
-    light: "rgba(124,58,237,0.15)",
-    grad: "linear-gradient(135deg,#4F46E5,#7C3AED,#EC4899)",
+    color: "#7467F0",
+    light: "rgba(116,103,240,0.15)",
+    grad: "linear-gradient(135deg,#5B4FE9,#7467F0,#FF7AB6)",
   },
   profile: {
-    color: "#6B7280",
+    color: "#625C85",
     light: "rgba(107,114,128,0.10)",
-    grad: "linear-gradient(135deg,#6B7280,#9CA3AF)",
+    grad: "linear-gradient(135deg,#625C85,#A9A3C7)",
   },
   "quiz-result": {
-    color: "#06B6D4",
+    color: "#70D6FF",
     light: "rgba(6,182,212,0.14)",
-    grad: "linear-gradient(135deg,#06B6D4,#38BDF8)",
+    grad: "linear-gradient(135deg,#70D6FF,#A8E8FF)",
   },
 };
 
@@ -211,62 +214,62 @@ const useNavItems = (t) =>
       {
         key: "dashboard",
         label: t("nav_dashboard"),
-        icon: <BarChartIcon />,
+        icon: <LayoutDashboard size={18} />,
         to: "/dashboard",
       },
       {
         key: "lectures",
         label: t("nav_lectures"),
-        icon: <AutoStoriesIcon />,
+        icon: <BookOpen size={18} />,
         to: "/lectures",
       },
       {
         key: "summarize",
         label: t("nav_summarize"),
-        icon: <SummarizeIcon />,
+        icon: <ScrollText size={18} />,
         to: "/summarize",
       },
       {
         key: "questions",
         label: t("nav_quiz"),
-        icon: <ArticleIcon />,
+        icon: <FileQuestion size={18} />,
         to: "/quiz",
       },
       {
         key: "weak-topics",
         label: t("nav_weak_topics", "Weak Topics"),
-        icon: <SchoolIcon />,
+        icon: <GraduationCap size={18} />,
         to: "/weak-topics",
       },
       {
         key: "question-bank",
         label: "Question Bank",
-        icon: <ArticleIcon />,
+        icon: <Library size={18} />,
         to: "/question-bank",
       },
       {
         key: "flashcards",
         label: t("nav_flashcards"),
-        icon: <StyleIcon />,
+        icon: <Layers size={18} />,
         to: "/flashcards",
       },
       {
         key: "study-plan",
         label: t("nav_study_plan"),
-        icon: <CalendarTodayIcon />,
+        icon: <CalendarDays size={18} />,
         to: "/study-plan",
       },
       {
         key: "exam-preparation",
         label: t("nav_exam_prep"),
-        icon: <SchoolIcon />,
+        icon: <GraduationCap size={18} />,
         to: "/exam-preparation",
         badge: "HOT",
       },
       {
         key: "concept-coach",
         label: t("nav_concept_coach"),
-        icon: <SmartToyIcon />,
+        icon: <Bot size={18} />,
         to: "/concept-coach",
         flagship: true,
         badge: "AI",
@@ -274,7 +277,7 @@ const useNavItems = (t) =>
       {
         key: "profile",
         label: t("nav_profile"),
-        icon: <PersonIcon />,
+        icon: <UserRound size={18} />,
         to: "/profile",
       },
     ],
@@ -347,7 +350,7 @@ const NavItem = ({ item, isActive, onClick }) => {
               }
             : {},
           "&:hover": {
-            bgcolor: isActive ? nc.light : "rgba(15,23,42,0.04)",
+            bgcolor: isActive ? nc.light : "rgba(22,17,47,0.04)",
             color: isActive ? nc.color : "text.primary",
             transform: "translateX(2px)",
             "& .nav-icon-box": {
@@ -371,9 +374,9 @@ const NavItem = ({ item, isActive, onClick }) => {
             background: isActive
               ? nc.grad
               : item.flagship
-                ? "rgba(124,58,237,0.1)"
-                : "rgba(15,23,42,0.04)",
-            color: isActive ? "#fff" : item.flagship ? "#7C3AED" : nc.color,
+                ? "rgba(116,103,240,0.1)"
+                : "rgba(22,17,47,0.04)",
+            color: isActive ? "#fff" : item.flagship ? "#7467F0" : nc.color,
             transition: "all 0.2s cubic-bezier(0.22,1,0.36,1)",
             boxShadow: isActive ? `0 4px 12px ${nc.color}40` : "none",
             "& svg": { fontSize: "1.05rem" },
@@ -407,8 +410,8 @@ const NavItem = ({ item, isActive, onClick }) => {
               borderRadius: "5px",
               background:
                 item.badge === "HOT"
-                  ? "linear-gradient(135deg,#F59E0B,#F97316)"
-                  : "linear-gradient(135deg,#4F46E5,#7C3AED,#EC4899)",
+                  ? "linear-gradient(135deg,#F6B84B,#FF7AB6)"
+                  : "linear-gradient(135deg,#5B4FE9,#7467F0,#FF7AB6)",
               color: "#FFFFFF",
               letterSpacing: "0.06em",
               animation:
@@ -422,9 +425,7 @@ const NavItem = ({ item, isActive, onClick }) => {
         )}
 
         {isActive && (
-          <KeyboardArrowRightIcon
-            sx={{ fontSize: 15, color: nc.color, opacity: 0.8 }}
-          />
+          <ChevronRight size={15} color={nc.color} opacity={0.8} />
         )}
       </Box>
     </Link>
@@ -468,8 +469,8 @@ function SidebarContent({
             borderRadius: "14px",
             py: 1.5,
             background:
-              "linear-gradient(135deg, rgba(37,99,235,0.06) 0%, rgba(124,58,237,0.06) 100%)",
-            border: "1px solid rgba(37,99,235,0.12)",
+              "linear-gradient(135deg, rgba(91,79,233,0.06) 0%, rgba(116,103,240,0.06) 100%)",
+            border: "1px solid rgba(91,79,233,0.12)",
             "&::before": {
               content: '""',
               position: "absolute",
@@ -479,7 +480,7 @@ function SidebarContent({
               top: -30,
               right: -20,
               background:
-                "radial-gradient(circle, rgba(124,58,237,0.2) 0%, transparent 70%)",
+                "radial-gradient(circle, rgba(116,103,240,0.2) 0%, transparent 70%)",
               pointerEvents: "none",
             },
           }}
@@ -490,11 +491,11 @@ function SidebarContent({
               height: 36,
               borderRadius: "10px",
               flexShrink: 0,
-              background: "linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)",
+              background: "linear-gradient(135deg, #5B4FE9 0%, #7467F0 100%)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 14px rgba(37,99,235,0.40)",
+              boxShadow: "0 4px 14px rgba(91,79,233,0.40)",
               animation: "pulseGlow 3s infinite",
             }}
           >
@@ -516,7 +517,7 @@ function SidebarContent({
                 fontSize: "1.05rem",
                 lineHeight: 1,
                 background:
-                  "linear-gradient(135deg, #2563EB 0%, #7C3AED 60%, #EC4899 100%)",
+                  "linear-gradient(135deg, #5B4FE9 0%, #7467F0 60%, #FF7AB6 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
@@ -576,17 +577,17 @@ function SidebarContent({
                       flex: 1,
                       height: "1px",
                       background:
-                        "linear-gradient(90deg, rgba(124,58,237,0.3), transparent)",
+                        "linear-gradient(90deg, rgba(116,103,240,0.3), transparent)",
                     }}
                   />
                   <Typography
                     variant="overline"
                     sx={{
-                      color: "#7C3AED",
+                      color: "#7467F0",
                       fontSize: "0.6rem",
                       fontWeight: 800,
                       letterSpacing: "0.12em",
-                      background: "linear-gradient(90deg, #7C3AED, #EC4899)",
+                      background: "linear-gradient(90deg, #7467F0, #FF7AB6)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
@@ -599,7 +600,7 @@ function SidebarContent({
                       flex: 1,
                       height: "1px",
                       background:
-                        "linear-gradient(90deg, transparent, rgba(236,72,153,0.3))",
+                        "linear-gradient(90deg, transparent, rgba(255,122,182,0.3))",
                     }}
                   />
                 </Box>
@@ -637,7 +638,7 @@ function SidebarContent({
             height: 34,
             fontSize: "0.78rem",
             fontWeight: 900,
-            background: `linear-gradient(135deg, ${avatarColor} 0%, #1e40af 100%)`,
+            background: `linear-gradient(135deg, ${avatarColor} 0%, #3124B8 100%)`,
             boxShadow: `0 3px 10px ${avatarColor}50`,
           }}
         >
@@ -672,7 +673,7 @@ function SidebarContent({
             sx={{
               color: "text.disabled",
               "&:hover": {
-                color: "#EF4444",
+                color: "#EF476F",
                 bgcolor: "rgba(239,68,68,0.10)",
                 transform: "rotate(180deg)",
               },
@@ -680,7 +681,7 @@ function SidebarContent({
               transition: "all 0.3s ease",
             }}
           >
-            <LogoutIcon sx={{ fontSize: 16 }} />
+            <LogOut size={16} />
           </IconButton>
         </Tooltip>
       </Box>
@@ -717,7 +718,7 @@ function SidebarContent({
             }}
             aria-label="Decrease font size"
           >
-            <RemoveIcon sx={{ fontSize: 14 }} />
+            <Minus size={14} />
           </IconButton>
           <IconButton
             size="small"
@@ -730,7 +731,7 @@ function SidebarContent({
             }}
             aria-label="Increase font size"
           >
-            <AddIcon sx={{ fontSize: 14 }} />
+            <Plus size={14} />
           </IconButton>
         </Box>
       </Box>
@@ -796,7 +797,7 @@ export default function SidebarLayout() {
           pointerEvents: "none",
           zIndex: 0,
           background:
-            "radial-gradient(circle at 10% 16%, rgba(14,165,233,0.18) 0%, transparent 34%), radial-gradient(circle at 84% 14%, rgba(124,58,237,0.16) 0%, transparent 32%), radial-gradient(circle at 72% 82%, rgba(236,72,153,0.15) 0%, transparent 35%), radial-gradient(circle at 18% 82%, rgba(16,185,129,0.12) 0%, transparent 30%)",
+            "radial-gradient(circle at 10% 16%, rgba(112,214,255,0.18) 0%, transparent 34%), radial-gradient(circle at 84% 14%, rgba(116,103,240,0.16) 0%, transparent 32%), radial-gradient(circle at 72% 82%, rgba(255,122,182,0.15) 0%, transparent 35%), radial-gradient(circle at 18% 82%, rgba(24,185,129,0.12) 0%, transparent 30%)",
         },
       }}
     >
@@ -821,7 +822,7 @@ export default function SidebarLayout() {
           overflowY: "auto",
           overflowX: "hidden",
           boxShadow:
-            "8px 0 34px rgba(15,23,42,0.10), 1px 0 0 rgba(191,219,254,0.65)",
+            "8px 0 34px rgba(22,17,47,0.10), 1px 0 0 rgba(221,216,250,0.65)",
         }}
       >
         <SidebarContent
@@ -845,7 +846,7 @@ export default function SidebarLayout() {
           sx: {
             width: SIDEBAR_WIDTH,
             border: "none",
-            boxShadow: "4px 0 32px rgba(15,23,42,0.12)",
+            boxShadow: "4px 0 32px rgba(22,17,47,0.12)",
           },
         }}
         ModalProps={{ keepMounted: true }}
@@ -883,7 +884,7 @@ export default function SidebarLayout() {
             WebkitBackdropFilter: "blur(20px)",
             borderBottom: "1px solid transparent",
             backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), linear-gradient(90deg, #2563EB, #7C3AED, #EC4899)",
+              "linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)), linear-gradient(90deg, #5B4FE9, #7467F0, #FF7AB6)",
             backgroundOrigin: "border-box",
             backgroundClip: "padding-box, border-box",
             color: "#0F172A",
@@ -896,7 +897,7 @@ export default function SidebarLayout() {
               right: 0,
               height: "2px",
               background:
-                "linear-gradient(90deg, #2563EB 0%, #7C3AED 50%, #EC4899 100%)",
+                "linear-gradient(90deg, #5B4FE9 0%, #7467F0 50%, #FF7AB6 100%)",
               opacity: 0.35,
             },
           }}
@@ -920,10 +921,10 @@ export default function SidebarLayout() {
                   width: 38,
                   height: 38,
                   color: "text.secondary",
-                  "&:hover": { bgcolor: "rgba(15,23,42,0.05)" },
+                  "&:hover": { bgcolor: "rgba(22,17,47,0.05)" },
                 }}
               >
-                <MenuIcon />
+                <MenuIcon size={21} />
               </IconButton>
 
               {/* Mobile logo */}
@@ -942,11 +943,11 @@ export default function SidebarLayout() {
                     height: 28,
                     borderRadius: "8px",
                     background:
-                      "linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)",
+                      "linear-gradient(135deg, #5B4FE9 0%, #3124B8 100%)",
                     display: { xs: "flex", md: "none" },
                     alignItems: "center",
                     justifyContent: "center",
-                    boxShadow: "0 2px 8px rgba(37,99,235,0.25)",
+                    boxShadow: "0 2px 8px rgba(91,79,233,0.25)",
                   }}
                 >
                   <Typography
@@ -971,8 +972,8 @@ export default function SidebarLayout() {
                     width: 6,
                     height: 6,
                     borderRadius: "50%",
-                    background: "linear-gradient(135deg, #2563EB, #7C3AED)",
-                    boxShadow: "0 0 8px rgba(37,99,235,0.5)",
+                    background: "linear-gradient(135deg, #5B4FE9, #7467F0)",
+                    boxShadow: "0 0 8px rgba(91,79,233,0.5)",
                     display: { xs: "none", md: "block" },
                   }}
                 />
@@ -1025,7 +1026,7 @@ export default function SidebarLayout() {
                   transition: "all 0.2s",
                   "&:hover": {
                     borderColor: "primary.main",
-                    boxShadow: "0 2px 8px rgba(37,99,235,0.12)",
+                    boxShadow: "0 2px 8px rgba(91,79,233,0.12)",
                   },
                 }}
               >
@@ -1036,7 +1037,7 @@ export default function SidebarLayout() {
                     height: 30,
                     fontSize: "0.72rem",
                     fontWeight: 800,
-                    background: `linear-gradient(135deg, ${avatarColor} 0%, #1e40af 100%)`,
+                    background: `linear-gradient(135deg, ${avatarColor} 0%, #3124B8 100%)`,
                   }}
                 >
                   {initials}
@@ -1084,7 +1085,7 @@ export default function SidebarLayout() {
               mt: 1,
               minWidth: 180,
               border: "1px solid #e2e8f0",
-              boxShadow: "0 8px 32px rgba(15,23,42,0.12)",
+              boxShadow: "0 8px 32px rgba(22,17,47,0.12)",
             },
           }}
           transformOrigin={{ horizontal: "right", vertical: "top" }}
@@ -1105,9 +1106,7 @@ export default function SidebarLayout() {
             }}
             sx={{ borderRadius: 1.5, mx: 0.5, mt: 0.5 }}
           >
-            <PersonIcon
-              sx={{ fontSize: 18, mr: 1.5, color: "text.secondary" }}
-            />
+            <UserRound size={18} style={{ marginRight: 12, color: "currentColor" }} />
             <Typography variant="body2" fontWeight={600}>
               My Profile
             </Typography>
@@ -1122,11 +1121,11 @@ export default function SidebarLayout() {
               borderRadius: 1.5,
               mx: 0.5,
               mb: 0.5,
-              color: "#EF4444",
+              color: "#EF476F",
               "&:hover": { bgcolor: "rgba(239,68,68,0.06)" },
             }}
           >
-            <LogoutIcon sx={{ fontSize: 18, mr: 1.5 }} />
+            <LogOut size={18} style={{ marginRight: 12 }} />
             <Typography variant="body2" fontWeight={600}>
               {t("nav_logout")}
             </Typography>

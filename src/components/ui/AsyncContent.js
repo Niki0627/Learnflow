@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box } from "@/src/components/tailwind/mui";
 import EmptyState from "./EmptyState";
 import ErrorState from "./ErrorState";
 import LoadingSkeletonPack from "./LoadingSkeletonPack";

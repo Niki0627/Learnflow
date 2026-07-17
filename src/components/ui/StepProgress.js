@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, LinearProgress } from "@mui/material";
+import { Box, Typography, LinearProgress } from "@/src/components/tailwind/mui";
 
 export default function StepProgress({ step = 1, total = 4, label }) {
   const percent = Math.max(0, Math.min(100, (step / total) * 100));

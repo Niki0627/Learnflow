@@ -5,7 +5,7 @@ import {
   Box, Container, Typography, Button, Grid, Paper, TextField,
   Slider, Switch, Chip, LinearProgress, useTheme,
   CircularProgress, Alert, Checkbox
-} from '@mui/material';
+} from "@/src/components/tailwind/mui";
 import {
   School as SchoolIcon,
   Tune as TuneIcon,
@@ -24,7 +24,7 @@ import {
   EmojiEvents as TrophyIcon,
   AccessTime as TimeIcon,
   QuizOutlined as QuizIcon
-} from '@mui/icons-material';
+} from "@/src/components/tailwind/icons";
 import { useAuth } from '../context/AuthContext';
 import API from '../api/api';
 import LectureSelect from '../components/LectureSelect';

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography } from "@/src/components/tailwind/mui";
 import SurfaceCard from "./SurfaceCard";
 
 export default function MetricCard({
@@ -15,7 +15,8 @@ export default function MetricCard({
       sx={{
         position: "relative",
         overflow: "hidden",
-        background: "linear-gradient(150deg, #FFFFFF 0%, #F8FBFF 100%)",
+        background:
+          "linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(238,234,254,0.74) 100%)",
         ...sx,
       }}
     >
@@ -54,8 +55,7 @@ export default function MetricCard({
               display: "grid",
               placeItems: "center",
               color: `${tone}.main`,
-              bgcolor: `${tone}.main15`,
-              backgroundColor: "rgba(37,99,235,0.1)",
+              backgroundColor: "rgba(91,79,233,0.11)",
             }}
           >
             {icon}

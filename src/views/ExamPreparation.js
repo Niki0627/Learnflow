@@ -9,7 +9,7 @@ import {
     CircularProgress, Divider, Collapse, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, Tooltip, Alert, Snackbar,
     FormControlLabel, Slider, InputAdornment, Select, MenuItem, FormControl, InputLabel
-} from '@mui/material';
+} from "@/src/components/tailwind/mui";
 import {
     School as SchoolIcon,
     UploadFile as UploadIcon,
@@ -31,7 +31,7 @@ import {
     MenuBook as MenuBookIcon,
     Coffee as CoffeeIcon,
     FitnessCenter as FitnessCenterIcon
-} from '@mui/icons-material';
+} from "@/src/components/tailwind/icons";
 
 // Shared Glass Card
 const GlassCard = ({ children, sx, ...props }) => {

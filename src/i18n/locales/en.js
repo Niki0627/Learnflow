@@ -9,7 +9,7 @@ const en = {
   nav_summarize: 'Summarize Lecture',
   nav_concept_coach: 'Concept Coach',
   nav_profile: 'Profile',
-  nav_main_feature: '✦ MAIN FEATURE',
+  nav_main_feature: 'MAIN FEATURE',
   nav_logout: 'Logout',
 
   // Concept Coach

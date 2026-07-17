@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TextField, MenuItem, CircularProgress } from "@mui/material";
+import { TextField, MenuItem, CircularProgress } from "@/src/components/tailwind/mui";
 import API from "../api/api";
 
 export default function LectureSelect({ value, onChange, label = "" }) {

@@ -8,43 +8,44 @@ module.exports = {
     extend: {
       colors: {
         ink: {
-          DEFAULT: "#264653",
-          light: "#4a6875",
+          DEFAULT: "#16112F",
+          light: "#625C85",
         },
-        teal: {
-          DEFAULT: "#2a9d8f",
-          light: "#58b8ac",
+        violet: {
+          DEFAULT: "#5B4FE9",
+          light: "#8F8CFF",
+          dark: "#3124B8",
         },
-        sand: {
-          DEFAULT: "#e9c46a",
-          light: "#f1d587",
+        lavender: {
+          DEFAULT: "#EEEAFE",
+          light: "#F7F5FF",
         },
-        clay: {
-          DEFAULT: "#f4a261",
-          light: "#f9c49a",
+        sky: {
+          DEFAULT: "#70D6FF",
+          light: "#A8E8FF",
         },
-        coral: {
-          DEFAULT: "#e76f51",
-          light: "#f29a86",
+        rose: {
+          DEFAULT: "#FF7AB6",
+          light: "#FFA6CF",
         },
         surface: {
-          DEFAULT: "#fffdf8",
-          warm: "#f7f0e3",
-          base: "#f6f1e6",
-          divider: "#e8dcc9",
+          DEFAULT: "#FFFFFF",
+          warm: "#F7F5FF",
+          base: "#F0ECFF",
+          divider: "#DDD8FA",
         },
       },
       fontFamily: {
-        sans: ["Lexend", "Noto Sans", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        card: "0 1px 3px 0 rgba(38,70,83,0.08), 0 1px 2px -1px rgba(38,70,83,0.06)",
-        "card-hover": "0 8px 24px 0 rgba(42,157,143,0.16)",
+        card: "0 24px 70px rgba(50,36,184,0.13)",
+        "card-hover": "0 30px 90px rgba(50,36,184,0.18)",
       },
       backgroundImage: {
-        "grad-primary": "linear-gradient(135deg, #264653 0%, #2a9d8f 100%)",
-        "grad-sunset": "linear-gradient(135deg, #f4a261 0%, #e76f51 100%)",
-        "grad-aurora": "linear-gradient(135deg, #2a9d8f 0%, #e9c46a 45%, #f4a261 100%)",
+        "grad-primary": "linear-gradient(135deg, #5B4FE9 0%, #7467F0 52%, #8F8CFF 100%)",
+        "grad-deep": "linear-gradient(135deg, #24176D 0%, #4F3DDB 58%, #7668F3 100%)",
+        "grad-accent": "linear-gradient(135deg, #70D6FF 0%, #8F8CFF 52%, #FF7AB6 100%)",
       },
     },
   },

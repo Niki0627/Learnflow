@@ -10,12 +10,12 @@ import {
     alpha,
     CircularProgress,
     Stack
-} from '@mui/material';
+} from "@/src/components/tailwind/mui";
 import { 
     Google as GoogleIcon, 
     Security as SecurityIcon,
     NavigateNext as NavigateNextIcon
-} from '@mui/icons-material';
+} from "@/src/components/tailwind/icons";
 import { supabase, isSupabaseConfigured } from '../../lib/supabase/client';
 
 const getOAuthRedirectUrl = () => {

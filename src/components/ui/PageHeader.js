@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Chip } from "@mui/material";
+import { Box, Typography, Chip } from "@/src/components/tailwind/mui";
 
 export default function PageHeader({ title, subtitle, badge, actions, sx }) {
   return (
@@ -16,7 +16,13 @@ export default function PageHeader({ title, subtitle, badge, actions, sx }) {
     >
       <Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.75 }}>
-          <Typography variant="h4" sx={{ fontWeight: 800 }}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 900,
+              color: "text.primary",
+            }}
+          >
             {title}
           </Typography>
           {badge ? (
@@ -24,12 +30,12 @@ export default function PageHeader({ title, subtitle, badge, actions, sx }) {
               size="small"
               label={badge}
               color="primary"
-              sx={{ fontWeight: 700, borderRadius: 2 }}
+              sx={{ fontWeight: 800, borderRadius: 999 }}
             />
           ) : null}
         </Box>
         {subtitle ? (
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 550 }}>
             {subtitle}
           </Typography>
         ) : null}

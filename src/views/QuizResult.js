@@ -15,7 +15,7 @@ import {
   LinearProgress,
   Collapse,
   Avatar
-} from '@mui/material';
+} from "@/src/components/tailwind/mui";
 import {
   CheckCircle as CheckCircleIcon,
   Cancel as CancelIcon,
@@ -33,7 +33,7 @@ import {
   Check as CheckIcon,
   Close as CloseIcon,
   Speed as SpeedIcon
-} from '@mui/icons-material';
+} from "@/src/components/tailwind/icons";
 import confetti from 'canvas-confetti';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import API from '../api/api';
@@ -286,7 +286,7 @@ function QuizResult() {
                         </Box>
                         <Typography variant="h3" fontWeight={800}>{streak} <span style={{ fontSize: '1.5rem', fontWeight: 500 }}>Day{streak !== 1 ? 's' : ''}</span></Typography>
                          <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                            {streak > 0 ? 'Keep it up! 🔥' : 'Start your streak today!'}
+                            {streak > 0 ? 'Keep the momentum going.' : 'Start your streak today.'}
                         </Typography>
                     </Paper>
                 </Grid>

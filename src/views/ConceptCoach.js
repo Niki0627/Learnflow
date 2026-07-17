@@ -17,7 +17,7 @@ import {
   Button,
   Drawer,
   Alert,
-} from "@mui/material";
+} from "@/src/components/tailwind/mui";
 import {
   Send as SendIcon,
   Person as PersonIcon,
@@ -38,7 +38,7 @@ import {
   History as HistoryIcon,
   Close as CloseIcon,
   BookmarkBorder as BookmarkIcon,
-} from "@mui/icons-material";
+} from "@/src/components/tailwind/icons";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import API from "../api/api";

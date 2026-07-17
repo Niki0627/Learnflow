@@ -8,7 +8,7 @@ import React, {
 import {
   createTheme,
   ThemeProvider as MUIThemeProvider,
-} from "@mui/material/styles";
+} from "@/src/components/tailwind/mui";
 import { getDesignTokens } from "../theme";
 
 const ColorModeContext = createContext({

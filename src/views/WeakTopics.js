@@ -11,7 +11,7 @@ import {
   Paper,
   CircularProgress,
   Alert,
-} from "@mui/material";
+} from "@/src/components/tailwind/mui";
 import {
   AutoAwesome as AutoAwesomeIcon,
   PlayArrow as PlayArrowIcon,
@@ -19,7 +19,7 @@ import {
   Warning as WarningIcon,
   TrendingDown as TrendingDownIcon,
   Refresh as RefreshIcon,
-} from "@mui/icons-material";
+} from "@/src/components/tailwind/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ActionBar,

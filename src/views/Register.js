@@ -11,14 +11,14 @@ import {
   Stack,
   TextField,
   Typography,
-} from "@mui/material";
+} from "@/src/components/tailwind/mui";
 import {
   ArrowForward as ArrowForwardIcon,
   CheckCircleOutline as CheckCircleOutlineIcon,
   PersonAdd as PersonAddIcon,
   School as SchoolIcon,
   Star as StarIcon,
-} from "@mui/icons-material";
+} from "@/src/components/tailwind/icons";
 import { useAuth } from "../context/AuthContext";
 
 const promises = [

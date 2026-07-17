@@ -6,7 +6,7 @@ import {
     Dialog, DialogActions, DialogContent, DialogTitle,
     Grid, Paper, TextField, Stack, Tab, Tabs, InputAdornment,
     Divider, Tooltip, Fade, Accordion, AccordionSummary, AccordionDetails
-} from '@mui/material';
+} from "@/src/components/tailwind/mui";
 import {
   Add as AddIcon,
   Article as ArticleIcon,
@@ -31,7 +31,7 @@ import {
   Search as SearchIcon,
   VideoFile as VideoIcon,
   AudioFile as AudioIcon,
-} from '@mui/icons-material';
+} from "@/src/components/tailwind/icons";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import NotesSidebar from '../components/NotesSidebar';
@@ -401,7 +401,7 @@ const LectureDetailsModal = ({ open, onClose, lecture, details, detailLecture, l
                                                     '& p': { m: 0, fontSize: '0.8rem', color: 'text.secondary' },
                                                     '& strong': { fontWeight: 700, color: '#f59e0b' },
                                                 }}>
-                                                    <Typography variant="caption" fontWeight={800} color="#f59e0b" display="block" mb={0.5}>💡 Explanation</Typography>
+                                                    <Typography variant="caption" fontWeight={800} color="#f59e0b" display="block" mb={0.5}>Explanation</Typography>
                                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{q.explanation}</ReactMarkdown>
                                                 </Box>
                                             )}
@@ -738,7 +738,7 @@ const UploadPanel = ({ onUploadSuccess }) => {
                     disabled={isDisabled}
                     sx={{ py: 1.5, borderRadius: '10px', fontWeight: 700 }}
                 >
-                    {uploading ? <CircularProgress size={22} color="inherit" /> : '✨ Generate Content'}
+                    {uploading ? <CircularProgress size={22} color="inherit" /> : 'Generate Content'}
                 </Button>
 
                 <Fade in={showSuccess}>

@@ -44,7 +44,7 @@ import {
   ListItemText,
   ListItemIcon,
   CircularProgress,
-} from "@mui/material";
+} from "@/src/components/tailwind/mui";
 import {
   Notifications as NotificationsIcon,
   Schedule as ScheduleIcon,
@@ -62,7 +62,7 @@ import {
   CheckCircle as CheckCircleIcon,
   Whatshot as WhatshotIcon,
   Add as AddIcon,
-} from "@mui/icons-material";
+} from "@/src/components/tailwind/icons";
 import { useAuth } from "../context/AuthContext";
 import API from "../api/api";
 import { LoadingSkeletonPack, SurfaceCard } from "../components/ui";

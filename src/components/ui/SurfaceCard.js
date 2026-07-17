@@ -1,14 +1,23 @@
 import React from "react";
-import { Card, CardContent } from "@mui/material";
+import { Card, CardContent } from "@/src/components/tailwind/mui";
 
 export default function SurfaceCard({ children, sx, contentSx, ...props }) {
   return (
     <Card
       sx={{
-        borderRadius: 2.5,
+        borderRadius: 3,
         border: "1px solid",
-        borderColor: "divider",
-        boxShadow: "0 10px 28px rgba(19,32,58,0.08)",
+        borderColor: "rgba(91,79,233,0.16)",
+        background:
+          "linear-gradient(145deg, rgba(255,255,255,0.88) 0%, rgba(246,244,255,0.72) 100%)",
+        backdropFilter: "blur(18px) saturate(150%)",
+        WebkitBackdropFilter: "blur(18px) saturate(150%)",
+        boxShadow: "0 24px 70px rgba(50,36,184,0.13)",
+        transition: "transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease",
+        "&:hover": {
+          borderColor: "rgba(91,79,233,0.26)",
+          boxShadow: "0 30px 90px rgba(50,36,184,0.18)",
+        },
         ...sx,
       }}
       {...props}
