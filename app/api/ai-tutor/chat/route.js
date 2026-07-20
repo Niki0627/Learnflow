@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { generateAIContent } from "../../../../lib/ai/providers";
 import { readJson } from "../../../../lib/api/errors";
+import { getSupabaseRequestContext } from "../../../../lib/api/auth";
+import { checkRateLimit } from "../../../../lib/api/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -12,6 +14,15 @@ const SYSTEM_PROMPT = `You are Concept Coach AI, an expert personal tutor.
 
 export async function POST(request) {
   try {
+    // Authenticate the request
+    await getSupabaseRequestContext(request);
+
+    // Apply Rate Limiting
+    const rateLimit = await checkRateLimit(request, 10, 60000); // 10 requests per minute
+    if (!rateLimit.success) {
+      return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+    }
+
     const body = await readJson(request);
     const message = typeof body.message === "string" ? body.message.trim() : "";
     const chatHistory = Array.isArray(body.chat_history) ? body.chat_history.slice(-4) : [];
@@ -41,11 +52,14 @@ Concept Coach AI:`, { maxTokens: 1000 });
       model: result.model,
     });
   } catch (error) {
+    console.error("[ai-tutor/chat] Error:", error);
+    
+    // Instead of raw error details, send generic message
     return NextResponse.json({
-      response: `AI error: ${error.message}`,
+      response: "Concept Coach is currently unavailable. Please try again later.",
       hints: [],
       suggestions: [],
       is_error: true,
-    }, { status: error.status || 200 });
+    }, { status: error.status && error.status !== 200 ? error.status : 500 });
   }
 }

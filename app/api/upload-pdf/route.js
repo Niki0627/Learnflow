@@ -6,9 +6,11 @@ import { createSupabaseServiceClient } from "../../../lib/supabase/server";
 
 export const runtime = "nodejs";
 
+const ALLOWED_MIME_TYPES = ["application/pdf", "text/plain"];
+
 /**
- * Upload a PDF to Supabase Storage using the service role client (bypasses RLS/bucket policies).
- * Returns the public URL or null if storage is not configured.
+ * Upload a file to Supabase Storage using the service role client (bypasses RLS/bucket policies).
+ * Returns the storage path or null if storage is not configured.
  */
 async function uploadToStorage(fileBuffer, safeName, contentType) {
   let serviceClient;
@@ -19,9 +21,9 @@ async function uploadToStorage(fileBuffer, safeName, contentType) {
     return null;
   }
 
-  // Auto-create the public bucket if it doesn't exist yet
+  // Auto-create the private bucket if it doesn't exist yet
   try {
-    await serviceClient.storage.createBucket("lectures", { public: true });
+    await serviceClient.storage.createBucket("lectures", { public: false });
   } catch {
     // Bucket already exists — that's fine, ignore
   }
@@ -38,13 +40,7 @@ async function uploadToStorage(fileBuffer, safeName, contentType) {
     return null;
   }
 
-  if (!uploadData?.path) return null;
-
-  const { data: urlData } = serviceClient.storage
-    .from("lectures")
-    .getPublicUrl(uploadData.path);
-
-  return urlData?.publicUrl || null;
+  return uploadData?.path || null;
 }
 
 export async function POST(request) {
@@ -52,6 +48,11 @@ export async function POST(request) {
     const { user, supabase } = await getSupabaseRequestContext(request);
     const formData = await readMultipartFormData(request);
     const file = getRequiredFile(formData);
+
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return Response.json({ error: "Unsupported file type. Only PDF and text files are allowed." }, { status: 400 });
+    }
+
     const title = formData.get("title") || file?.name || "Uploaded Lecture";
 
     // Extract text content for AI study aids
@@ -60,14 +61,13 @@ export async function POST(request) {
     // Upload the actual file to Supabase Storage using the service role client
     const fileBuffer = await file.arrayBuffer();
     const safeName = `${user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-    const filePublicUrl = await uploadToStorage(fileBuffer, safeName, file.type);
+    const filePath = await uploadToStorage(fileBuffer, safeName, file.type);
 
     const payload = {
       user_id: user.id,
       title,
       content,
-      // Only store the URL (not the raw filename) — null means no preview available
-      file_path: filePublicUrl || null,
+      file_path: filePath || null,
     };
 
     const { data, error } = await supabase
@@ -84,7 +84,16 @@ export async function POST(request) {
       throw error;
     }
 
-    return Response.json({ ...data, storageEnabled: Boolean(filePublicUrl) }, { status: 201 });
+    // Return a temporary signed URL for immediate use in the client
+    let signedUrl = filePath;
+    if (filePath) {
+       const { data: urlData } = await createSupabaseServiceClient().storage
+         .from("lectures")
+         .createSignedUrl(filePath, 60 * 60); // 1 hour expiry
+       signedUrl = urlData?.signedUrl || filePath;
+    }
+
+    return Response.json({ ...data, file_path: signedUrl, storageEnabled: Boolean(filePath) }, { status: 201 });
   } catch (error) {
     return apiError(error);
   }

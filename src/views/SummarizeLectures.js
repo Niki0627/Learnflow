@@ -6,7 +6,7 @@ import mermaid from 'mermaid';
 import API from '../api/api';
 import { cn } from '../lib/utils';
 
-mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'loose', fontFamily: 'Inter, sans-serif' });
+mermaid.initialize({ startOnLoad: false, theme: 'dark', securityLevel: 'strict', fontFamily: 'Inter, sans-serif' });
 
 const MermaidDiagram = ({ chart }) => {
   const [svg, setSvg] = useState('');
