@@ -181,7 +181,6 @@ export default function Dashboard() {
   }, []);
 
   const fetchStats = async () => {
-    setLoading(true);
     setStatsError("");
     try {
       const response = await API.get("dashboard/stats/");
