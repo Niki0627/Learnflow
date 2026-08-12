@@ -1,0 +1,49 @@
+import { apiError, getRequestContext } from "@lib/api/auth";
+import { notFound, readJson } from "@lib/api/errors";
+import { isNoRowsError } from "@lib/api/auth";
+
+export const runtime = "nodejs";
+
+const ratingScore: Record<string, number> = { again: 1, hard: 2, good: 3, easy: 4 };
+
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const { user, supabase } = await getRequestContext();
+    const body = await readJson(request);
+    const rating = ratingScore[body.rating] || Number(body.rating || 3);
+
+    const { data: cardRow, error: readError } = await supabase
+      .from("flashcards")
+      .select("*")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+    if (readError) {
+      if (isNoRowsError(readError)) throw notFound("Flashcard not found.");
+      throw readError;
+    }
+    const card: any = cardRow;
+
+    const repetitions = rating >= 3 ? Number(card.repetitions || 0) + 1 : 0;
+    const interval = rating >= 3 ? Math.max(1, Number(card.interval || 0) * rating || 1) : 0;
+    const nextReview = new Date(Date.now() + interval * 86400000).toISOString();
+
+    const { data, error } = await (supabase
+      .from("flashcards") as any)
+      .update({
+        repetitions,
+        interval,
+        ease_factor: Math.max(1.3, Number(card.ease_factor || 2.5) + (rating - 3) * 0.15),
+        next_review_date: nextReview,
+      })
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .select("*")
+      .single();
+    if (error) throw error;
+    return Response.json({ card: data });
+  } catch (error) {
+    return apiError(error);
+  }
+}
