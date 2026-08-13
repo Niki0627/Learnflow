@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../src/index.css";
+import "../styles/globals.css";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 

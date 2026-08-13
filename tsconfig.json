@@ -22,7 +22,6 @@
         "./*"
       ],
       "@lib/*": [
-        "./lib/*",
         "./src/lib/*"
       ],
       "@components/*": [
@@ -34,8 +33,11 @@
       "@context/*": [
         "./src/context/*"
       ],
+      "@utils/supabase/*": [
+        "./src/lib/supabase/*"
+      ],
       "@utils/*": [
-        "./utils/*"
+        "./src/utils/*"
       ],
       "@i18n": [
         "./src/i18n"

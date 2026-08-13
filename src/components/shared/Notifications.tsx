@@ -8,7 +8,7 @@ import {
   Trash2 as DeleteOutlineIcon,
   Circle as CircleIcon,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@context/AuthContext";
 import { api } from "@lib/api-client";
 import type { AppNotification } from "@lib/types";
 

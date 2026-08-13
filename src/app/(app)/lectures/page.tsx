@@ -9,7 +9,7 @@ import {
   FileText, PlayCircle, Loader2, Search, Plus, UploadCloud, X, Check, Trash2,
   Maximize, ExternalLink, CalendarDays, BookOpen, Layers, ChevronLeft, ChevronRight, ZoomIn, ZoomOut
 } from "lucide-react";
-import NotesSidebar from "@/src/components/NotesSidebar";
+import NotesSidebar from "@/src/components/shared/NotesSidebar";
 import { subjectToColor } from "@/src/utils/subjectColors";
 import { api } from "@/src/lib/api-client";
 import { cn } from "@/src/lib/utils";

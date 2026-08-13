@@ -84,7 +84,7 @@ export function AuthProvider({
   useEffect(() => {
     const supabase = createClient();
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange((_event: any, session: any) => {
       if (session?.user) {
         fetchProfile(session.user.id).then((profile) =>
           setUser(hydrateUser(session.user, profile)),

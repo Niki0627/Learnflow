@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { User } from "@supabase/supabase-js";
-import { createClient } from "../../utils/supabase/server";
+import { createClient } from "@utils/supabase/server";
 import { createServiceClient } from "../supabase/service";
 import type { Database } from "../types/database";
 import { ApiError } from "./errors";
