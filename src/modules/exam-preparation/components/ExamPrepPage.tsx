@@ -19,7 +19,7 @@ import {
   Loader2,
   FileText,
 } from "lucide-react";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import {
   fetchSyllabi,
   uploadSyllabus,

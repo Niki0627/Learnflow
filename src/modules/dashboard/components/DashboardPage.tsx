@@ -10,9 +10,9 @@ import {
   Upload, Flame, BrainCircuit, FileText, AlertTriangle, LayoutDashboard, Loader2,
   Trash2, Plus, X,
 } from "lucide-react";
-import { useAuth } from "@/src/core/auth/context";
-import { cn } from "@/src/core/utils/cn";
-import { formatUsername } from "@/src/core/utils/formatUsername";
+import { useAuth } from "@context/AuthContext";
+import { cn } from "@lib/utils";
+import { formatUsername } from "@lib/utils";
 import { fetchDashboardStats, explainWeakTopicApi } from "../api";
 import type { DashboardStats, WeakTopic, WeakTopicExplanation, Todo } from "../types";
 

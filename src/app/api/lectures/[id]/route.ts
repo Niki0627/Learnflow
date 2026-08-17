@@ -1,55 +1,46 @@
-import { apiError, getRequestContext, isNoRowsError } from "@lib/api/auth";
+import { withAuth, isNoRowsError } from "@lib/api/auth";
 import { toLecture } from "@lib/api/learnflow";
 
 export const runtime = "nodejs";
 
-export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
-    const { user, supabase } = await getRequestContext();
-    const { data, error } = await supabase
-      .from("lecture_notes")
-      .select("*, questions(*)")
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .single();
+export const GET = withAuth<{ id: string }>(async ({ user, supabase }, _request, { params }) => {
+  const { id } = await params;
+  const { data, error } = await supabase
+    .from("lecture_notes")
+    .select("*, questions(*)")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .single();
 
-    if (error) {
-      if (isNoRowsError(error)) {
-        return Response.json({ error: "Lecture not found." }, { status: 404 });
-      }
-      throw error;
+  if (error) {
+    if (isNoRowsError(error)) {
+      return Response.json({ error: "Lecture not found." }, { status: 404 });
     }
-
-    const anyData = data as any;
-    return Response.json({ ...toLecture(anyData), questions: anyData.questions || [] });
-  } catch (error) {
-    return apiError(error);
+    throw error;
   }
-}
 
-export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
-    const { user, supabase } = await getRequestContext();
+   
+  const anyData = data as any;
+  return Response.json({ ...toLecture(anyData), questions: anyData.questions || [] });
+});
 
-    const { error, count } = await supabase
-      .from("lecture_notes")
-      .delete({ count: "exact" })
-      .eq("id", id)
-      .eq("user_id", user.id);
+export const DELETE = withAuth<{ id: string }>(async ({ user, supabase }, _request, { params }) => {
+  const { id } = await params;
 
-    if (error) throw error;
+  const { error, count } = await supabase
+    .from("lecture_notes")
+    .delete({ count: "exact" })
+    .eq("id", id)
+    .eq("user_id", user.id);
 
-    if (count === 0) {
-      return Response.json(
-        { error: "Lecture not found or already deleted." },
-        { status: 404 },
-      );
-    }
+  if (error) throw error;
 
-    return Response.json({ ok: true });
-  } catch (error) {
-    return apiError(error);
+  if (count === 0) {
+    return Response.json(
+      { error: "Lecture not found or already deleted." },
+      { status: 404 },
+    );
   }
-}
+
+  return Response.json({ ok: true });
+});

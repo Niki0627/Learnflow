@@ -1,4 +1,4 @@
-import { api } from "@/src/core/api/client";
+import { api } from "@lib/api-client";
 import type { QuizQuestion, QuizLecture } from "./types";
 
 export interface FetchQuestionsParams {

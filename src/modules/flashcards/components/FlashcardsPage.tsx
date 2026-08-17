@@ -7,7 +7,7 @@ import {
   BrainCircuit, Sparkles, ChevronLeft, ChevronRight,
   PlayCircle, Bookmark, CheckCircle2, XCircle, Trophy, RefreshCw,
 } from "lucide-react";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import { fetchLectures, generateFlashcards, fetchFlashcards, reviewFlashcard } from "../api";
 import type { Flashcard, FlashcardLecture } from "../types";
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, BookOpen, Clock, Loader2, Check, Brain } from "lucide-react";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import { fetchQuizLectures } from "../api";
 import type { QuizLecture } from "../types";
 

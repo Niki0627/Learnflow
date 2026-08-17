@@ -9,8 +9,8 @@ import {
   FileText, PlayCircle, Loader2, Search, Plus, UploadCloud, X, Check, Trash2,
   Maximize, ExternalLink, CalendarDays, BookOpen, Layers, ChevronLeft, ChevronRight, ZoomIn, ZoomOut,
 } from "lucide-react";
-import { cn } from "@/src/core/utils/cn";
-import { subjectToColor } from "@/src/core/utils/subjectColors";
+import { cn } from "@lib/utils";
+import { subjectToColor } from "@lib/utils";
 import { NotesSidebar } from "@/src/modules/notes";
 import { useLectures } from "../hooks/useLectures";
 import { uploadTextNote, uploadPDF, reuploadPDF } from "../api";

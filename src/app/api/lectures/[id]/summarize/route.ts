@@ -1,15 +1,23 @@
-import { apiError, getRequestContext } from "@lib/api/auth";
+import { NextResponse } from "next/server";
+import { withAuth } from "@lib/api/auth";
+import { checkRateLimit } from "@lib/api/ratelimit";
 import { generateAIContent } from "@lib/ai/providers";
 import { getOwnedLecture, parseJsonObject } from "@lib/api/learnflow";
 
 export const runtime = "nodejs";
 
-export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params;
-    const { user, supabase } = await getRequestContext();
-    const lecture = await getOwnedLecture(supabase, user.id, id);
-    const prompt = `Summarize this lecture for a student. Return ONLY a JSON object exactly matching this schema:
+export const POST = withAuth<{ id: string }>(async ({ user, supabase }, request, { params }) => {
+  const rateLimit = await checkRateLimit(request, user.id);
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429 },
+    );
+  }
+
+  const { id } = await params;
+  const lecture = await getOwnedLecture(supabase, user.id, id);
+  const prompt = `Summarize this lecture for a student. Return ONLY a JSON object exactly matching this schema:
 {
   "tldr": "A 1-2 sentence extremely brief summary",
   "overview": "A detailed paragraph explaining the main topic.",
@@ -23,41 +31,41 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
 
 Lecture: ${lecture.title}
 ${String(lecture.content || "").slice(0, 12000)}`;
-    let summary: Record<string, any> | null = null;
-    try {
-      const result = await generateAIContent(prompt, { maxTokens: 4000 });
-      summary = parseJsonObject(result.text);
-    } catch {
-      summary = null;
-    }
-    if (!summary || !summary.overview) {
-      summary = {
-        tldr: "Could not generate full summary.",
-        overview: String(lecture.content || lecture.title).slice(0, 900),
-        key_concepts: [
-          {
-            name: lecture.title,
-            description: "Core topic from the lecture.",
-            importance: "high",
-          },
-        ],
-        definitions: [],
-        relationships:
-          "The core concept forms the foundation for understanding this lecture.",
-        exam_bullets: ["Review the main lecture content."],
-        memory_anchors: [],
-        flowchart: `graph TD\nA["${lecture.title.replace(/"/g, "'")}"] --> B["Review notes"]\nB --> C["Practice questions"]`,
-      };
-    }
 
-    await (supabase
-      .from("lecture_notes") as any)
-      .update({ study_notes: summary.overview })
-      .eq("id", lecture.id)
-      .eq("user_id", user.id);
-
-    return Response.json({ summary });
-  } catch (error) {
-    return apiError(error);
+   
+  let summary: Record<string, any> | null = null;
+  try {
+    const result = await generateAIContent(prompt, { maxTokens: 4000 });
+    summary = parseJsonObject(result.text);
+  } catch {
+    summary = null;
   }
-}
+  if (!summary || !summary.overview) {
+    summary = {
+      tldr: "Could not generate full summary.",
+      overview: String(lecture.content || lecture.title).slice(0, 900),
+      key_concepts: [
+        {
+          name: lecture.title,
+          description: "Core topic from the lecture.",
+          importance: "high",
+        },
+      ],
+      definitions: [],
+      relationships:
+        "The core concept forms the foundation for understanding this lecture.",
+      exam_bullets: ["Review the main lecture content."],
+      memory_anchors: [],
+      flowchart: `graph TD\nA["${lecture.title.replace(/"/g, "'")}"] --> B["Review notes"]\nB --> C["Practice questions"]`,
+    };
+  }
+
+   
+  await (supabase
+    .from("lecture_notes") as any)
+    .update({ study_notes: summary.overview })
+    .eq("id", lecture.id)
+    .eq("user_id", user.id);
+
+  return Response.json({ summary });
+});

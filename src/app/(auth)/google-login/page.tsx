@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@utils/supabase/client";
+import { createClient } from "@lib/supabase/client";
 import { GraduationCap, ShieldCheck } from "lucide-react";
 
 const getOAuthRedirectUrl = (): string => {

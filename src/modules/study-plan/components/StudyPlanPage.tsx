@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import { fetchStudyPlanLectures, generateStudyPlan } from "../api";
 import type { StudyPlanResult, GenerateParams, StudyPlanLecture } from "../types";
 

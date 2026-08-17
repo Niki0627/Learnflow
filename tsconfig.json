@@ -24,26 +24,14 @@
       "@modules/*": [
         "./src/modules/*"
       ],
-      "@core/*": [
-        "./src/core/*"
-      ],
       "@lib/*": [
         "./src/lib/*"
       ],
       "@components/*": [
         "./src/components/*"
       ],
-      "@views/*": [
-        "./src/views/*"
-      ],
       "@context/*": [
         "./src/context/*"
-      ],
-      "@utils/supabase/*": [
-        "./src/lib/supabase/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
       ],
       "@i18n": [
         "./src/i18n"

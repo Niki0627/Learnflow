@@ -14,7 +14,7 @@ import {
   CheckCircle,
   FileQuestion,
 } from "lucide-react";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import { fetchAllQuestions } from "../api";
 import type { BankQuestion } from "../types";
 

@@ -5,9 +5,9 @@ import {
   Award, BrainCircuit, Camera, CheckCircle2, Edit, Flame, GraduationCap,
   Link as LinkIcon, Medal, Settings, Share, UserCircle,
 } from "lucide-react";
-import { useAuth } from "@/src/core/auth/context";
-import { cn } from "@/src/core/utils/cn";
-import { formatUsername } from "@/src/core/utils/formatUsername";
+import { useAuth } from "@context/AuthContext";
+import { cn } from "@lib/utils";
+import { formatUsername } from "@lib/utils";
 import { fetchProfile, saveProfile } from "../api";
 import type { ProfileForm, ProfileStats, ProfilePreferences } from "../types";
 

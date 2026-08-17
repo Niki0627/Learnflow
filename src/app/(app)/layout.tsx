@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getUser } from "@utils/supabase/server";
+import { getUser } from "@lib/supabase/server";
 import AppShell from "@/src/components/layout/AppShell";
 
 export default async function AppLayout({

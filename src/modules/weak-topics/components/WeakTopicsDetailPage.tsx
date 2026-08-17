@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { RefreshCw, Loader2, TrendingDown, Play } from "lucide-react";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import { fetchWeakTopics } from "../api";
 import type { WeakTopicItem } from "../types";
 

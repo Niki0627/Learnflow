@@ -21,6 +21,17 @@ const config = [
       "@next/next/no-html-link-for-pages": "off",
       "@next/next/no-img-element": "off",
       "react/no-unescaped-entities": "off",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/src/core/*", "@core/*", "@core", "src/core/*", "@utils/*", "@views/*"],
+              message: "Imports from src/core, @core, @utils, and @views are banned. Use @lib/*, @context/*, or @modules/* instead.",
+            },
+          ],
+        },
+      ],
     },
   },
 ];

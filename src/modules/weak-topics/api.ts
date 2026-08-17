@@ -1,4 +1,4 @@
-import { api } from "@/src/core/api/client";
+import { api } from "@lib/api-client";
 import type { WeakTopicLecture, WeakTopicItem } from "./types";
 
 export async function fetchWeakTopicLectures(): Promise<WeakTopicLecture[]> {

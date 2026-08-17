@@ -9,7 +9,7 @@ import {
   Trophy, CheckCircle, X, Timer, Flame, TrendingUp, Lightbulb,
   ChevronDown, ChevronUp, Sparkles, ArrowRight,
 } from "lucide-react";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import { fetchDashboardStats } from "../api";
 import type { QuizResultData } from "../types";
 

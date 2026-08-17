@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "react-i18next";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import { sendChatMessage } from "../api";
 import type { ChatMessage, ChatSession } from "../types";
 import {
@@ -301,7 +301,6 @@ export default function ConceptCoachPage() {
         setInputValue((prev) => { if (prev.trim()) sendMessage(prev.trim()); return ""; });
       }, 300);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleVoiceError = useCallback((err: string) => {
@@ -321,7 +320,6 @@ export default function ConceptCoachPage() {
       const msg = `Please explain **${autoExplainTopic}**${autoExplainSubject ? ` from ${autoExplainSubject}` : ""} in a clear, comprehensive way.`;
       setTimeout(() => sendMessage(msg), 400);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

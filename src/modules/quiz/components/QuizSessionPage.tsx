@@ -10,7 +10,7 @@ import {
   Loader2,
   CheckCircle,
 } from "lucide-react";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import {
   fetchQuestionsForQuiz,
   generateMCQsForQuiz,

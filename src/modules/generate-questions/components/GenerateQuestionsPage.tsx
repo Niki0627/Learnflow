@@ -17,7 +17,7 @@ import {
   Filter,
   Loader2,
 } from "lucide-react";
-import { cn } from "@/src/core/utils/cn";
+import { cn } from "@lib/utils";
 import { fetchGenerateLectures, generateMCQs, updateQuestion } from "../api";
 import type { Question, GenerateLecture, EditForm } from "../types";
 

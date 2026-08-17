@@ -1,20 +1,22 @@
 # LearnFlow
 
-An AI-powered study workspace built with **Next.js** and **Supabase**. Upload lecture notes, generate quizzes and flashcards, create study plans, prepare for exams, and chat with an AI tutor — all in one place.
+An AI-powered study workspace built with **Next.js 16** (App Router) and **Supabase**. Upload lecture notes, generate quizzes and flashcards, create study plans, prepare for exams, and chat with an AI tutor — all in one place.
 
 ## Tech Stack
 
 | Category       | Technologies                                                                              |
 | -------------- | ----------------------------------------------------------------------------------------- |
 | Framework      | Next.js 16 (App Router, React 19)                                                         |
-| UI             | Material UI, Tailwind CSS 3, shadcn/ui, Framer Motion, Recharts, Lucide + MUI Icons       |
+| UI             | Tailwind CSS 3, Radix UI, Framer Motion, Recharts, Lucide Icons                           |
 | Auth           | Supabase Auth (email/password + Google OAuth)                                             |
-| Database       | Supabase Postgres with Row-Level Security + direct `pg` pool                              |
+| Database       | Supabase Postgres with Row-Level Security (RLS)                                           |
 | AI Providers   | Google Gemini, Sarvam AI, OpenRouter (cascading fallback)                                 |
+| Rate Limiting  | Upstash Redis & Ratelimit (with graceful local fallback)                                  |
 | i18n           | i18next + react-i18next (English, Tamil, Hindi, French)                                   |
-| PDF            | react-pdf, pdfjs-dist, react-dropzone                                                     |
+| PDF Processing | react-pdf, pdfjs-dist, react-dropzone                                                     |
+| Testing        | Node.js Test Runner (Unit) + Playwright (E2E)                                             |
 | Package Mgr    | pnpm 11                                                                                   |
-| Linting        | ESLint 9 (eslint-config-next)                                                             |
+| CI/CD          | GitHub Actions                                                                            |
 
 ## Features
 
@@ -27,29 +29,24 @@ An AI-powered study workspace built with **Next.js** and **Supabase**. Upload le
 - **Weak Topics** — AI-identified weak areas with explanations and targeted practice
 - **Study Plans** — AI-generated study plans with exam date, hours/week, priority topics
 - **Exam Preparation** — Syllabus upload, previous papers, likely question prediction, strategy generation
-- **Concept Coach** — AI tutor chat with Socratic step-by-step guidance
+- **Concept Coach** — AI tutor chat with Socratic step-by-step guidance and voice input
 - **Notifications** — In-app notifications for quiz results, study reminders
 - **Profile** — User profile with school, grade, subjects, preferences
 - **Internationalization** — Full UI in English, Tamil, Hindi, French
 - **Authentication** — Email/password, Google OAuth, protected routes, JWT session management
 
-## Project Architecture
+## Path Aliases
 
-```
-app/[[...slug]]/page.js         ← catch-all Next.js route
-  └── ClientApp.js              ← dynamic client-side entry (ssr: false)
-        └── src/App.js          ← React SPA with react-router-dom
-              ├── Public: /, /login, /register
-              └── Protected: /dashboard, /lectures, /quiz, /flashcards,
-                             /study-plan, /exam-preparation, /concept-coach,
-                             /summarize, /weak-topics, /question-bank, /profile
-                            └── src/views/* (21 page components)
-                                  └── src/components/ui/* (20 reusable components)
-                                        └── src/api/api.js (Axios)
-                                              └── app/api/*/route.js
-                                                    └── lib/api/*, lib/ai/*
-                                                          └── Supabase / PG / AI
-```
+Standardized in `tsconfig.json`:
+
+| Alias | Target Path | Purpose |
+| --- | --- | --- |
+| `@/*` | `./*` | Root relative imports |
+| `@modules/*` | `./src/modules/*` | Feature modules (components, types, api) |
+| `@lib/*` | `./src/lib/*` | Core server/client utilities, API client, Supabase, AI providers |
+| `@components/*` | `./src/components/*` | Shared UI components |
+| `@context/*` | `./src/context/*` | Global React context providers (AuthContext) |
+| `@i18n/*` | `./src/i18n/*` | Localization configuration and locale bundles |
 
 ## Setup
 
@@ -71,15 +68,26 @@ pnpm install
 Copy `.env.example` to `.env.local`:
 
 ```bash
+cp .env.example .env.local
+```
+
+Fill in your Supabase and AI provider credentials:
+
+```bash
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_API_BASE_URL=/api/
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
 
-GEMINI_API_KEY=
-SARVAM_API_KEY=
-OPENROUTER_API_KEY=
+# Required: Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Required: Primary AI
+GEMINI_API_KEY=your-gemini-key
+
+# Optional: Fallback AI providers
+SARVAM_API_KEY=your-sarvam-key
+OPENROUTER_API_KEY=your-openrouter-key
 ```
 
 ### Database
@@ -92,41 +100,59 @@ supabase/schema.sql
 
 This creates 11 tables with Row-Level Security policies and a trigger for new user profile creation.
 
-### Run
+### Development
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:3000](http://localhost:3000).
 
-## Scripts
+## Testing
 
-| Script  | Command        |
-| ------- | -------------- |
-| dev     | `next dev`     |
-| build   | `next build`   |
-| start   | `next start`   |
-| lint    | `eslint .`     |
+```bash
+# Run unit & integration tests
+pnpm test
 
-## Supabase OAuth
+# Run unit tests only
+pnpm test:unit
 
-In your Supabase dashboard under Auth → Providers → Google, add:
+# Run Playwright E2E tests
+pnpm test:e2e
+```
 
-- `http://localhost:3000/auth/callback` (development)
-- Your production callback URL
+## Build & Lint
+
+```bash
+pnpm lint
+pnpm exec tsc --noEmit
+pnpm build
+```
 
 ## Directory Structure
 
-| Path                  | Description                              |
-| --------------------- | ---------------------------------------- |
-| `app/api/`            | Next.js API route handlers (20+ routes)  |
-| `app/auth/`           | Auth callback handler                    |
-| `lib/`                | Server-side logic (AI, DB, API helpers)  |
-| `src/views/`          | Page components (21 views)               |
-| `src/components/ui/`  | Reusable UI components (20)              |
-| `src/context/`        | React context providers (Auth, Theme)    |
-| `src/i18n/locales/`   | Translation files (en, ta, hi, fr)      |
-| `src/api/`            | Axios client with auth interceptor       |
-| `supabase/`           | Database schema and migrations           |
-| `utils/supabase/`     | SSR Supabase client factories            |
+```
+src/
+├── app/                  # Next.js App Router (pages and API routes)
+│   ├── (app)/            # Protected authenticated app views (thin wrappers)
+│   ├── (auth)/           # Authentication pages (login, register, google-login)
+│   └── api/              # API route handlers with withAuth and rate limiting
+├── modules/              # Self-contained feature modules (13 modules)
+│   ├── concept-coach/
+│   ├── dashboard/
+│   ├── exam-preparation/
+│   ├── flashcards/
+│   ├── generate-questions/
+│   ├── lectures/
+│   ├── notes/
+│   ├── profile/
+│   ├── question-bank/
+│   ├── quiz/
+│   ├── study-plan/
+│   ├── summarize/
+│   └── weak-topics/
+├── components/           # Shared global components (Navbar, Header, ProtectedRoute)
+├── context/              # Context providers (AuthContext)
+├── i18n/                 # Localization dictionaries
+└── lib/                  # Central utilities, API client, Supabase, AI fallback
+```

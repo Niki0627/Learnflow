@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { apiError, getRequestContext } from "@lib/api/auth";
+import { withAuth } from "@lib/api/auth";
 import { checkRateLimit } from "@lib/api/ratelimit";
 import { readJson } from "@lib/api/errors";
 import { generateAIContent } from "@lib/ai/providers";
@@ -12,37 +12,35 @@ const SYSTEM_PROMPT = `You are Concept Coach AI, an expert personal tutor.
 - Use markdown for formulas, lists, and key terms.
 - End with a guiding question that keeps the learner thinking.`;
 
-export async function POST(request: Request) {
-  try {
-    const { user } = await getRequestContext();
+export const POST = withAuth(async ({ user }, request) => {
+  const rateLimit = await checkRateLimit(request, user.id);
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429 },
+    );
+  }
 
-    const rateLimit = await checkRateLimit(request, user.id);
-    if (!rateLimit.success) {
-      return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
-        { status: 429 },
-      );
-    }
+  const body = await readJson(request);
+  const message = typeof body.message === "string" ? body.message.trim() : "";
+  const chatHistory: { role: string; content: string }[] = Array.isArray(
+    body.chat_history,
+  )
+    ? body.chat_history.slice(-4)
+    : [];
 
-    const body = await readJson(request);
-    const message = typeof body.message === "string" ? body.message.trim() : "";
-    const chatHistory: { role: string; content: string }[] = Array.isArray(
-      body.chat_history,
+  if (!message) {
+    return NextResponse.json({ error: "Message is required." }, { status: 400 });
+  }
+
+  const context = chatHistory
+    .map(
+      (msg) =>
+        `${msg.role === "assistant" ? "Concept Coach" : "Student"}: ${msg.content || ""}`,
     )
-      ? body.chat_history.slice(-4)
-      : [];
+    .join("\n\n");
 
-    if (!message) {
-      return NextResponse.json({ error: "Message is required." }, { status: 400 });
-    }
-
-    const context = chatHistory
-      .map(
-        (msg) =>
-          `${msg.role === "assistant" ? "Concept Coach" : "Student"}: ${msg.content || ""}`,
-      )
-      .join("\n\n");
-
+  try {
     const result = await generateAIContent(
       `${SYSTEM_PROMPT}
 
@@ -62,7 +60,8 @@ Concept Coach AI:`,
       provider: result.provider,
       model: result.model,
     });
-  } catch (error: any) {
+  } catch (err: unknown) {
+    const error = err as { status?: number };
     return NextResponse.json(
       {
         response: "Concept Coach is currently unavailable. Please try again later.",
@@ -73,4 +72,4 @@ Concept Coach AI:`,
       { status: error?.status && error.status !== 200 ? error.status : 500 },
     );
   }
-}
+});

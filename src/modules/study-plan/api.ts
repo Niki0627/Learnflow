@@ -1,4 +1,4 @@
-import { api } from "@/src/core/api/client";
+import { api } from "@lib/api-client";
 import type { StudyPlanResult, GenerateParams, StudyPlanLecture } from "./types";
 
 export async function fetchStudyPlanLectures(): Promise<StudyPlanLecture[]> {

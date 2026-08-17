@@ -1,4 +1,4 @@
-import { api } from "@/src/core/api/client";
+import { api } from "@lib/api-client";
 import type { Flashcard, FlashcardLecture } from "./types";
 
 export async function fetchLectures(): Promise<FlashcardLecture[]> {
