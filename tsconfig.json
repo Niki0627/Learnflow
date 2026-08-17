@@ -21,6 +21,12 @@
       "@/*": [
         "./*"
       ],
+      "@modules/*": [
+        "./src/modules/*"
+      ],
+      "@core/*": [
+        "./src/core/*"
+      ],
       "@lib/*": [
         "./src/lib/*"
       ],
